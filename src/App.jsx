@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import { useState } from "react";
+import MessagePanel from "./components/Message/MessagePanel";
+import Header from "./components/Header";
+import AppRouter from "./router/AppRouter";
+import ScrollToTop from "./components/ScrollToTop";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [openChats, setOpenChats] = useState([]);
+
+  const handleOpenChat = (friendName) => {
+    if (!openChats.find((chat) => chat.name === friendName)) {
+      setOpenChats([...openChats, { name: friendName }]);
+    }
+  };
+
+  const handleCloseChat = (friendName) => {
+    setOpenChats(openChats.filter((chat) => chat.name !== friendName));
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="bg-gray-100 min-h-screen">
+      <Header />
+      <ScrollToTop />
+      <div className="pt-16">
+        <AppRouter onOpenChat={handleOpenChat} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
 
-export default App
+      <div className="fixed bottom-4 right-4 flex gap-4">
+        {openChats.map((chat, index) => (
+          <MessagePanel
+            key={chat.name}
+            friendName={chat.name}
+            onClose={() => handleCloseChat(chat.name)}
+            positionOffset={index}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
