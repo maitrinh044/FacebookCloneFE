@@ -2,54 +2,72 @@
 import { useState, useEffect } from "react";
 import MessageLayout from "../components/Message/MessageLayout";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getUserFriends } from "../services/userService";
+import { getMessageList } from "../services/MessageService";
+
 
 export default function MessagePage() {
-  const navigate = useNavigate(); // <-- Hook để chuyển trang
+  const navigate = useNavigate();
   const location = useLocation();
-  const { friendName } = location.state || {};
-  const [chatList, setChatList] = useState([
-    {
-      id: 1,
-      name: "An Nguyễn",
-      lastMessage: "Hẹn gặp nhé!",
-      messages: [
-        { text: "Chào bạn!", fromMe: false },
-        { text: "Hi An!", fromMe: true },
-        { text: "Hẹn gặp nhé!", fromMe: false },
-      ],
-    },
-    {
-      id: 2,
-      name: "Bảo Trân",
-      lastMessage: "Tối đi ăn không?",
-      messages: [
-        { text: "Tối đi ăn không?", fromMe: false },
-      ],
-    },
-  ]);
+  const { friend } = location.state || {};
+  const currentUserId = 1;
 
-  const [selectedChat, setSelectedChat] = useState(chatList[0]);
+  const [chatList, setChatList] = useState([]);
+  const [selectedChat, setSelectedChat] = useState( null);
 
+  // Load chat list
   useEffect(() => {
-    if (friendName) {
-      const foundChat = chatList.find(chat => chat.name === friendName);
-      if (foundChat) setSelectedChat(foundChat);
+    const fetchChatList = async () => {
+      try {
+        const friends = await getUserFriends(currentUserId);
+
+        const updatedChatList = await Promise.all(
+          friends.map(async (f) => {
+            const messages = await getMessageList(currentUserId, f.id);
+            const lastMessage = messages.length > 0 ? messages[messages.length - 1] : "Chưa có tin nhắn";
+            return {
+              user: f,
+              lastMessage,
+              messages,
+            };
+          })
+        );
+
+        setChatList(updatedChatList);
+      } catch (error) {
+        console.error("Lỗi khi load chat list:", error);
+      }
+    };
+
+    fetchChatList();
+  }, [currentUserId]);
+
+  // Gán selectedChat theo friend truyền vào sau khi chatList load xong
+  useEffect(() => {
+    if (friend && chatList.length > 0) {
+      const foundChat = chatList.find(chat => chat.user.id === friend.id);
+      if (foundChat) {
+        setSelectedChat(foundChat);
+      }
+    } else if (chatList.length > 0 && !selectedChat) {
+      setSelectedChat(chatList[0]);
     }
-  }, [friendName]);
+  }, [friend, chatList]);
+
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">Tin nhắn</h2>
+    <div className="pt-0 h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+      <div className="flex-1 overflow-y-auto">
+        <MessageLayout
+          chatList={chatList}
+          selectedChat={selectedChat}
+          onSelectChat={setSelectedChat}
+          onUpdateChatList={setChatList}
+          currentUserId={currentUserId}
+        />
       </div>
-      <MessageLayout
-        chatList={chatList}
-        selectedChat={selectedChat}
-        onSelectChat={setSelectedChat}
-        onUpdateChatList={setChatList} // 👈 thêm dòng này
-      />
-
     </div>
   );
+  
+  
 }
-       

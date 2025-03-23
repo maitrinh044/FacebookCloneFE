@@ -1,46 +1,65 @@
 // src/components/MessagePanel.jsx
-import { useState } from "react";
+import { useState, useEffect, useRef} from "react";
+import { useFetchMessages } from "../../utils/useFetchMessage";
+import MessageList from "./MessageList";
+import SendMessageForm from "./SendMessageForm";
+import { addNewMessage } from "../../services/MessageService";
+import { useLocation } from "react-router-dom";
+
 import {
   FaChevronDown,
   FaChevronUp,
-  FaTimes,
+  FaTimes, 
   FaExpand,
   FaPhone,
   FaVideo,
+  FaPaperPlane,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import CallModal from "../Message/CallModal";
 import CallOverlay from "../Message/CallOverlay";
 
-export default function MessagePanel({ friendName, onClose, positionOffset }) {
+export default function MessagePanel({ friend, onClose, positionOffset, currentUserId = 1 }) {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([
-    { from: friendName, text: "Chào bạn!" },
-    { from: "Bạn", text: `Chào ${friendName}!` },
-  ]);
+  const { messageList = [], loading } = useFetchMessages(currentUserId, friend.id);
+  const [localMessages, setLocalMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [isMinimized, setIsMinimized] = useState(false);
-  const [callType, setCallType] = useState(null); // 'voice' hoặc 'video'
+  const [callType, setCallType] = useState(null);
   const [callInfo, setCallInfo] = useState(null);
+  const scrollRef = useRef(null);
 
-  const handleSend = () => {
-    if (inputText.trim() !== "") {
-      setMessages([...messages, { from: "Bạn", text: inputText }]);
-      setInputText("");
+  const avatarUrl = "https://placehold.co/40x40";
+  
+  const inputRef = useRef(null);
+
+  const location = useLocation();
+  useEffect(() => {
+    if (!isMinimized && inputRef.current) {
+      inputRef.current.focus();
     }
-  };
+  }, [isMinimized]);
 
-  const avatarUrl = "https://scontent.fsgn5-6.fna.fbcdn.net/v/t39.30808-6/458161522_2243394162660512_7913931544320209269_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeFE4H0KfJHUauSeB90nsw9jIBJwHuSktOAgEnAe5KS04F5KUxSkb8DlPyoPUcf2mlb9fV6MzqCuAtSLoc7Ay6-A&_nc_ohc=CXoMMnzvULoQ7kNvgEh0ypF&_nc_oc=Adhd1HcZH8ihnu0nOpaHQL9P6zFJqIzADQy2tSGyfmQKeSJV_6Hkf7Xvt4OoxnzJG3Y&_nc_zt=23&_nc_ht=scontent.fsgn5-6.fna&_nc_gid=AQR7ZI_aDJOrecOKCXIigMN&oh=00_AYGQ7t7qCRDcZNQEIHRWgbCoYPYdNv04Mz2JyaDNxAK61w&oe=67D6AB59"; // dùng avatar tạm theo tên
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (container) {
+      // Đảm bảo scroll sau khi DOM thực sự render xong
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          container.scrollTop = container.scrollHeight;
+        });
+      }, 0);
+    }
+  }, [messageList, localMessages]);
+  
+  
+  
 
   const handleCall = (type) => {
-    setCallInfo({
-      type,
-      friendName,
-      avatarUrl,
-    });
+    setCallType(type);
+    setCallInfo({ type, friendName: friend.firstName, avatarUrl });
   };
-  
-  
+
   const handleEndCall = () => setCallInfo(null);
 
   const panelWidth = 320;
@@ -48,78 +67,75 @@ export default function MessagePanel({ friendName, onClose, positionOffset }) {
   const rightOffset = positionOffset * (panelWidth + spacing);
 
   return (
-    <div
-      className="fixed bottom-4 w-80 bg-white shadow-lg rounded-xl border border-gray-300 flex flex-col"
-      style={{ right: `${rightOffset}px` }}
-    >
-      {/* Header */}
-      <div className="bg-blue-600 text-white p-3 rounded-t-xl font-semibold flex justify-between items-center">
-        <span>{friendName}</span>
-        <div className="flex items-center gap-2">
-          <button title="Gọi thoại" onClick={() => handleCall("voice")}>
-            <FaPhone />
-          </button>
-          <button title="Gọi video" onClick={() => handleCall("video")}>
-            <FaVideo />
-          </button>
-          <button onClick={() => setIsMinimized(!isMinimized)}>
-            {isMinimized ? <FaChevronUp /> : <FaChevronDown />}
-          </button>
-          <button
-            onClick={() => navigate("/messages", { state: { friendName } })}
-            title="Mở toàn bộ đoạn chat"
-          >
-            <FaExpand />
-          </button>
-          <button onClick={onClose}>
-            <FaTimes />
-          </button>
-        </div>
-      </div>
-
-      {callType && (
-        <CallModal
-          type={callType}
-          friendName={friendName}
-          onClose={() => setCallType(null)}
-        />
-      )}
-
-      {callInfo && (
-        <CallOverlay
-          friendName={callInfo.friendName}
-          avatarUrl={callInfo.avatarUrl}
-          isVideo={callInfo.type === "video"}
-          onEndCall={() => setCallInfo(null)}
-        />
-      )}
-
-      {!isMinimized && (
-        <>
-          <div className="flex-1 p-3 h-64 overflow-y-auto text-sm">
-            {messages.map((msg, index) => (
-              <div key={index} className="mb-2">
-                <span className="font-semibold">{msg.from}:</span> {msg.text}
-              </div>
-            ))}
+    <>
+    {location.pathname !== "/messages" && (
+      <div
+        className="fixed bottom-4 w-80 bg-white shadow-xl rounded-2xl border border-gray-300 flex flex-col overflow-hidden"
+        style={{ right: `${rightOffset}px` }}
+      >
+        {/* Header */}
+        <div className="bg-blue-600 text-white px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <img
+                src={avatarUrl}
+                alt="avatar"
+                className="w-8 h-8 rounded-full border-2 border-white"
+              />
+              <span
+                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                  friend.online ? "bg-green-500" : "bg-gray-400"
+                }`}
+              />
+            </div>
+            <span>{friend.firstName} {friend.lastName}</span>
           </div>
-          <div className="p-2 border-t flex">
-            <input
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              className="flex-1 px-3 py-1 border border-gray-300 rounded-full text-sm focus:outline-none"
-              placeholder="Nhập tin nhắn..."
-            />
-            <button
-              onClick={handleSend}
-              className="ml-2 px-4 bg-blue-500 text-white rounded-full text-sm"
-            >
-              Gửi
+          <div className="flex items-center gap-2">
+            <button title="Gọi thoại" className="hover:bg-blue-700 p-1 rounded-full" onClick={() => handleCall("voice")}><FaPhone size={14} /></button>
+            <button title="Gọi video" className="hover:bg-blue-700 p-1 rounded-full" onClick={() => handleCall("video")}><FaVideo size={14} /></button>
+            <button className="hover:bg-blue-700 p-1 rounded-full" onClick={() => setIsMinimized(!isMinimized)}>
+              {isMinimized ? <FaChevronUp /> : <FaChevronDown />}
             </button>
+            <button title="Mở toàn bộ đoạn chat" className="hover:bg-blue-700 p-1 rounded-full" onClick={() => navigate("/messages", { state: { friend } })}><FaExpand size={14} /></button>
+            <button className="hover:bg-blue-700 p-1 rounded-full" onClick={onClose}><FaTimes size={14} /></button>
           </div>
-        </>
-      )}
-    </div>
+        </div>
+
+        {callType && <CallModal type={callType} friendName={friend.firstName} onClose={() => setCallType(null)} />}
+        {callInfo && <CallOverlay friendName={callInfo.friendName} avatarUrl={callInfo.avatarUrl} isVideo={callInfo.type === "video"} onEndCall={handleEndCall} />}
+
+        {!isMinimized && (
+          <>
+            {/* Scrollable Message Area */}
+            <div
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto text-sm bg-gray-50 flex flex-col-reverse"
+              style={{ maxHeight: "300px", minHeight: "150px" }}
+            >
+              <MessageList
+                currentUserId={currentUserId}
+                receiverId={friend.id}
+                localMessages={localMessages}
+              />
+            </div>
+            <SendMessageForm
+              senderId={currentUserId}
+              receiverId={friend.id}
+              inputRef={inputRef}
+              onSend={async (msgObj) => {
+                try {
+                  const savedMessage = await addNewMessage(msgObj);
+                  setLocalMessages((prev) => [...prev, savedMessage]);
+                } catch (error) {
+                  console.error("Lỗi gửi tin nhắn:", error);
+                }
+              }}
+            />
+
+          </>
+        )}
+      </div>
+    )}
+    </>
   );
 }

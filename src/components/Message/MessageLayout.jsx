@@ -1,106 +1,119 @@
 // src/components/MessageLayout.jsx
 import { useState, useEffect, useRef } from "react";
+import ChatHeader from "./ChatHeader";
+import SendMessageForm from "./SendMessageForm";
 
-
-export default function MessageLayout({ chatList, selectedChat, onSelectChat, onUpdateChatList }) {
-  const [inputText, setInputText] = useState("");
+export default function MessageLayout({
+  chatList,
+  selectedChat,
+  onSelectChat,
+  onUpdateChatList,
+  currentUserId,
+}) {
   const messagesEndRef = useRef(null);
-
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [selectedChat?.messages]);
-  
 
-  const handleSend = () => {
-    if (inputText.trim() === "") return;
-
-    const newMessage = { text: inputText, fromMe: true };
-
-    // ✅ Cập nhật danh sách chat
+  const handleSend = (newMessage) => {
     const updatedChatList = chatList.map((chat) => {
-      if (chat.id === selectedChat.id) {
+      if (chat.id === selectedChat.user.id) {
         return {
           ...chat,
           messages: [...chat.messages, newMessage],
-          lastMessage: newMessage.text,
+          lastMessage: {
+            content: newMessage.content,
+            senderId: newMessage.senderId.id,
+            senderName: "Bạn", // hoặc lấy từ current user nếu cần
+          },
         };
       }
       return chat;
     });
 
-    // ✅ Truyền danh sách mới về cho MessagePage để cập nhật state
     onUpdateChatList(updatedChatList);
-
-    // ✅ Cập nhật lại selectedChat (nếu cần giữ đồng bộ)
     onSelectChat({
       ...selectedChat,
       messages: [...selectedChat.messages, newMessage],
     });
-
-    setInputText("");
   };
 
   return (
-    <div className="flex bg-white shadow rounded-xl overflow-hidden h-[70vh]">
+    <div className="flex bg-white shadow overflow-hidden h-full w-full">
       {/* Sidebar danh sách chat */}
-      <div className="w-1/3 border-r p-4 overflow-y-auto">
+      <div className="w-1/4 border-r p-4 overflow-y-auto">
         <h4 className="text-gray-500 text-sm mb-3 font-semibold">Cuộc trò chuyện</h4>
         <ul className="space-y-2">
           {chatList.map((chat) => (
             <li
-              key={chat.id}
-              className={`p-3 rounded-lg cursor-pointer hover:bg-gray-100 ${
-                chat.id === selectedChat.id ? "bg-blue-100 font-semibold" : ""
-              }`}
-              onClick={() => onSelectChat(chat)}
-            >
-              <div className="text-base">{chat.name}</div>
+            key={chat.user.id}
+            className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-100 ${
+              chat.user.id === selectedChat?.user.id ? "bg-blue-100 font-semibold" : ""
+            }`}
+            onClick={() => onSelectChat(chat)}
+          >
+            <div className="relative">
+              <img
+                src={chat.avatar || "https://placehold.co/40x40"}
+                alt={chat.name}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <span
+                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border border-white ${
+                  chat.user.online ? "bg-green-500" : "bg-gray-400"
+                }`}
+              ></span>
+            </div>
+            <div className="flex flex-col">
+              <div className="text-base">{chat.user.firstName} {chat.user.lastName}</div>
               <div className="text-sm text-gray-500 truncate">
-                {chat.lastMessage}
+                {chat.lastMessage.content
+                  ? chat.lastMessage?.senderId === currentUserId
+                    ? `Bạn: ${chat.lastMessage?.content}`
+                    : `${chat.lastMessage.senderId?.firstName}: ${chat.lastMessage?.content}`
+                  : ""}
               </div>
-            </li>
+            </div>
+          </li>
           ))}
         </ul>
       </div>
 
       {/* Nội dung chat */}
-      <div className="w-2/3 flex flex-col">
-        <div className="flex-1 p-4 overflow-y-auto space-y-2 text-sm">
-          {selectedChat?.messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`max-w-xs px-3 py-2 rounded-lg ${
-                msg.fromMe
-                  ? "bg-blue-500 text-white ml-auto"
-                  : "bg-gray-100 text-gray-800"
-              }`}
-            >
-              {msg.text}
+      <div className="w-3/4 flex flex-col">
+        {selectedChat && (
+          <>
+            <ChatHeader chatUser={selectedChat} />
+            <div className="flex-1 p-4 overflow-y-auto space-y-2 text-sm">
+              {selectedChat.messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`max-w-xs px-3 py-2 rounded-lg transition-all duration-200 ease-in-out ${
+                    msg.senderId.id === currentUserId
+                      ? "bg-blue-500 text-white ml-auto"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {msg.content}
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
             </div>
-          ))}
-          <div ref={messagesEndRef} /> {/* 👈 Đây là điểm cuộn xuống cuối */}
-        </div>
 
-        <div className="border-t p-3 flex">
-          <input
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none"
-            placeholder="Nhập tin nhắn..."
-          />
-          <button
-            onClick={handleSend}
-            className="ml-2 px-4 bg-blue-500 text-white rounded-full text-sm hover:bg-blue-600"
-          >
-            Gửi
-          </button>
-        </div>
+            {/* ✅ Gọi SendMessageForm ở đây */}
+            <SendMessageForm
+              onSend={handleSend}
+              senderId={currentUserId}
+              receiverId={selectedChat.user.id}
+              inputRef={inputRef}
+            />
+          </>
+        )}
       </div>
     </div>
   );
 }
-
