@@ -1,32 +1,55 @@
-// src/components/PostList.jsx
+import { useState } from "react";
 import PostItem from "../Post/PostItem";
+import CreatePost from "../Post/CreatePost";
 
 const samplePosts = [
   {
     id: 1,
     username: "An Nguyễn",
-    userAvatar: "https://scontent.fsgn5-6.fna.fbcdn.net/v/t39.30808-6/458161522_2243394162660512_7913931544320209269_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeFE4H0KfJHUauSeB90nsw9jIBJwHuSktOAgEnAe5KS04F5KUxSkb8DlPyoPUcf2mlb9fV6MzqCuAtSLoc7Ay6-A&_nc_ohc=CXoMMnzvULoQ7kNvgEh0ypF&_nc_oc=Adhd1HcZH8ihnu0nOpaHQL9P6zFJqIzADQy2tSGyfmQKeSJV_6Hkf7Xvt4OoxnzJG3Y&_nc_zt=23&_nc_ht=scontent.fsgn5-6.fna&_nc_gid=AQR7ZI_aDJOrecOKCXIigMN&oh=00_AYGQ7t7qCRDcZNQEIHRWgbCoYPYdNv04Mz2JyaDNxAK61w&oe=67D6AB59",
+    userAvatar: "https://via.placeholder.com/40",
     time: "2 giờ trước",
     content: "Hôm nay trời đẹp quá!",
-    image: "https://scontent.fsgn5-6.fna.fbcdn.net/v/t39.30808-6/458161522_2243394162660512_7913931544320209269_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeFE4H0KfJHUauSeB90nsw9jIBJwHuSktOAgEnAe5KS04F5KUxSkb8DlPyoPUcf2mlb9fV6MzqCuAtSLoc7Ay6-A&_nc_ohc=CXoMMnzvULoQ7kNvgEh0ypF&_nc_oc=Adhd1HcZH8ihnu0nOpaHQL9P6zFJqIzADQy2tSGyfmQKeSJV_6Hkf7Xvt4OoxnzJG3Y&_nc_zt=23&_nc_ht=scontent.fsgn5-6.fna&_nc_gid=AQR7ZI_aDJOrecOKCXIigMN&oh=00_AYGQ7t7qCRDcZNQEIHRWgbCoYPYdNv04Mz2JyaDNxAK61w&oe=67D6AB59",
-    likes: 3,
+    image: "https://via.placeholder.com/300",
   },
   {
     id: 2,
     username: "Bảo Trân",
-    userAvatar: "https://scontent.fsgn5-6.fna.fbcdn.net/v/t39.30808-6/458161522_2243394162660512_7913931544320209269_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeFE4H0KfJHUauSeB90nsw9jIBJwHuSktOAgEnAe5KS04F5KUxSkb8DlPyoPUcf2mlb9fV6MzqCuAtSLoc7Ay6-A&_nc_ohc=CXoMMnzvULoQ7kNvgEh0ypF&_nc_oc=Adhd1HcZH8ihnu0nOpaHQL9P6zFJqIzADQy2tSGyfmQKeSJV_6Hkf7Xvt4OoxnzJG3Y&_nc_zt=23&_nc_ht=scontent.fsgn5-6.fna&_nc_gid=AQR7ZI_aDJOrecOKCXIigMN&oh=00_AYGQ7t7qCRDcZNQEIHRWgbCoYPYdNv04Mz2JyaDNxAK61w&oe=67D6AB59",
+    userAvatar: "https://via.placeholder.com/40",
     time: "1 giờ trước",
     content: "Mọi người đã xem bộ phim mới chưa?",
     image: "",
-    likes: 1,
   },
 ];
 
 export default function PostList() {
+  const [posts, setPosts] = useState(samplePosts);
+
+  const handlePostCreated = (newPost) => {
+    setPosts([newPost, ...posts]);
+  };
+
+  const handleSharePost = (sharedContent) => {
+    const originalPost = posts.find(p => p.id === posts.id); // Đảm bảo bạn có logic lấy post gốc phù hợp
+    const sharedPost = {
+      ...originalPost,
+      id: Date.now(),
+      sharedBy: "Người dùng hiện tại",
+      sharedContent,
+      sharedTime: "Vừa xong",
+      isShared: true
+    };
+    setPosts([sharedPost, ...posts]);
+  };
+
   return (
     <div>
-      {samplePosts.map((post) => (
-        <PostItem key={post.id} post={post} />
+      <CreatePost onPostCreated={handlePostCreated} />
+      {posts.map((post) => (
+        <PostItem 
+          key={post.id} 
+          post={post} 
+          onShare={handleSharePost}
+        />
       ))}
     </div>
   );
