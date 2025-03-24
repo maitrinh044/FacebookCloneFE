@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaThumbsUp, FaRegCommentDots, FaShare } from "react-icons/fa";
 import SharePost from "./SharePost";
+import { Avatar } from "antd";
 
 export default function PostItem({ post, onShare }) {
   const [isLiked, setIsLiked] = useState(false);
@@ -95,7 +96,7 @@ export default function PostItem({ post, onShare }) {
         {comments.map((comment) => (
           <div key={comment.id} className="flex items-center gap-2 mt-2">
             <img
-              src="https://via.placeholder.com/30"
+              src="../../../src/assets/img/facebook.jpg"
               alt="avatar"
               className="w-6 h-6 rounded-full object-cover"
             />
@@ -111,7 +112,7 @@ export default function PostItem({ post, onShare }) {
       {/* Form thêm bình luận */}
       <div className="mt-4 flex items-center gap-2">
         <img
-          src="https://via.placeholder.com/30"
+          src="../../../src/assets/img/facebook.jpg"
           alt="avatar"
           className="w-6 h-6 rounded-full object-cover"
         />
@@ -142,7 +143,7 @@ export default function PostItem({ post, onShare }) {
           onClose={() => setShowShareModal(false)}
           onShare={handleSharePost}
           currentUser={{
-            avatar: "https://via.placeholder.com/40",
+            avatar: "../../../src/assets/img/facebook.jpg",      
             name: "Người dùng hiện tại"
           }}
         />

@@ -31,7 +31,7 @@ export default function CreatePost({ onPostCreated }) {
       const newPost = {
         id: Date.now(),
         username: "Người dùng",
-        userAvatar: "https://via.placeholder.com/40",
+        userAvatar: "../../../src/assets/img/facebook.jpg",
         time: "Vừa xong",
         content: postContent,
         image: imagePreview || "",
@@ -50,7 +50,7 @@ export default function CreatePost({ onPostCreated }) {
     <div className="bg-white rounded-xl shadow-md p-4 mb-4">
       <div className="flex items-center gap-3 mb-3">
         <img
-          src="https://via.placeholder.com/40"
+          src="../../../src/assets/img/facebook.jpg"
           alt="User Avatar"
           className="w-10 h-10 rounded-full object-cover"
         />

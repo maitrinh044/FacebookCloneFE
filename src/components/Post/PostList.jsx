@@ -6,15 +6,15 @@ const samplePosts = [
   {
     id: 1,
     username: "An Nguyễn",
-    userAvatar: "https://via.placeholder.com/40",
+    userAvatar: "../../../src/assets/img/facebook.jpg",
     time: "2 giờ trước",
     content: "Hôm nay trời đẹp quá!",
-    image: "https://via.placeholder.com/300",
+    image: "../../../src/assets/img/facebook.jpg",
   },
   {
     id: 2,
     username: "Bảo Trân",
-    userAvatar: "https://via.placeholder.com/40",
+    userAvatar: "../../../src/assets/img/facebook.jpg",
     time: "1 giờ trước",
     content: "Mọi người đã xem bộ phim mới chưa?",
     image: "",
