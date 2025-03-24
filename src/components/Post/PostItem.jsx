@@ -1,7 +1,9 @@
+// src/components/PostItem.jsx
+
 import { useState } from "react";
 import { FaThumbsUp, FaRegCommentDots, FaShare } from "react-icons/fa";
 import SharePost from "./SharePost";
-import { Avatar } from "antd";
+import ReactionPopup from "./ReactionPopup";
 
 export default function PostItem({ post, onShare }) {
   const [isLiked, setIsLiked] = useState(false);
@@ -10,14 +12,26 @@ export default function PostItem({ post, onShare }) {
   const [newComment, setNewComment] = useState("");
   const [showShareModal, setShowShareModal] = useState(false);
 
+  const [selectedReaction, setSelectedReaction] = useState(null);
+  const [showReactionPopup, setShowReactionPopup] = useState(false);
+
   const handleLike = () => {
-    if (isLiked) {
-      setLikeCount(prev => prev - 1);
+    const defaultReaction = { id: "like", emoji: "👍", label: "Thích" };
+    if (selectedReaction?.id === "like") {
+      setSelectedReaction(null);
+      setLikeCount((prev) => prev - 1);
     } else {
-      setLikeCount(prev => prev + 1);
+      setSelectedReaction(defaultReaction);
+      setLikeCount((prev) => prev + 1);
     }
-    setIsLiked(!isLiked);
   };
+
+  const handleSelectReaction = (reaction) => {
+    if (!selectedReaction) setLikeCount((prev) => prev + 1);
+    setSelectedReaction(reaction);
+    setShowReactionPopup(false);
+  };
+  
 
   const handleAddComment = () => {
     if (newComment.trim()) {
@@ -45,6 +59,17 @@ export default function PostItem({ post, onShare }) {
     setShowShareModal(false);
   };
 
+  let reactionTimeout;
+  const handleMouseEnter = () => {
+    clearTimeout(reactionTimeout);
+    setShowReactionPopup(true);
+  };
+
+  const handleMouseLeave = () => {
+    reactionTimeout = setTimeout(() => setShowReactionPopup(false), 300);
+  };
+
+
   return (
     <div className="bg-white rounded-xl shadow p-4 mb-4">
       {/* Header bài viết */}
@@ -69,13 +94,29 @@ export default function PostItem({ post, onShare }) {
 
       {/* Action buttons */}
       <div className="mt-3 flex gap-6 text-gray-600 text-sm border-t pt-2">
-        <button 
-          className={`flex items-center gap-1 transition ${isLiked ? "text-blue-500" : ""}`}
-          onClick={handleLike}
+        <div
+          className="relative"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
-          <FaThumbsUp className={isLiked ? "text-blue-500" : ""} />
-          Thích
-        </button>
+          {/* Nút Like */}
+          <button
+            className={`flex items-center gap-1 transition ${selectedReaction ? "text-blue-500 font-semibold" : ""}`}
+            onClick={handleLike}
+          >
+            <span>{selectedReaction ? selectedReaction.emoji : <FaThumbsUp />}</span>
+            {selectedReaction ? selectedReaction.label : "Thích"}
+          </button>
+
+          {/* Popup cảm xúc */}
+          {showReactionPopup && (
+            <div className="absolute bottom-full left-0 z-50">
+              <ReactionPopup onSelect={handleSelectReaction} />
+            </div>
+          )}
+        </div>
+
+
 
         <button className="flex items-center gap-1 hover:text-blue-600 transition">
           <FaRegCommentDots />
