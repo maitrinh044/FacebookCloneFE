@@ -1,0 +1,39 @@
+.custom-nav-btn {
+    width: 30px !important;
+    height: 30px !important;
+    background-color: rgba(201, 200, 200, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.custom-nav-btn-editprl {
+    width: 40px !important; /* Đặt kích thước chuẩn */
+    height: 40px !important;
+    background-color: rgba(201, 200, 200, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Thu nhỏ icon */
+.swiper-button-prev::after,
+.swiper-button-next::after {
+    font-size: 14px !important;
+    color: white !important;
+}
+
+/* Ẩn nút prev ban đầu */
+.swiper-button-prev.hidden,
+.swiper-button-next.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
