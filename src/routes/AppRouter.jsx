@@ -5,9 +5,9 @@ import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
 import Messages from "../pages/MessagePage";
 import EditProfilePage from "../pages/EditProfilePage";
-import FriendListPage from "../pages/FriendListPage";
-import FriendRequests from "../pages/FriendRequests";
-import FriendSuggestions from "../pages/FriendSuggestions"; // Đã sửa tên import
+import FriendListPage from "../components/FriendList/FriendListPage";
+import FriendRequests from "../components/FriendList/FriendRequests";
+import FriendSuggestions from "../components/FriendList/FriendSuggestions";
 import AuthLayout from "../Layout/AuthLayout";
 import MainLayout from "../Layout/MainLayout";
 
@@ -23,9 +23,11 @@ export default function AppRouter({ onOpenChat }) {
       <Route path="/profile/:id" element={<MainLayout><ProfilePage /></MainLayout>} />
       <Route path="/messages" element={<MainLayout><Messages /></MainLayout>} />
       <Route path="/profile/:userId/edit" element={<MainLayout><EditProfilePage /></MainLayout>} />
+      
+      {/* Friends Routes */}
       <Route path="/friends" element={<MainLayout><FriendListPage /></MainLayout>} />
       <Route path="/friend-requests" element={<MainLayout><FriendRequests /></MainLayout>} />
-      <Route path="/suggestions" element={<MainLayout><FriendSuggestions /></MainLayout>} /> {/* Đã sửa path */}
+      <Route path="/suggestions" element={<MainLayout><FriendSuggestions /></MainLayout>} />
     </Routes>
   );
 }

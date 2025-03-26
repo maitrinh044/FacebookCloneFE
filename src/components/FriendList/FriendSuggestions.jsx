@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaUserPlus, FaTimes, FaUserCheck } from "react-icons/fa";
 import { message } from "antd";
-import Sidebar from "../components/FriendList/Sidebar";
+import Sidebar from "./Sidebar";
 
 const mockSuggestions = [
   { id: 1, name: "Nguyễn Văn A", mutualFriends: 4, avatar: "https://i.pravatar.cc/150?img=1", status: "suggested" },

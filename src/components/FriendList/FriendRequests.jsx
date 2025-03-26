@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaUserCheck, FaUserTimes } from "react-icons/fa";
 import { message } from "antd";
-import Sidebar from "../components/FriendList/Sidebar";
+import Sidebar from "./Sidebar";
 
 const mockFriendRequests = [
   { id: 1, name: "Mỹ Trân", mutuals: 5, avatar: "https://i.pravatar.cc/150?img=1" },

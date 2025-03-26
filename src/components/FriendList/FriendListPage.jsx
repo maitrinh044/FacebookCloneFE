@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaRegCommentDots, FaUserTimes, FaUserLock, FaUserSlash, FaSearch } from "react-icons/fa";
 import { message } from "antd";
-import Sidebar from "../components/FriendList/Sidebar";
+import Sidebar from "./Sidebar";
 
 const mockFriends = [
   { id: 1, name: "Mai Thị Thương", mutuals: 8, avatar: "https://i.pravatar.cc/150?img=1" },
