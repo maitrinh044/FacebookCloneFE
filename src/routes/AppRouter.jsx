@@ -1,4 +1,3 @@
-// src/router/AppRouter.jsx
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import LoginPage from "../pages/LoginPage";
@@ -6,10 +5,9 @@ import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
 import Messages from "../pages/MessagePage";
 import EditProfilePage from "../pages/EditProfilePage";
-import FriendListPage from "../pages/FriendListPage";
+import FriendsPage from "../pages/FriendsPage"; // Đã đổi tên từ FriendListPage
 import AuthLayout from "../Layout/AuthLayout";
 import MainLayout from "../Layout/MainLayout";
-import Header from "../components/Header";
 
 export default function AppRouter({ onOpenChat }) {
   return (
@@ -23,7 +21,14 @@ export default function AppRouter({ onOpenChat }) {
       <Route path="/profile/:id" element={<MainLayout><ProfilePage /></MainLayout>} />
       <Route path="/messages" element={<MainLayout><Messages /></MainLayout>} />
       <Route path="/profile/:userId/edit" element={<MainLayout><EditProfilePage /></MainLayout>} />
-      <Route path="/friends" element={<MainLayout><FriendListPage /></MainLayout>} />
+      
+      {/* Friends Routes */}
+      <Route path="/friends" element={<MainLayout><FriendsPage /></MainLayout>}>
+        <Route index element={<AllFriends />} />
+        <Route path="all" element={<AllFriends />} />
+        <Route path="requests" element={<FriendRequests />} />
+        <Route path="suggestions" element={<FriendSuggestions />} />
+      </Route>
     </Routes>
   );
 }
