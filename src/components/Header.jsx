@@ -4,54 +4,54 @@ import {
   FaBell,
   FaSearch,
   FaFacebookMessenger,
-  FaUserCircle, 
-  FaSignOutAlt, 
-  FaCog 
+  FaUserCircle,
+  FaSignOutAlt,
+  FaCog,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import MessagePopup from "./Message/MessagePopup";
+import NotificationPopup from "./Notification/NotificationPopup";
 
 export default function Header() {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [isRead, setIsRead] = useState(false);
-  const notificationRef = useRef(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showMessagePopup, setShowMessagePopup] = useState(false);
+
+  const notificationRef = useRef(null);
   const profileRef = useRef(null);
-  const iconRef = useRef(null);
 
-  // Giả lập danh sách thông báo
+  // Danh sách thông báo giả lập
   const notifications = [
-    { message: "Bình luận mới từ An Nguyễn", time: "2 phút trước" },
-    { message: "Dũng đã thích bài viết của bạn", time: "10 phút trước" },
-    { message: "Chi đã gửi lời mời kết bạn", time: "1 giờ trước" },
+    {
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+      name: "An Nguyễn",
+      message: "đã bình luận về bài viết của bạn.",
+      time: "2 phút trước",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      name: "Dũng Trần",
+      message: "đã thích bài viết của bạn.",
+      time: "10 phút trước",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/30.jpg",
+      name: "Chi Nguyễn",
+      message: "đã gửi cho bạn lời mời kết bạn.",
+      time: "1 giờ trước",
+      action: { accept: "Xác nhận", reject: "Xóa" },
+    },
   ];
-
-  const friendList = [
-    { id: 1, name: "Nguyễn An" },
-    { id: 2, name: "Trần Dũng" },
-    { id: 3, name: "Lê Chi" },
-  ];
-
-  
   const unreadCount = notifications.length;
 
+  // Đóng menu khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target)
-      ) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileMenu(false);
       }
@@ -60,21 +60,10 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleNotificationClick = () => {
-    setShowNotifications(!showNotifications);
-    setIsRead(true); // Đánh dấu đã đọc
-  };
-
+  // Xử lý đăng xuất
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
-  };
-
-  // Mở FriendListPopup khi click vào icon tin nhắn
-  const [showMessagePopup, setShowMessagePopup] = useState(false);
-
-  const handleMessageIconClick = () => {
-    setShowMessagePopup(!showMessagePopup);
   };
 
   return (
@@ -94,106 +83,55 @@ export default function Header() {
         </div>
       </div>
 
+      {/* Icons Section */}
       <div className="flex gap-4 items-center relative">
-        <button
-          onClick={() => navigate("/friends")}
-          className="p-2 rounded-full hover:bg-gray-100 flex items-center justify-center"
-        >
+        <button onClick={() => navigate("/friends")} className="p-2 rounded-full hover:bg-gray-100">
           <FaUserFriends className="text-xl text-gray-700" />
         </button>
 
-        {/* Message Icon */}
+        {/* Messenger Icon */}
         <div className="relative">
-            <button
-              onClick={handleMessageIconClick}
-              className="p-2 rounded-full hover:bg-gray-100 flex items-center justify-center"
-            >
-              <FaFacebookMessenger className="text-xl text-gray-700" />
-            </button>
-
-            {/* Hiển thị MessagePopup nếu trạng thái showMessagePopup là true */}
-            {showMessagePopup && (
-              <MessagePopup
-                onClose={() => setShowMessagePopup(false)}  // Đóng popup khi nhấn X
-                friendList={friendList}  // Truyền danh sách bạn bè vào MessagePopup
-              />
-            )}
-          </div>
+          <button onClick={() => setShowMessagePopup(!showMessagePopup)} className="p-2 rounded-full hover:bg-gray-100">
+            <FaFacebookMessenger className="text-xl text-gray-700" />
+          </button>
+          {showMessagePopup && <MessagePopup onClose={() => setShowMessagePopup(false)} />}
+        </div>
 
         {/* Notification Icon */}
         <div className="relative" ref={notificationRef}>
-          <button
-            onClick={handleNotificationClick}
-            className="p-2 rounded-full hover:bg-gray-100 flex items-center justify-center relative"
-          >
+          <button onClick={() => setShowNotifications(!showNotifications)} className="p-2 rounded-full hover:bg-gray-100 relative">
             <FaBell className="text-xl text-gray-700" />
-            {!isRead && unreadCount > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center animate-shake">
                 {unreadCount}
               </span>
             )}
           </button>
-
-          {/* Dropdown notifications */}
-          {showNotifications && (
-            <div className="absolute right-0 top-12 w-64 bg-white shadow-lg rounded-xl border border-gray-200 z-50">
-              <h4 className="p-3 font-semibold text-gray-700 border-b">
-                Thông báo
-              </h4>
-              <ul className="max-h-64 overflow-y-auto">
-                {notifications.map((noti, index) => (
-                  <li
-                    key={index}
-                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                  >
-                    <div>{noti.message}</div>
-                    <div className="text-xs text-gray-400">{noti.time}</div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {showNotifications && <NotificationPopup notifications={notifications} onClose={() => setShowNotifications(false)} />}
         </div>
 
         {/* Avatar Dropdown Menu */}
         <div className="relative" ref={profileRef}>
-          <button
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="p-2 rounded-full hover:bg-gray-100 flex items-center justify-center"
-          >
+          <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="p-2 rounded-full hover:bg-gray-100">
             <FaUserCircle className="text-2xl text-gray-700" />
           </button>
-
           {showProfileMenu && (
             <div className="absolute right-0 top-12 w-48 bg-white shadow-lg rounded-xl border border-gray-200 z-50">
               <ul className="text-sm text-gray-700">
-                <li
-                  className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => navigate("/profile/1")}
-                >
-                  <FaUserCircle />
-                  Hồ sơ cá nhân
+                <li onClick={() => navigate("/profile/1")} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer">
+                  <FaUserCircle /> Hồ sơ cá nhân
                 </li>
-                <li
-                  className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => navigate("/settings")}
-                >
-                  <FaCog />
-                  Cài đặt
+                <li onClick={() => navigate("/settings")} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer">
+                  <FaCog /> Cài đặt
                 </li>
-                <li
-                  className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-500"
-                  onClick={handleLogout}
-                >
-                  <FaSignOutAlt />
-                  Đăng xuất
+                <li onClick={handleLogout} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-500">
+                  <FaSignOutAlt /> Đăng xuất
                 </li>
               </ul>
             </div>
           )}
         </div>
       </div>
-
     </div>
   );
 }
