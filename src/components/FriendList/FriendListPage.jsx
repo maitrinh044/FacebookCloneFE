@@ -9,7 +9,7 @@ const mockFriends = [
   { id: 3, name: "Có Hoàng", mutuals: 3, avatar: "https://i.pravatar.cc/150?img=3" },
 ];
 
-export default function AllFriends() {
+export default function FriendListPage() {
   const [friends, setFriends] = useState(mockFriends);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
