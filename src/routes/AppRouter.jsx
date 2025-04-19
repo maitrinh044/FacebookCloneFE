@@ -10,6 +10,8 @@ import FriendRequests from "../components/FriendList/FriendRequests";
 import FriendSuggestions from "../components/FriendList/FriendSuggestions";
 import AuthLayout from "../Layout/AuthLayout";
 import MainLayout from "../Layout/MainLayout";
+import GroupPage from "../pages/GroupPage";
+import PrivateRoute from "./PrivateRoute";
 
 export default function AppRouter({ onOpenChat }) {
   return (
@@ -18,16 +20,22 @@ export default function AppRouter({ onOpenChat }) {
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
       <Route path="/register" element={<AuthLayout><RegisterPage /></AuthLayout>} />
 
-      {/* Main Routes - CÓ Header */}
-      <Route path="/" element={<MainLayout><Home onOpenChat={onOpenChat} /></MainLayout>} />
-      <Route path="/profile/:id" element={<MainLayout><ProfilePage /></MainLayout>} />
-      <Route path="/messages" element={<MainLayout><Messages /></MainLayout>} />
-      <Route path="/profile/:userId/edit" element={<MainLayout><EditProfilePage /></MainLayout>} />
-      
-      {/* Friends Routes */}
-      <Route path="/friends" element={<MainLayout><FriendListPage /></MainLayout>} />
-      <Route path="/friend-requests" element={<MainLayout><FriendRequests /></MainLayout>} />
-      <Route path="/suggestions" element={<MainLayout><FriendSuggestions /></MainLayout>} />
+      {/* Protected Routes - CÓ Header */}
+      <Route element={<PrivateRoute />}>
+        <Route path="/" element={<MainLayout><Home onOpenChat={onOpenChat} /></MainLayout>} />
+        <Route path="/profile/:id" element={<MainLayout><ProfilePage /></MainLayout>} />
+        <Route path="/messages" element={<MainLayout><Messages /></MainLayout>} />
+        <Route path="/profile/:userId/edit" element={<MainLayout><EditProfilePage /></MainLayout>} />
+
+        {/* Friends */}
+        <Route path="/friends" element={<MainLayout><FriendListPage /></MainLayout>} />
+        <Route path="/friend-requests" element={<MainLayout><FriendRequests /></MainLayout>} />
+        <Route path="/suggestions" element={<MainLayout><FriendSuggestions /></MainLayout>} />
+
+        {/* Groups */}
+        <Route path="/groups" element={<MainLayout><GroupPage /></MainLayout>} />
+        <Route path="/groups/:id" element={<MainLayout><GroupPage /></MainLayout>} />
+      </Route>
     </Routes>
   );
 }

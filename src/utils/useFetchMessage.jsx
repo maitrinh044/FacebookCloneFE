@@ -1,27 +1,34 @@
 import { useState, useEffect } from "react";
-import { getUser } from "../services/userService";
 import { getMessageList } from "../services/MessageService";
 
-export const useFetchMessages = (senderId, receiverId) => {
-    const [messageList, setMessages] = useState([]);
-    const [error, setError] = useState(null);
+export function useFetchMessages(currentUserId, friendId) {
+    const [messageList, setMessageList] = useState([]);
     const [loading, setLoading] = useState(true);
-
+  
+    const fetchMessages = async () => {
+      try {
+        setLoading(true);
+        const response = await getMessageList(currentUserId, friendId);
+        setMessageList(response);  // Đảm bảo dữ liệu có trả về từ API
+        return response; // Trả về dữ liệu để sử dụng trong refetch
+      } catch (error) {
+        console.error("Lỗi khi lấy tin nhắn:", error);
+        return []; // Hoặc trả về mảng rỗng nếu có lỗi
+      } finally {
+        setLoading(false);
+      }
+    };
+  
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getMessageList(senderId, receiverId);
-                setMessages(data);
-            } catch (error) {
-                console.error("An error occurred:", error.message);
-                setMessages([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
-    return {messageList, loading, error};
+      if (currentUserId && friendId) {
+        fetchMessages();
+      }
+    }, [currentUserId, friendId]);
+  
+    return {
+      messageList,
+      loading,
+      refetch: fetchMessages, // Trả về hàm fetchMessages để có thể gọi lại
+    };
 }
-
-export default useFetchMessages;
+  

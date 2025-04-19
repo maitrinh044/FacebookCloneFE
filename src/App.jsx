@@ -3,10 +3,14 @@ import { useState } from "react";
 import MessagePanel from "./components/Message/MessagePanel";
 import AppRouter from "./routes/AppRouter";
 import ScrollToTop from "./components/ScrollToTop";
+import { LoadingProvider, useLoading } from "./contexts/LoadingContext";
+import LoadingOverlay from "./components/common/LoadingOverlay";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function App() {
+function MainApp() {
   const [openChats, setOpenChats] = useState([]);
-  const userId = 1;
+  const { loading } = useLoading(); // ✅ Gọi useLoading trong component con
 
   const handleOpenChat = (friend) => {
     if (!openChats.find((chat) => chat.id === friend.id)) {
@@ -20,6 +24,7 @@ export default function App() {
 
   return (
     <div className="bg-gray-100 min-h-screen">
+      {loading && <LoadingOverlay />} {/* ✅ Loader nằm trong UI */}
       <ScrollToTop />
       <AppRouter onOpenChat={handleOpenChat} />
       <div className="fixed bottom-4 right-4 flex gap-4">
@@ -33,5 +38,23 @@ export default function App() {
         ))}
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LoadingProvider>
+      <MainApp />
+      <ToastContainer 
+        position="top-right"
+        autoClose={1000}
+        hideProgressBar={true}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+        toastClassName="custom-toast"
+      />
+    </LoadingProvider>
   );
 }

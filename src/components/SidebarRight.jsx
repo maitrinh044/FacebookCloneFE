@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 
 export default function SidebarRight({ onOpenChat }) {
   const { friends , loading, error} = useFetchUserFriends();
-  const sortedFriends = [...friends].sort((a, b) => b.online - a.online);
+    const sortedFriends = [];
+    if (friends != null) {
+      const sortedFriends = [...friends].sort((a, b) => b.online - a.online);
+    }
 
 
   return (

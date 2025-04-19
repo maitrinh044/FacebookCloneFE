@@ -23,15 +23,22 @@ const MessageList = ({ currentUserId, receiverId, localMessages = [] }) => {
       fetchMessages();
     }
   }, [currentUserId, receiverId]);
+  console.log("messages: ", messages);
+  useEffect(() => {
+    // Khi localMessages thay đổi, cập nhật lại danh sách tin nhắn
+    if (localMessages.length > 0) {
+      setMessages(prevMessages => [...prevMessages, ...localMessages]);
+    }
+  }, [localMessages]);  // Khi localMessages thay đổi, cập nhật tin nhắn mới
 
   useEffect(() => {
     // Đảm bảo scroll sau khi toàn bộ content đã render
-    setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'auto' });
-    }, 0);
-  }, [messages, localMessages]);
-
-  const allMessages = [...messages, ...localMessages];
+    if (messages.length > 0) {
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 0);
+    }
+  }, [messages]);  // Mỗi khi messages thay đổi (gồm cả localMessages)
 
   if (loading) return <div>Đang tải tin nhắn...</div>;
 
@@ -42,7 +49,7 @@ const MessageList = ({ currentUserId, receiverId, localMessages = [] }) => {
         ref={scrollContainerRef}
       >
         <div className="flex flex-col space-y-2">
-          {allMessages.map((msg, index) => (
+          {[...messages, ...localMessages].map((msg, index) => (
             <div
               key={msg.id || `local-${index}`}
               className={`flex ${
