@@ -6,7 +6,13 @@ export default function SharePost({ post, onClose, onShare, currentUser }) {
 
   const handleShare = () => {
     if (sharedContent.trim() || post.content) {
-      onShare(sharedContent);
+      onShare({
+        ...post,
+        sharedBy: currentUser?.name || "Người dùng hiện tại",
+        sharedContent,
+        sharedTime: new Date().toISOString(),
+        isShared: true,
+      });
     }
   };
 
@@ -23,7 +29,7 @@ export default function SharePost({ post, onClose, onShare, currentUser }) {
         <div className="p-4">
           <div className="flex items-start gap-3 mb-4">
             <img
-              src={currentUser.avatar}
+              src={currentUser?.avatar || "https://via.placeholder.com/40"}
               alt="Avatar"
               className="w-10 h-10 rounded-full object-cover"
             />
@@ -39,7 +45,7 @@ export default function SharePost({ post, onClose, onShare, currentUser }) {
           <div className="bg-gray-50 rounded-lg p-3 border">
             <div className="flex items-center gap-2 mb-2">
               <img
-                src={post.userAvatar}
+                src={post.userAvatar || "https://via.placeholder.com/40"}
                 alt="Avatar"
                 className="w-8 h-8 rounded-full object-cover"
               />

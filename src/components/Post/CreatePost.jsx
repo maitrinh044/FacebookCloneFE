@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-export default function CreatePost({ onPostCreated }) {
+export default function CreatePost({ onPostCreated, currentUser }) {
   const [postContent, setPostContent] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
@@ -30,9 +30,9 @@ export default function CreatePost({ onPostCreated }) {
     if (postContent.trim() || selectedImage) {
       const newPost = {
         id: Date.now(),
-        username: "Người dùng",
-        userAvatar: "../../../src/assets/img/facebook.jpg",
-        time: "Vừa xong",
+        username: currentUser?.name || "Người dùng",
+        userAvatar: currentUser?.avatar || "https://via.placeholder.com/40",
+        time: new Date().toISOString(),
         content: postContent,
         image: imagePreview || "",
       };
@@ -50,7 +50,7 @@ export default function CreatePost({ onPostCreated }) {
     <div className="bg-white rounded-xl shadow-md p-4 mb-4">
       <div className="flex items-center gap-3 mb-3">
         <img
-          src="../../../src/assets/img/facebook.jpg"
+          src={currentUser?.avatar || "https://via.placeholder.com/40"}
           alt="User Avatar"
           className="w-10 h-10 rounded-full object-cover"
         />
@@ -63,7 +63,6 @@ export default function CreatePost({ onPostCreated }) {
         />
       </div>
 
-      {/* Hiển thị xem trước hình ảnh */}
       {imagePreview && (
         <div className="relative mb-3">
           <img
