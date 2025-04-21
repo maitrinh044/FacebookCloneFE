@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { FaThumbsUp, FaRegCommentDots, FaShare } from "react-icons/fa";
 import SharePost from "./SharePost";
 import ReactionPopup from "./ReactionPopup";
-import { getCommentsByPost, createComment } from "../utils/CommentService";
-import { toggleReaction, countReactions, getReactionTypes } from "../utils/ReactionService";
+import { getCommentsByPost, createComment } from "../../services/CommentService";
+import { toggleReaction, countReactions, getReactionTypes } from "../../services/ReactionService";
 
 export default function PostItem({ post, onShare }) {
   const [isLiked, setIsLiked] = useState(false);

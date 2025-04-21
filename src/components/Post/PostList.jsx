@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PostItem from "../Post/PostItem";
 import CreatePost from "../Post/CreatePost";
-import { getAllPosts, createPost } from "../utils/PostService";
+import { getAllPosts, createPost } from "../../services/PostService";
 
 export default function PostList() {
   const [posts, setPosts] = useState([]);

@@ -4,7 +4,7 @@ import { FaRegCommentDots, FaUserTimes, FaUserLock, FaUserSlash, FaSearch } from
 import { message } from "antd";
 import Sidebar from "./Sidebar";
 
-import FriendlistService from "../services/FriendlistService";
+import FriendlistService from "../../services/FriendlistService";
 
 export default function FriendListPage() {
   const [friends, setFriends] = useState([]);
