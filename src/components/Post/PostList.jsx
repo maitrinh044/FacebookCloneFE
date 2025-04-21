@@ -1,45 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PostItem from "../Post/PostItem";
 import CreatePost from "../Post/CreatePost";
-
-const samplePosts = [
-  {
-    id: 1,
-    username: "An Nguyễn",
-    userAvatar: "../../../src/assets/img/facebook.jpg",
-    time: "2 giờ trước",
-    content: "Hôm nay trời đẹp quá!",
-    image: "../../../src/assets/img/facebook.jpg",
-  },
-  {
-    id: 2,
-    username: "Bảo Trân",
-    userAvatar: "../../../src/assets/img/facebook.jpg",
-    time: "1 giờ trước",
-    content: "Mọi người đã xem bộ phim mới chưa?",
-    image: "",
-  },
-];
+import { getAllPosts, createPost } from "../utils/PostService";
 
 export default function PostList() {
-  const [posts, setPosts] = useState(samplePosts);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handlePostCreated = (newPost) => {
-    setPosts([newPost, ...posts]);
-  };
-
-  const handleSharePost = (sharedContent) => {
-    const originalPost = posts.find(p => p.id === posts.id); // Đảm bảo bạn có logic lấy post gốc phù hợp
-    const sharedPost = {
-      ...originalPost,
-      id: Date.now(),
-      sharedBy: "Người dùng hiện tại",
-      sharedContent,
-      sharedTime: "Vừa xong",
-      isShared: true
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const data = await getAllPosts();
+        setPosts(data);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch posts");
+        setLoading(false);
+      }
     };
-    setPosts([sharedPost, ...posts]);
+    fetchPosts();
+  }, []);
+
+  const handlePostCreated = async (newPost) => {
+    try {
+      const createdPost = await createPost(newPost);
+      setPosts([createdPost, ...posts]);
+    } catch (err) {
+      setError("Failed to create post");
+    }
   };
+
+  const handleSharePost = async (sharedPost) => {
+    try {
+      const newSharedPost = await createPost({
+        ...sharedPost,
+        isShared: true,
+        sharedTime: new Date().toISOString(),
+      });
+      setPosts([newSharedPost, ...posts]);
+    } catch (err) {
+      setError("Failed to share post");
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div>

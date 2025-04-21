@@ -1,16 +1,6 @@
-// src/components/ReactionPopup.jsx
 import React from "react";
 
-const reactions = [
-  { id: "like", emoji: "👍", label: "Thích" },
-  { id: "love", emoji: "❤️", label: "Yêu thích" },
-  { id: "haha", emoji: "😆", label: "Haha" },
-  { id: "wow", emoji: "😮", label: "Wow" },
-  { id: "sad", emoji: "😢", label: "Buồn" },
-  { id: "angry", emoji: "😡", label: "Phẫn nộ" },
-];
-
-const ReactionPopup = ({ onSelect }) => {
+const ReactionPopup = ({ reactions, onSelect }) => {
   return (
     <div className="absolute bottom-4 left-0 bg-white border shadow-md rounded-full px-3 py-2 flex gap-2 z-50">
       {reactions.map((reaction) => (
