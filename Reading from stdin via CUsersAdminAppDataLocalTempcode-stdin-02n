@@ -2,54 +2,33 @@ import { useState, useRef, useEffect } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaRegCommentDots, FaUserTimes, FaUserLock, FaUserSlash, FaSearch } from "react-icons/fa";
 import { message } from "antd";
-import Sidebar from "./Sidebar";
-import FriendlistService from "../services/FriendlistService";
+
+const mockFriends = [
+  { id: 1, name: "Mai Thị Thương", mutuals: 8, avatar: "https://i.pravatar.cc/150?img=1" },
+  { id: 2, name: "Trương Trí Tuệ", mutuals: 1, avatar: "https://i.pravatar.cc/150?img=2" },
+  { id: 3, name: "Có Hoàng", mutuals: 3, avatar: "https://i.pravatar.cc/150?img=3" },
+];
 
 export default function FriendListPage() {
-  const [friends, setFriends] = useState([]);
+  const [friends, setFriends] = useState(mockFriends);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
   const menuRef = useRef(null);
 
-  // Fetch danh sách bạn bè khi component mount
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        setLoading(true);
-        const data = await FriendlistService.getFriends();
-        setFriends(data);
-      } catch (error) {
-        message.error("Không thể tải danh sách bạn bè");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchFriends();
-  }, []);
-
-  // Xử lý các hành động như nhắn tin, bỏ theo dõi, chặn, hủy kết bạn
-  const handleAction = async (id, action) => {
-    try {
-      if (action === "unfriend") {
-        await FriendlistService.unfriend(id);
-        setFriends(friends.filter((f) => f.id !== id));
-        message.success("Đã hủy kết bạn thành công");
-      } else {
-        message.success(`Đã thực hiện: ${action}`);
-      }
-      setMenuOpenId(null);
-    } catch (error) {
-      message.error(`Lỗi khi thực hiện ${action}`);
+  const handleAction = (id, action) => {
+    if (action === "unfriend") {
+      setFriends(friends.filter((f) => f.id !== id));
+      message.success("Đã hủy kết bạn thành công");
+    } else {
+      message.success(`Đã thực hiện: ${action}`);
     }
+    setMenuOpenId(null);
   };
 
-  // Lọc danh sách bạn bè theo tên
   const filteredFriends = friends.filter((friend) =>
     friend.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Đóng menu khi click bên ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -61,45 +40,33 @@ export default function FriendListPage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Bạn bè ({filteredFriends.length})</h2>
-
-          <div className="relative mb-4">
-            <input
-              type="text"
-              placeholder="Tìm kiếm bạn bè..."
-              className="w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-full pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FaSearch className="absolute left-3 top-3 text-gray-500" />
-          </div>
-
-          {loading ? (
-            <p className="text-gray-500 text-center py-4">Đang tải...</p>
-          ) : filteredFriends.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">Không có bạn bè nào</p>
-          ) : (
-            <ul className="space-y-4">
-              {filteredFriends.map((friend) => (
-                <FriendItem
-                  key={friend.id}
-                  friend={friend}
-                  menuOpenId={menuOpenId}
-                  setMenuOpenId={setMenuOpenId}
-                  handleAction={handleAction}
-                  menuRef={menuRef}
-                />
-              ))}
-            </ul>
-          )}
+    <div className="flex-1 p-6">
+      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-xl font-bold mb-4">Bạn bè ({filteredFriends.length})</h2>
+        
+        <div className="relative mb-4">
+          <input
+            type="text"
+            placeholder="Tìm kiếm bạn bè..."
+            className="w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-full pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <FaSearch className="absolute left-3 top-3 text-gray-500" />
         </div>
+
+        <ul className="space-y-4">
+          {filteredFriends.map((friend) => (
+            <FriendItem 
+              key={friend.id} 
+              friend={friend}
+              menuOpenId={menuOpenId}
+              setMenuOpenId={setMenuOpenId}
+              handleAction={handleAction}
+              menuRef={menuRef}
+            />
+          ))}
+        </ul>
       </div>
     </div>
   );
@@ -117,8 +84,8 @@ function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction, menuRef }
       </div>
 
       <div className="relative" ref={menuRef}>
-        <button
-          onClick={() => setMenuOpenId(prev => prev === friend.id ? null : friend.id)}
+        <button 
+          onClick={() => setMenuOpenId(prev => prev === friend.id ? null : friend.id)} 
           className="p-2 hover:bg-gray-200 rounded-full"
         >
           <BsThreeDotsVertical className="text-xl text-gray-700" />
