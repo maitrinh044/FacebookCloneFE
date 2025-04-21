@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { FaUserCheck, FaTimes } from "react-icons/fa";
 import { message } from "antd";
@@ -47,6 +48,7 @@ export default function FriendRequestsPage() {
   };
 
   return (
+
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <Sidebar />
@@ -56,16 +58,20 @@ export default function FriendRequestsPage() {
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-bold mb-4">Lời mời kết bạn ({requests.length})</h2>
 
+
           {loading ? (
             <p className="text-gray-500 text-center py-4">Đang tải...</p>
           ) : requests.length === 0 ? (
+
             <p className="text-gray-500 text-center py-4">Không có lời mời nào</p>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {requests.map(request => (
                 <div key={request.id} className="bg-gray-50 p-4 rounded-lg shadow">
+
                   <img
                     src={request.avatar}
+
                     alt={request.name}
                     className="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-blue-500"
                   />
@@ -77,14 +83,20 @@ export default function FriendRequestsPage() {
                     <button
                       onClick={() => handleAccept(request.id)}
                       className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition flex items-center justify-center gap-2"
+
+
                     >
                       <FaUserCheck /> Xác nhận
                     </button>
                     <button
+
+
                       onClick={() => handleDecline(request.id)}
                       className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300 transition flex items-center justify-center gap-2"
                     >
                       <FaTimes /> Xóa
+
+
                     </button>
                   </div>
                 </div>
@@ -92,7 +104,9 @@ export default function FriendRequestsPage() {
             </div>
           )}
         </div>
+
       </div>
     </div>
   );
 }
+

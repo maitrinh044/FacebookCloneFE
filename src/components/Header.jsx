@@ -7,10 +7,12 @@ import {
   FaUserCircle,
   FaSignOutAlt,
   FaCog,
+
   FaHome,
   FaUsers,
   FaTv,
   FaStore,
+
 } from "react-icons/fa";
 
 import axios from "axios";
@@ -19,26 +21,49 @@ import { toast } from 'react-toastify';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import MessagePopup from "./Message/MessagePopup";
+
 import useFetchUserFriends from "../utils/useFetchUserFriends";
 import MessagePanel from "./Message/MessagePanel";
 import { getLastMessage } from "../services/MessageService";
 
+
+
 export default function Header() {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [isRead, setIsRead] = useState(false);
-  const notificationRef = useRef(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showMessagePopup, setShowMessagePopup] = useState(false);
+
+  const notificationRef = useRef(null);
   const profileRef = useRef(null);
+
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [openChats, setOpenChats] = useState([]);
   const location = useLocation();
 
+
   const notifications = [
-    { message: "Bình luận mới từ An Nguyễn", time: "2 phút trước" },
-    { message: "Dũng đã thích bài viết của bạn", time: "10 phút trước" },
-    { message: "Chi đã gửi lời mời kết bạn", time: "1 giờ trước" },
+    {
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+      name: "An Nguyễn",
+      message: "đã bình luận về bài viết của bạn.",
+      time: "2 phút trước",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      name: "Dũng Trần",
+      message: "đã thích bài viết của bạn.",
+      time: "10 phút trước",
+    },
+    {
+      avatar: "https://randomuser.me/api/portraits/women/30.jpg",
+      name: "Chi Nguyễn",
+      message: "đã gửi cho bạn lời mời kết bạn.",
+      time: "1 giờ trước",
+      action: { accept: "Xác nhận", reject: "Xóa" },
+    },
   ];
+
 
   const friendList = useFetchUserFriends().friends || [];
   const unreadCount = notifications.length;
@@ -61,21 +86,12 @@ export default function Header() {
     }
   }, [friendList]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target)
-      ) {
-        setShowNotifications(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileMenu(false);
       }
@@ -83,6 +99,7 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
 
   const handleNotificationClick = () => {
     setShowNotifications(!showNotifications);
@@ -148,6 +165,7 @@ export default function Header() {
 
   const handleCloseChat = (id) => {
     setOpenChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
+
   };
 
   return (
@@ -166,6 +184,7 @@ export default function Header() {
           />
         </div>
       </div>
+
 
       {/* Middle: Navigation icons */}
       <div className="flex gap-8 items-center">
@@ -196,10 +215,12 @@ export default function Header() {
       </div>
 
 
+
       <div className="flex gap-4 items-center relative">
         <button onClick={() => navigate("/friends")} className="p-2 rounded-full hover:bg-gray-100">
           <FaUserFriends className="text-xl text-gray-700" />
         </button>
+
 
         {location.pathname !== "/messages" && (
           <div className="relative">
@@ -218,17 +239,21 @@ export default function Header() {
               <MessagePanel friend={friend} onClose={() => handleCloseChat(friend.id)} />
             </div>
           ))}
+
         </div>
 
         <div className="relative" ref={notificationRef}>
+
           <button onClick={handleNotificationClick} className="p-2 rounded-full hover:bg-gray-100 relative">
+
             <FaBell className="text-xl text-gray-700" />
-            {!isRead && unreadCount > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center animate-shake">
                 {unreadCount}
               </span>
             )}
           </button>
+
           {showNotifications && (
             <div className="absolute right-0 top-12 w-64 bg-white shadow-lg rounded-xl border border-gray-200 z-50">
               <h4 className="p-3 font-semibold text-gray-700 border-b">Thông báo</h4>
@@ -242,6 +267,7 @@ export default function Header() {
               </ul>
             </div>
           )}
+
         </div>
 
         <div className="relative" ref={profileRef}>
@@ -251,6 +277,7 @@ export default function Header() {
           {showProfileMenu && (
             <div className="absolute right-0 top-12 w-48 bg-white shadow-lg rounded-xl border border-gray-200 z-50">
               <ul className="text-sm text-gray-700">
+
                 <li className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer" onClick={() => navigate("/profile/1")}>
                   <FaUserCircle /> Hồ sơ cá nhân
                 </li>
@@ -258,6 +285,7 @@ export default function Header() {
                   <FaCog /> Cài đặt
                 </li>
                 <li className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-500" onClick={handleLogout}>
+
                   <FaSignOutAlt /> Đăng xuất
                 </li>
               </ul>

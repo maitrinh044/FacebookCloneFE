@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { FaUserPlus, FaTimes, FaUserCheck } from "react-icons/fa";
 import { message } from "antd";
@@ -49,6 +50,7 @@ export default function FriendSuggestionsPage() {
   };
 
   return (
+
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <Sidebar />
@@ -64,16 +66,20 @@ export default function FriendSuggestionsPage() {
             <button className="text-blue-500 hover:underline">Xem tất cả</button>
           </div>
 
+
           {loading ? (
             <p className="text-gray-500 text-center py-4">Đang tải...</p>
           ) : suggestions.length === 0 ? (
+
             <p className="text-gray-500 text-center py-4">Không có gợi ý nào</p>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {suggestions.map(suggestion => (
                 <div key={suggestion.id} className="bg-gray-50 p-4 rounded-lg shadow">
+
                   <img
                     src={suggestion.avatar}
+
                     alt={suggestion.name}
                     className="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-blue-500"
                   />
@@ -83,6 +89,8 @@ export default function FriendSuggestionsPage() {
                   </p>
                   <div className="flex flex-col gap-2">
                     {suggestion.status === "pending" ? (
+
+
                       <button
                         className="flex items-center justify-center gap-2 bg-gray-200 text-gray-700 py-2 rounded"
                         disabled
@@ -91,14 +99,18 @@ export default function FriendSuggestionsPage() {
                       </button>
                     ) : (
                       <button
+
                         onClick={() => handleAddFriend(suggestion.id)}
+
                         className="flex items-center justify-center gap-2 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
                       >
                         <FaUserPlus /> Thêm bạn bè
                       </button>
                     )}
                     <button
+
                       onClick={() => handleRemove(suggestion.id)}
+
                       className="flex items-center justify-center gap-2 bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300 transition"
                     >
                       <FaTimes /> Gỡ

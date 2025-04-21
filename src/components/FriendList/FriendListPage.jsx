@@ -3,6 +3,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaRegCommentDots, FaUserTimes, FaUserLock, FaUserSlash, FaSearch } from "react-icons/fa";
 import { message } from "antd";
 import Sidebar from "./Sidebar";
+
 import FriendlistService from "../services/FriendlistService";
 
 export default function FriendListPage() {
@@ -45,9 +46,11 @@ export default function FriendListPage() {
   };
 
   // Lọc danh sách bạn bè theo tên
+
   const filteredFriends = friends.filter((friend) =>
     friend.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   // Đóng menu khi click bên ngoài
   useEffect(() => {
@@ -61,6 +64,7 @@ export default function FriendListPage() {
   }, []);
 
   return (
+
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <Sidebar />
@@ -69,6 +73,8 @@ export default function FriendListPage() {
       <div className="flex-1 p-6">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-bold mb-4">Bạn bè ({filteredFriends.length})</h2>
+
+
 
           <div className="relative mb-4">
             <input
@@ -80,6 +86,7 @@ export default function FriendListPage() {
             />
             <FaSearch className="absolute left-3 top-3 text-gray-500" />
           </div>
+
 
           {loading ? (
             <p className="text-gray-500 text-center py-4">Đang tải...</p>
@@ -99,10 +106,13 @@ export default function FriendListPage() {
               ))}
             </ul>
           )}
+
         </div>
       </div>
     </div>
   );
+
+
 }
 
 function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction, menuRef }) {
@@ -117,8 +127,10 @@ function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction, menuRef }
       </div>
 
       <div className="relative" ref={menuRef}>
+
         <button
           onClick={() => setMenuOpenId(prev => prev === friend.id ? null : friend.id)}
+
           className="p-2 hover:bg-gray-200 rounded-full"
         >
           <BsThreeDotsVertical className="text-xl text-gray-700" />
@@ -143,4 +155,6 @@ function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction, menuRef }
       </div>
     </li>
   );
+
 }
+

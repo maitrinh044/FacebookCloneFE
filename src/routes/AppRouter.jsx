@@ -36,6 +36,7 @@ export default function AppRouter({ onOpenChat }) {
         <Route path="/groups" element={<MainLayout><GroupPage /></MainLayout>} />
         <Route path="/groups/:id" element={<MainLayout><GroupPage /></MainLayout>} />
       </Route>
+
     </Routes>
   );
 }
