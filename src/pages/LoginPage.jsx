@@ -51,6 +51,7 @@ export default function LoginPage() {
           // Lưu token vào localStorage
           localStorage.setItem("accessToken", response.data.data.accessToken);
           localStorage.setItem("refreshToken", response.data.data.refreshToken);
+          localStorage.setItem("userId", response.data.data.userId)
           navigate("/"); // Điều hướng về trang chủ
           toast.success('Đăng nhập thành công!');
         } else {
