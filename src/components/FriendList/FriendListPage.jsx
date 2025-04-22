@@ -3,56 +3,79 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaRegCommentDots, FaUserTimes, FaUserLock, FaUserSlash, FaSearch } from "react-icons/fa";
 import { message } from "antd";
 import Sidebar from "./Sidebar";
+import * as FriendlistService from "../../services/FriendlistService";
 
-import FriendlistService from "../../services/FriendlistService";
-
-export default function FriendListPage() {
+export default function FriendListPage({ currentUserId }) {
   const [friends, setFriends] = useState([]);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const menuRef = useRef(null);
 
-  // Fetch danh sách bạn bè khi component mount
   useEffect(() => {
     const fetchFriends = async () => {
+      if (!currentUserId) return;
+
       try {
         setLoading(true);
-        const data = await FriendlistService.getFriends();
-        setFriends(data);
+        const friendships = await FriendlistService.getAllFriendships();
+
+        // Lọc các mối quan hệ đã chấp nhận và lấy thông tin bạn bè
+        const friendsWithDetails = await Promise.all(
+          friendships
+            .filter((f) => f.status === "accepted")
+            .map(async (friendship) => {
+              const friendId =
+                friendship.senderId === currentUserId
+                  ? friendship.receiverId
+                  : friendship.senderId;
+              const user = await FriendlistService.getUserById(friendId);
+              return {
+                id: friendship.id,
+                friendId,
+                name: user.name,
+                avatar: user.avatar || "/default-avatar.png",
+                mutuals: user.mutualFriends || 0,
+              };
+            })
+        );
+
+        setFriends(friendsWithDetails);
       } catch (error) {
+        console.error("Failed to load friends:", error);
         message.error("Không thể tải danh sách bạn bè");
       } finally {
         setLoading(false);
       }
     };
-    fetchFriends();
-  }, []);
 
-  // Xử lý các hành động như nhắn tin, bỏ theo dõi, chặn, hủy kết bạn
+    fetchFriends();
+  }, [currentUserId]);
+
   const handleAction = async (id, action) => {
     try {
       if (action === "unfriend") {
-        await FriendlistService.unfriend(id);
+        await FriendlistService.updateFriendship(id, "declined");
         setFriends(friends.filter((f) => f.id !== id));
         message.success("Đã hủy kết bạn thành công");
-      } else {
+      } else if (action === "block") {
+        await FriendlistService.updateFriendship(id, "blocked");
+        setFriends(friends.filter((f) => f.id !== id));
+        message.success("Đã chặn trang cá nhân");
+      } else if (action === "message" || action === "unfollow") {
         message.success(`Đã thực hiện: ${action}`);
       }
       setMenuOpenId(null);
     } catch (error) {
+      console.error(`${action} error:`, error);
       message.error(`Lỗi khi thực hiện ${action}`);
     }
   };
 
-  // Lọc danh sách bạn bè theo tên
-
   const filteredFriends = friends.filter((friend) =>
-    friend.name.toLowerCase().includes(searchTerm.toLowerCase())
+    friend.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-
-  // Đóng menu khi click bên ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -64,17 +87,11 @@ export default function FriendListPage() {
   }, []);
 
   return (
-
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
       <Sidebar />
-
-      {/* Main Content */}
       <div className="flex-1 p-6">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-bold mb-4">Bạn bè ({filteredFriends.length})</h2>
-
-
 
           <div className="relative mb-4">
             <input
@@ -86,7 +103,6 @@ export default function FriendListPage() {
             />
             <FaSearch className="absolute left-3 top-3 text-gray-500" />
           </div>
-
 
           {loading ? (
             <p className="text-gray-500 text-center py-4">Đang tải...</p>
@@ -106,20 +122,21 @@ export default function FriendListPage() {
               ))}
             </ul>
           )}
-
         </div>
       </div>
     </div>
   );
-
-
 }
 
 function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction, menuRef }) {
   return (
     <li className="flex justify-between items-center bg-gray-100 p-3 rounded-lg shadow relative">
       <div className="flex items-center gap-4">
-        <img src={friend.avatar} alt={friend.name} className="w-12 h-12 rounded-full object-cover" />
+        <img
+          src={friend.avatar}
+          alt={friend.name}
+          className="w-12 h-12 rounded-full object-cover"
+        />
         <div>
           <span className="font-medium">{friend.name}</span>
           <p className="text-gray-500 text-sm">{friend.mutuals} bạn chung</p>
@@ -127,10 +144,8 @@ function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction, menuRef }
       </div>
 
       <div className="relative" ref={menuRef}>
-
         <button
-          onClick={() => setMenuOpenId(prev => prev === friend.id ? null : friend.id)}
-
+          onClick={() => setMenuOpenId((prev) => (prev === friend.id ? null : friend.id))}
           className="p-2 hover:bg-gray-200 rounded-full"
         >
           <BsThreeDotsVertical className="text-xl text-gray-700" />
@@ -138,16 +153,28 @@ function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction, menuRef }
 
         {menuOpenId === friend.id && (
           <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10 p-2">
-            <button onClick={() => handleAction(friend.id, "message")} className="flex items-center w-full px-4 py-2 hover:bg-gray-200 rounded">
+            <button
+              onClick={() => handleAction(friend.id, "message")}
+              className="flex items-center w-full px-4 py-2 hover:bg-gray-200 rounded"
+            >
               <FaRegCommentDots className="mr-3" /> Nhắn tin
             </button>
-            <button onClick={() => handleAction(friend.id, "unfollow")} className="flex items-center w-full px-4 py-2 hover:bg-gray-200 rounded">
+            <button
+              onClick={() => handleAction(friend.id, "unfollow")}
+              className="flex items-center w-full px-4 py-2 hover:bg-gray-200 rounded"
+            >
               <FaUserTimes className="mr-3" /> Bỏ theo dõi
             </button>
-            <button onClick={() => handleAction(friend.id, "block")} className="flex items-center w-full px-4 py-2 hover:bg-gray-200 rounded">
+            <button
+              onClick={() => handleAction(friend.id, "block")}
+              className="flex items-center w-full px-4 py-2 hover:bg-gray-200 rounded"
+            >
               <FaUserLock className="mr-3" /> Chặn trang cá nhân
             </button>
-            <button onClick={() => handleAction(friend.id, "unfriend")} className="flex items-center w-full px-4 py-2 hover:bg-red-100 rounded text-red-500">
+            <button
+              onClick={() => handleAction(friend.id, "unfriend")}
+              className="flex items-center w-full px-4 py-2 hover:bg-red-100 rounded text-red-500"
+            >
               <FaUserSlash className="mr-3" /> Hủy kết bạn
             </button>
           </div>
@@ -155,6 +182,4 @@ function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction, menuRef }
       </div>
     </li>
   );
-
 }
-

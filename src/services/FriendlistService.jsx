@@ -1,83 +1,56 @@
-import axiosClient from '../utils/axiosClient';
+import axiosClient from "../utils/axiosClient";
 
-// Dịch vụ xử lý các API liên quan đến danh sách bạn bè
-const FriendlistService = {
-  // Lấy danh sách bạn bè (trạng thái ACCEPTED)
-  getFriends: async () => {
+// Lấy tất cả các mối quan hệ bạn bè
+export const getAllFriendships = async () => {
     try {
-      const response = await axiosClient.get('/friendship/getFriends');
-      return response.data;
+        const response = await axiosClient.get('/friendships');
+        return response.data.data;
     } catch (error) {
-      console.error('Lỗi khi lấy danh sách bạn bè:', error);
-      throw error;
+        console.error("Lỗi khi gọi API getAllFriendships:", error);
+        throw new Error(`Lỗi khi lấy danh sách bạn bè: ${error.response?.data?.message || error.message}`);
     }
-  },
-
-  // Lấy danh sách lời mời kết bạn (trạng thái PENDING, user_2 là người dùng hiện tại)
-  getFriendRequests: async () => {
-    try {
-      const response = await axiosClient.get('/friendship/getRequests');
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi lấy lời mời kết bạn:', error);
-      throw error;
-    }
-  },
-
-  // Lấy danh sách gợi ý kết bạn
-  getFriendSuggestions: async () => {
-    try {
-      const response = await axiosClient.get('/friendship/getSuggestions');
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi lấy gợi ý kết bạn:', error);
-      throw error;
-    }
-  },
-
-  // Gửi lời mời kết bạn
-  addFriend: async (userId) => {
-    try {
-      const response = await axiosClient.post('/friendship/add', { userId });
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi gửi lời mời kết bạn:', error);
-      throw error;
-    }
-  },
-
-  // Chấp nhận lời mời kết bạn
-  acceptFriendRequest: async (requestId) => {
-    try {
-      const response = await axiosClient.post('/friendship/accept', { requestId });
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi chấp nhận lời mời kết bạn:', error);
-      throw error;
-    }
-  },
-
-  // Từ chối lời mời kết bạn hoặc xóa gợi ý
-  declineFriendRequest: async (requestId) => {
-    try {
-      const response = await axiosClient.post('/friendship/decline', { requestId });
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi từ chối lời mời kết bạn:', error);
-      throw error;
-    }
-  },
-
-  // Hủy kết bạn
-  unfriend: async (friendId) => {
-    try {
-      const response = await axiosClient.post('/friendship/remove', { friendId });
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi hủy kết bạn:', error);
-      throw error;
-    }
-  },
 };
 
-export default FriendlistService;
+// Lấy các yêu cầu kết bạn đang chờ cho một người dùng
+export const getPendingRequests = async (userId) => {
+    try {
+        const response = await axiosClient.get(`/friendships/pending/${userId}`);
+        return response.data.data;
+    } catch (error) {
+        console.error(`Lỗi khi gọi API getPendingRequests cho userId ${userId}:`, error);
+        throw new Error(`Lỗi khi lấy yêu cầu kết bạn: ${error.response?.data?.message || error.message}`);
+    }
+};
+
+// Lấy thông tin một mối quan hệ bạn bè theo ID
+export const getFriendshipById = async (friendshipId) => {
+    try {
+        const response = await axiosClient.get(`/friendships/${friendshipId}`);
+        return response.data.data;
+    } catch (error) {
+        console.error("Lỗi khi gọi API getFriendshipById:", error);
+        throw new Error(`Lỗi khi lấy thông tin bạn bè: ${error.response?.data?.message || error.message}`);
+    }
+};
+
+// Gửi một yêu cầu kết bạn mới
+export const addFriendship = async (friendshipData) => {
+    try {
+        const response = await axiosClient.post('/friendships', friendshipData);
+        return response.data.data;
+    } catch (error) {
+        console.error("Lỗi khi gọi API addFriendship:", error);
+        throw new Error(`Lỗi khi gửi lời mời kết bạn: ${error.response?.data?.message || error.message}`);
+    }
+};
+
+// Cập nhật trạng thái mối quan hệ bạn bè (chấp nhận/từ chối)
+export const updateFriendship = async (friendshipData) => {
+    try {
+        const response = await axiosClient.put('/friendships', friendshipData);
+        return response.data.data;
+    } catch (error) {
+        console.error("Lỗi khi gọi API updateFriendship:", error);
+        throw new Error(`Lỗi khi cập nhật trạng thái bạn bè: ${error.response?.data?.message || error.message}`);
+    }
+};  
