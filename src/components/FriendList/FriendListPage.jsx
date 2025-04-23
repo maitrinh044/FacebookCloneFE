@@ -4,13 +4,16 @@ import { FaRegCommentDots, FaUserTimes, FaUserLock, FaUserSlash, FaSearch } from
 import { message } from "antd";
 import Sidebar from "./Sidebar";
 import * as FriendlistService from "../../services/FriendlistService";
+import { getUserById } from "../../services/userService";
 
-export default function FriendListPage({ currentUserId }) {
+export default function FriendListPage() {
   const [friends, setFriends] = useState([]);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const menuRef = useRef(null);
+
+  const currentUserId = localStorage.getItem("userId"); //
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -23,17 +26,17 @@ export default function FriendListPage({ currentUserId }) {
         // Lọc các mối quan hệ đã chấp nhận và lấy thông tin bạn bè
         const friendsWithDetails = await Promise.all(
           friendships
-            .filter((f) => f.status === "accepted")
+            .filter((f) => f.type === "ACCEPTED")
             .map(async (friendship) => {
               const friendId =
-                friendship.senderId === currentUserId
-                  ? friendship.receiverId
-                  : friendship.senderId;
-              const user = await FriendlistService.getUserById(friendId);
+                friendship.user1.id === currentUserId
+                  ? friendship.user1.id
+                  : friendship.user2.id;
+              const user = await getUserById(friendId);
               return {
                 id: friendship.id,
                 friendId,
-                name: user.name,
+                name: user.firstName + " " + user.lastName,
                 avatar: user.avatar || "/default-avatar.png",
                 mutuals: user.mutualFriends || 0,
               };
@@ -85,6 +88,9 @@ export default function FriendListPage({ currentUserId }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  console.log("friends: ", friends);
+  console.log(filteredFriends);
 
   return (
     <div className="flex min-h-screen bg-gray-50">

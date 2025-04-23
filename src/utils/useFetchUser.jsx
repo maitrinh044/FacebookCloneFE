@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getUser } from "../services/userService";
+import { getUser } from "../services/UserService";
 import { useFetcher } from "react-router-dom";
 
 export const useFetchUser = () => {

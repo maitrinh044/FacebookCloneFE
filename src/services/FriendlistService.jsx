@@ -3,7 +3,7 @@ import axiosClient from "../utils/axiosClient";
 // Lấy tất cả các mối quan hệ bạn bè
 export const getAllFriendships = async () => {
     try {
-        const response = await axiosClient.get('/friendships');
+        const response = await axiosClient.get('/friendships/getAllFriendships');
         return response.data.data;
     } catch (error) {
         console.error("Lỗi khi gọi API getAllFriendships:", error);

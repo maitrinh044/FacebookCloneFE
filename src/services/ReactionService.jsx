@@ -2,7 +2,7 @@ import axiosClient from "../utils/axiosClient";
 
 export const getReactions = async (targetType, targetId) => {
   try {
-    const response = await axiosClient.get(`${API_URL}/${targetType}/${targetId}`);
+    const response = await axiosClient.get(`/reactions/${targetType}/${targetId}`);
     return response.data.data;
   } catch (error) {
     console.error('Error fetching reactions:', error);
@@ -12,7 +12,7 @@ export const getReactions = async (targetType, targetId) => {
 
 export const toggleReaction = async (reactionData) => {
   try {
-    const response = await axiosClient.post(`${API_URL}/toggle`, reactionData);
+    const response = await axiosClient.post(`/reactions/toggle`, reactionData);
     return response.data;
   } catch (error) {
     console.error('Error toggling reaction:', error);
@@ -22,7 +22,7 @@ export const toggleReaction = async (reactionData) => {
 
 export const countReactions = async (targetType, targetId) => {
   try {
-    const response = await axiosClient.get(`${API_URL}/count/${targetType}/${targetId}`);
+    const response = await axiosClient.get(`/reactions/count/${targetType}/${targetId}`);
     return response.data.data;
   } catch (error) {
     console.error('Error counting reactions:', error);
@@ -32,7 +32,7 @@ export const countReactions = async (targetType, targetId) => {
 
 export const countReactionsByType = async (targetType, targetId, reactionType) => {
   try {
-    const response = await axiosClient.get(`${API_URL}/count/${targetType}/${targetId}/${reactionType}`);
+    const response = await axiosClient.get(`/reactions/count/${targetType}/${targetId}/${reactionType}`);
     return response.data.data;
   } catch (error) {
     console.error('Error counting reactions by type:', error);
@@ -43,7 +43,7 @@ export const countReactionsByType = async (targetType, targetId, reactionType) =
 // New function to fetch available reaction types
 export const getReactionTypes = async () => {
   try {
-    const response = await axiosClient.get(`${API_URL}/types`);
+    const response = await axiosClient.get(`/reactions/types`);
     return response.data.data; // Expecting [{ id, emoji, label }, ...]
   } catch (error) {
     console.error('Error fetching reaction types:', error);
