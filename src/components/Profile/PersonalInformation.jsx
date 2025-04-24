@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { useState, useEffect, useRef } from "react";
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import 'swiper/swiper-bundle.css';
 import "../Css/customSwiper.css"; // Import file CSS tùy chỉnh
 
 const user = {
@@ -26,13 +27,23 @@ export default function PersonalInformation({ isOwnProfile }) {
     const [hidePrev, setHidePrev] = useState(true);
     const [hideNext, setHideNext] = useState(false);
     
+    const swiperRef = useRef(null);
+
     useEffect(() => {
-        // Khi Swiper mount xong, kiểm tra trạng thái next/prev
-        setTimeout(() => {
-            const swiper = document.querySelector(".mySwiper").swiper;
-            setHidePrev(swiper.isBeginning);
-            setHideNext(swiper.isEnd);
-        }, 100);
+        // Kiểm tra khi Swiper đã mount
+        if (swiperRef.current) {
+            const swiper = swiperRef.current.swiper;
+            if (swiper) {
+                setHidePrev(swiper.isBeginning);
+                setHideNext(swiper.isEnd);
+
+                // Cập nhật khi thay đổi slide
+                swiper.on('slideChange', () => {
+                    setHidePrev(swiper.isBeginning);
+                    setHideNext(swiper.isEnd);
+                });
+            }
+        }
     }, []);
 
     return (

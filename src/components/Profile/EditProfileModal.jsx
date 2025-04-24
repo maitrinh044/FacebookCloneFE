@@ -9,7 +9,8 @@ import "swiper/css"; // Import CSS mặc định của Swiper
 import "swiper/css/navigation"; // Import CSS cho nút điều hướng
 
 export default function EditProfileModal({ user, onClose, isOpen }) {
-  const [name, setName] = useState(user.name);
+  console.log("user: ", user);
+  const [name, setName] = useState(user.firstName);
   const [bio, setBio] = useState(user.bio);
   const [avatarPreview, setAvatarPreview] = useState(user.avatar);
   const [coverPreview, setCoverPreview] = useState(user.coverPhoto);

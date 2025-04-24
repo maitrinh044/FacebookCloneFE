@@ -15,8 +15,7 @@ import {
 
 } from "react-icons/fa";
 
-import axios from "axios";
-import { toast } from 'react-toastify';
+import { handleLogout } from "../utils/auth";
 
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
@@ -25,11 +24,11 @@ import MessagePopup from "./Message/MessagePopup";
 import useFetchUserFriends from "../utils/useFetchUserFriends";
 import MessagePanel from "./Message/MessagePanel";
 import { getLastMessage } from "../services/MessageService";
-
-
+import { useStomp } from "../contexts/StompContext";
 
 export default function Header() {
   const navigate = useNavigate();
+  const {disconnect} = useStomp();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMessagePopup, setShowMessagePopup] = useState(false);
@@ -105,54 +104,10 @@ export default function Header() {
     setShowNotifications(!showNotifications);
     setIsRead(true);
   };
-  const handleLogout = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken");
-  
-      if (refreshToken) {
-        // Gửi yêu cầu POST đến API để logout và truyền refreshToken trong body
-        await axios.post('http://localhost:8080/auth/logout', JSON.stringify(refreshToken), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
 
-        const rememberMe = localStorage.getItem("rememberMe") === "true";
-  
-        // Xóa token khỏi localStorage
-        if (!rememberMe) {
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          localStorage.removeItem("userId");
-          localStorage.removeItem("email");
-        } else {
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-        }
-  
-        // Thông báo đăng xuất thành công
-        toast.dismiss();
-        toast.success("Đăng xuất thành công!");
-  
-        navigate("/login");
-      } else {
-        toast.error("Không tìm thấy refreshToken, có thể bạn chưa đăng nhập.", {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 5000,
-          hideProgressBar: true,
-        });
-      }
-    } catch (error) {
-      console.error("Lỗi khi đăng xuất:", error);
-      toast.error("Đã có lỗi xảy ra khi đăng xuất!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 5000,
-        hideProgressBar: true,
-      });
-    }
+  const onLogout = () => {
+    handleLogout(disconnect, navigate);
   };
-  
-  
 
   const handleSelectFriend = (friend) => {
     setOpenChats((prevChats) => {
@@ -284,7 +239,7 @@ export default function Header() {
                 <li className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer" onClick={() => navigate("/settings")}>
                   <FaCog /> Cài đặt
                 </li>
-                <li className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-500" onClick={handleLogout}>
+                <li className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-500" onClick={onLogout}>
 
                   <FaSignOutAlt /> Đăng xuất
                 </li>

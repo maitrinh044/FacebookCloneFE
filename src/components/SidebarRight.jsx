@@ -4,17 +4,25 @@ import { useState, useEffect } from "react";
 
 export default function SidebarRight({ onOpenChat }) {
   const { friends , loading, error} = useFetchUserFriends();
-    const sortedFriends = [];
-    if (friends != null) {
-      const sortedFriends = [...friends].sort((a, b) => b.online - a.online);
-    }
+
+  let sortedFriends = []; 
+  const { onlineUsers } = ["1"];
+
+
+  // if (Array.isArray(friends)) {
+  //   sortedFriends = friends.map(friend => ({
+  //     ...friend,
+  //     online: onlineUsers.has(friend.id.toString()),  // Kiểm tra xem user có trong onlineUsers không
+  //   })).sort((a, b) => b.online - a.online);  // Sắp xếp bạn bè theo trạng thái online
+  // }
+
 
 
   return (
     <div className="w-64 pt-20 px-4 bg-white min-h-screen border-l border-gray-300 rounded-[10px]">
       <h3 className="text-sm font-semibold mb-4 text-gray-500">Người liên hệ</h3>
       <ul className="space-y-3">
-        {sortedFriends.map((friend, index) => (
+        {friends.map((friend, index) => (
           <li
             key={index}
             className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer"
