@@ -25,7 +25,7 @@ export default function ProfileHeader({ user, userId, isOwnProfile, onEdit }) {
       <div className="relative w-full h-full bg-gradient-to-b from-gray-400 to-white">
         <div className="max-w-[1000px] mx-auto h-full relative">
           <img
-            src={user.coverPhoto}
+            src={user?.coverPhoto || ""}
             alt="Cover"
             className="w-full h-full object-cover rounded-[10px]"
           />
@@ -60,8 +60,8 @@ export default function ProfileHeader({ user, userId, isOwnProfile, onEdit }) {
         <div className="w-64 flex-1">
           {/* Tên & Bio */}
         <div className="">
-          <h1 className="text-2xl font-bold text-gray-800">{user.name}</h1>
-          <p className="text-gray-600">{user.bio}</p>
+          <h1 className="text-2xl font-bold text-gray-800">{user?.lastName || ""} {user?.firstName || ""}</h1>
+          <p className="text-gray-600">{user?.biography || ""}</p>
           {!isOwnProfile && (
             <p className="text-gray-600">176 bạn bè</p>
           )}

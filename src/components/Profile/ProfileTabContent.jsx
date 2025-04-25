@@ -70,7 +70,7 @@ export default function ProfileTabContent({ isOwnProfile, activeTab, user }) {
         <div className="w-[600px] flex-shrink-0">
           {/* <ProfileTabContent activeTab={activeTab} user={user} /> */}
           <div className="space-y-4">
-          {user.posts && user.posts.length > 0 ? (
+          {user?.posts && user.posts.length > 0 ? (
             user.posts.map((posts, index) => (
               <div key={index} className="bg-white shadow-md p-4 rounded-md text-gray-700 mb-3 flex flex-col">
                 {/* Header */}

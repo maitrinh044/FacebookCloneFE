@@ -2,20 +2,22 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFacebook } from "react-icons/fa";
 import { toast } from 'react-toastify';
-import axios from "axios";
+import { login } from "../utils/auth";
+import { useStomp } from "../contexts/StompContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
+  const { connect } = useStomp();
 
   if (rememberMe) {
     localStorage.setItem("rememberMe", "true");
   } else {
     localStorage.setItem("rememberMe", "false");
   }
-  
+
   useEffect(() => {
     const savedEmail = localStorage.getItem("email");
     const savedPassword = localStorage.getItem("password");
@@ -31,34 +33,12 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (email && password) {
-      try {
-        const response = await axios.post('http://localhost:8080/auth/login', {
-          emailOrPhone: email,
-          password: password
-        });
+      const success = await login(email, password, rememberMe, connect);
 
-        // Kiểm tra nếu nhận được token từ API
-        if (response.data.data.accessToken) {
-          // Lưu thông tin vào localStorage nếu "Ghi nhớ tôi" được chọn
-          if (rememberMe) {
-            localStorage.setItem("email", email);
-            localStorage.setItem("password", password); // Lưu mật khẩu
-          } else {
-            localStorage.removeItem("email");
-            localStorage.removeItem("password"); // Xóa nếu không chọn ghi nhớ
-          }
-
-          // Lưu token vào localStorage
-          localStorage.setItem("accessToken", response.data.data.accessToken);
-          localStorage.setItem("refreshToken", response.data.data.refreshToken);
-          localStorage.setItem("userId", response.data.data.userId)
-          navigate("/"); // Điều hướng về trang chủ
-          toast.success('Đăng nhập thành công!');
-        } else {
-          toast.error('Đăng nhập thất bại!');
-        }
-      } catch (error) {
-        console.error('Lỗi đăng nhập:', error);
+      if (success) {
+        navigate("/"); // Điều hướng về trang chủ
+        toast.success('Đăng nhập thành công!');
+      } else {
         toast.error('Đăng nhập thất bại!');
       }
     } else {
