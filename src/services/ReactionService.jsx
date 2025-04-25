@@ -1,59 +1,57 @@
-import axiosClient from "../utils/axiosClient";
+const API_URL = "http://localhost:8080";
 
-export const getReactions = async (targetType, targetId) => {
-  try {
-    const response = await axiosClient.get(`/reactions/${targetType}/${targetId}`);
-    return response.data.data;
-  } catch (error) {
-    console.error('Error fetching reactions:', error);
-    throw error;
-  }
+export const getReactionTypes = async () => {
+    const response = await fetch(`${API_URL}/reactions/types`);
+    const data = await response.json();
+    if (data.statusCode !== 200) throw new Error(data.message || "Không thể tải loại phản ứng");
+    return data.data;
 };
 
-export const toggleReaction = async (reactionData) => {
-  try {
-    const response = await axiosClient.post(`/reactions/toggle`, reactionData);
-    return response.data;
-  } catch (error) {
-    console.error('Error toggling reaction:', error);
-    throw error;
-  }
+export const toggleReaction = async (reaction, userId) => {
+    if (!userId) throw new Error("User ID is required");
+    const response = await fetch(`${API_URL}/reactions/toggle`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            type: reaction.reactionType,
+            targetType: reaction.targetType,
+            targetId: reaction.targetId,
+            userId: userId,
+        }),
+    });
+    const data = await response.json();
+    if (data.statusCode !== 200) throw new Error(data.message || "Không thể thực hiện phản ứng");
+    return data.data;
 };
 
 export const countReactions = async (targetType, targetId) => {
-  try {
-    const response = await axiosClient.get(`/reactions/count/${targetType}/${targetId}`);
-    return response.data.data;
-  } catch (error) {
-    console.error('Error counting reactions:', error);
-    throw error;
-  }
+    const response = await fetch(`${API_URL}/reactions/count/${targetType}/${targetId}`);
+    const data = await response.json();
+    if (data.statusCode !== 200) throw new Error(data.message || "Không thể đếm phản ứng");
+    return data.data;
 };
 
-export const countReactionsByType = async (targetType, targetId, reactionType) => {
-  try {
-    const response = await axiosClient.get(`/reactions/count/${targetType}/${targetId}/${reactionType}`);
-    return response.data.data;
-  } catch (error) {
-    console.error('Error counting reactions by type:', error);
-    throw error;
-  }
+export const getReactions = async (targetType, targetId, userId = null) => {
+    const response = await fetch(`${API_URL}/reactions/${targetType}/${targetId}`);
+    const data = await response.json();
+    if (data.statusCode !== 200) throw new Error(data.message || "Không thể tải phản ứng");
+    if (userId) {
+        return data.data.find(reaction => reaction.userId === userId) || null;
+    }
+    return data.data;
 };
 
-// New function to fetch available reaction types
-export const getReactionTypes = async () => {
-  try {
-    const response = await axiosClient.get(`/reactions/types`);
-    return response.data.data; // Expecting [{ id, emoji, label }, ...]
-  } catch (error) {
-    console.error('Error fetching reaction types:', error);
-    return [
-      { id: "like", emoji: "👍", label: "Thích" },
-      { id: "love", emoji: "❤️", label: "Yêu thích" },
-      { id: "haha", emoji: "😆", label: "Haha" },
-      { id: "wow", emoji: "😮", label: "Wow" },
-      { id: "sad", emoji: "😢", label: "Buồn" },
-      { id: "angry", emoji: "😡", label: "Phẫn nộ" },
-    ]; // Fallback to static types
-  }
+export const getReactionCountsByType = async (targetType, targetId) => {
+    const reactionTypes = ["LIKE", "LOVE", "HAHA", "WOW", "SAD", "ANGRY"];
+    const counts = {};
+    for (const type of reactionTypes) {
+        const response = await fetch(`${API_URL}/reactions/count/${targetType}/${targetId}/${type}`);
+        const data = await response.json();
+        if (data.statusCode === 200) {
+            counts[type] = data.data;
+        } else {
+            counts[type] = 0;
+        }
+    }
+    return counts;
 };
