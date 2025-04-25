@@ -1,20 +1,30 @@
-import React from "react";
 
-const ReactionPopup = ({ reactions, onSelect }) => {
-  return (
-    <div className="absolute bottom-4 left-0 bg-white border shadow-md rounded-full px-3 py-2 flex gap-2 z-50">
-      {reactions.map((reaction) => (
-        <button
-          key={reaction.id}
-          className="text-2xl hover:scale-125 transition-transform"
-          onClick={() => onSelect(reaction)}
-          title={reaction.label}
-        >
-          {reaction.emoji}
-        </button>
-      ))}
-    </div>
-  );
+import PropTypes from "prop-types";
+
+export default function ReactionPopup({ reactions, onSelect }) {
+    return (
+        <div className="flex gap-2 bg-white rounded-full shadow-md p-2">
+            {reactions.map((reaction) => (
+                <button
+                    key={reaction.id}
+                    onClick={() => onSelect(reaction)}
+                    className="text-2xl hover:scale-125 transition-transform"
+                    title={reaction.label}
+                >
+                    {reaction.emoji}
+                </button>
+            ))}
+        </div>
+    );
+}
+
+ReactionPopup.propTypes = {
+    reactions: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            emoji: PropTypes.string.isRequired,
+            label: PropTypes.string.isRequired,
+        })
+    ).isRequired,
+    onSelect: PropTypes.func.isRequired,
 };
-
-export default ReactionPopup;
