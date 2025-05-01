@@ -6,34 +6,45 @@ import ProfileTabs from "../components/Profile/ProfileTabs";
 import ProfileTabContent from "../components/Profile/ProfileTabContent";
 import EditProfileModal from "../components/Profile/EditProfileModal";
 import PersonalInformation from "../components/Profile/PersonalInformation";
-import { getUserById } from "../services/UserService";
+import useFetchProfile, { getReactionsByUser } from "../utils/userFetchProfile";
+import { useFetchUser, useFetchUserById } from "../utils/useFetchUser";
 
 export default function ProfilePage() {
   const { id } = useParams();
-  console.log("id: ", id);
   const currentUserId = localStorage.getItem("userId");
-
+  const currentUserId2 = localStorage.getItem("userId");
+  console.log("urlUserId: ", id);
+  const {user} = useFetchUserById(currentUserId);
+  console.log("currentUserId: ", currentUserId);
+  console.log("currentUser: ", user);
+  // const {reactionByUser} = getReactionsByUser(currentUserId);
+  // console.log("reactionByCurrentUser: ", reactionByUser);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {listPost, userData, reactionByPost,commentByPost,reactionTypes,listFriends,controlReactionUser,addCommentByUser,reactionByUser,controlActiveStatusPost,updateUser,loading} = useFetchProfile(id, currentUserId2);
+  console.log("listPost: ", listPost);
+  console.log("userData: ", userData);
+  console.log("reactionByPost: ", reactionByPost);
+  console.log("commentByPost: ", commentByPost);
+  console.log("reactionTypes: ", reactionTypes);
+  console.log("listFriends: ", listFriends);
+  console.log("reactionByCurrentUser: ", reactionByUser);
 
-  const [user, setUser] = useState(null);
-
+  
+  const {users, error} = useFetchUser();
+  console.log("users: ", users);
+  function getUserById(userId) {
+    const user = users.find(e => e.id === userId);
+    return user || [];
+  }
   const [activeTab, setActiveTab] = useState("posts");
   const [showEdit, setShowEdit] = useState(false);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await getUserById(id);  // Gọi API để lấy thông tin người dùng
-        console.log("a");
-        setUser(userData);  // Lưu dữ liệu vào state
-      } catch (error) {
-        console.error("Không thể lấy thông tin người dùng:", error);
-      }
-    };
-
-    fetchUser();  // Gọi hàm fetchUser khi trang load
-  }, [id]);  // Gọi lại khi ID thay đổi
-
+  const handleSaveUser = (updatedUser) => {
+    setUsers((prev) => ({
+      ...prev,
+      [id]: updatedUser,
+    }));
+  };
   useEffect(() => {
     if (showEdit) {
       document.body.classList.add("overflow-hidden");
@@ -41,21 +52,20 @@ export default function ProfilePage() {
       document.body.classList.remove("overflow-hidden");
     }
   }, [showEdit]);
-  
-  console.log(user);
-
+  if(loading) return(<p>loading....</p>)
   return (
     <div className="bg-gray-100 min-h-screen">
       <Header />
       <div className="w-full min-h-screen mx-auto flex flex-col">
         <ProfileHeader
-          user={user}
-          userId={1}
+          user={userData}
           isOwnProfile={id === currentUserId}
           onEdit={() => setIsModalOpen(true)}
+          listFriends={listFriends}
+
         />
         {isModalOpen && (
-          <EditProfileModal user={user}  onClose={() => setIsModalOpen(false)} isOpen={() => setIsModalOpen(true)} />
+          <EditProfileModal user={userData}  onClose={() => setIsModalOpen(false)} isOpen={() => setIsModalOpen(true)} updateUser={updateUser} />
         )}
         <div className="pt-28 w-full mx-auto border-b border-gray-300">
           <div className="bg-white shadow">
@@ -64,7 +74,21 @@ export default function ProfilePage() {
           <div className="bg-gray rounded-xl max-w-[1000px] mx-auto m-4 flex flex-row">
 
             <div className="w-[1000px]">
-              <ProfileTabContent isOwnProfile={id === currentUserId} activeTab={activeTab} user={user} />
+              <ProfileTabContent isOwnProfile={id === currentUserId} 
+                                currentUser={user} 
+                                activeTab={activeTab} 
+                                user={userData} 
+                                listPost={listPost} 
+                                listFriends={listFriends} 
+                                users={users} 
+                                commentByPost={commentByPost} 
+                                reactionByPost={reactionByPost} 
+                                reactionTypes={reactionTypes} 
+                                reactionByCurrentUser={reactionByUser}
+                                controlReactionUser={controlReactionUser}
+                                addCommentByUser={addCommentByUser}
+                                controlActiveStatusPost={controlActiveStatusPost}
+                                />
             </div>
           </div>
         </div>

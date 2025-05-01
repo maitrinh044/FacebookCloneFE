@@ -1,32 +1,27 @@
 // src/components/EditProfileModal.jsx
 import { useState } from "react";
 import '../Css/EditProfileModal.css';
-import { FaBook, FaPhone, FaTimes } from "react-icons/fa";
+import { FaBirthdayCake, FaBook, FaFemale, FaGenderless, FaMale, FaPhone, FaTimes, FaUserCircle } from "react-icons/fa";
 import "../Css/customSwiper.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules"; // Import Navigation từ Swiper
 import "swiper/css"; // Import CSS mặc định của Swiper
 import "swiper/css/navigation"; // Import CSS cho nút điều hướng
+import { use } from "react";
 
-export default function EditProfileModal({ user, onClose, isOpen }) {
-  console.log("user: ", user);
-  const [name, setName] = useState(user.firstName);
-  const [bio, setBio] = useState(user.bio);
-  const [avatarPreview, setAvatarPreview] = useState(user.avatar);
-  const [coverPreview, setCoverPreview] = useState(user.coverPhoto);
+export default function EditProfileModal({ user, onClose, isOpen, updateUser }) {
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName)
+  const [bio, setBio] = useState(user.biography);
+  const [profilePicture, setProfilePicture] = useState(user.profilePicture);
+  const [coverPhoto, setCoverPhoto] = useState(user.coverPhoto);
+  const [birthday, setBirthDay] = useState(user.birthday);
+  const [gender, setGender] = useState(user.gender)
   const [email, setEmail] = useState(user.email || "");
   const [phone, setPhone] = useState(user.phone || "");
   const [hidePrev, setHidePrev] = useState(true);
   const [hideNext, setHideNext] = useState(false);
 
-  // Danh sách ảnh Story
-  const images = [
-    "https://via.placeholder.com/200x300?text=Story+1",
-    "https://via.placeholder.com/200x300?text=Story+2",
-    "https://via.placeholder.com/200x300?text=Story+3",
-    "https://via.placeholder.com/200x300?text=Story+4",
-    "https://via.placeholder.com/200x300?text=Story+5",
-  ];
 
   if (!isOpen) return null;
   const handleAvatarChange = (e) => {
@@ -45,19 +40,44 @@ export default function EditProfileModal({ user, onClose, isOpen }) {
     }
   };
 
+  // const handleSave = () => {
+  //   const updatedUser = {
+  //     ...user,
+  //     firstName, 
+  //     lastName,
+  //     birthday,
+  //     gender,
+  //     bio,
+  //     profilePicture,
+  //     coverPhoto,
+  //     email,
+  //     phone,
+  //   };
+  //   updateUser(updateUser);
+  //   onClose();
+  // };
   const handleSave = () => {
     const updatedUser = {
-      ...user,
-      name,
-      bio,
-      avatar: avatarPreview,
-      coverPhoto: coverPreview,
-      email,
-      phone,
+        id: user.id, // Đảm bảo rằng bạn có ID của người dùng
+        firstName : firstName, 
+        lastName: lastName,
+        birthday: birthday,
+        gender: gender,
+        biography: bio, // Sử dụng biến bio đã cập nhật
+        profilePicture: profilePicture,
+        coverPhoto: coverPhoto,
+        email: email,
+        phone: phone,
+        password: user.password,
+        role: user.role,
+        createdAt: user.createdAt,
+        activeStatus: user.activeStatus,
+        online: user.online
     };
-    onSave(updatedUser);
+
+    updateUser(updatedUser); // Gọi hàm cập nhật với đối tượng đã chỉnh sửa
     onClose();
-  };
+};
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000] ">
@@ -74,15 +94,29 @@ export default function EditProfileModal({ user, onClose, isOpen }) {
           <div className="flex flex-col gap-5">
             <div className="flex justify-between">
               <h2 className="font-bold text-[20px]">Ảnh đại diện</h2>
-              <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Chỉnh sửa</button>
+              {/* <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Chỉnh sửa</button> */}
+              {profilePicture != null ? (
+                <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Chỉnh sửa</button>
+              ) : (
+                <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Thêm</button>
+              )}
             </div>
             <div className="flex justify-center">
               <div className="rounded-full object-cover">
-                <img
-                  src={user.avatar}
+                {/* <img
+                  src={user.}
                   alt="avatar"
                   className="rounded-full object-cover w-40 h-40"
-                />
+                /> */}
+                {profilePicture != null ? (
+                  <img
+                    src={profilePicture}
+                    alt="avatar"
+                    className="rounded-full object-cover w-40 h-40"
+                  />
+                ) : (
+                  <FaUserCircle className="rounded-full object-cover w-40 h-40 text-gray-300" />
+                )}
               </div>
             </div>
             {/* <label className="text-sm font-semibold">Tên</label>
@@ -96,85 +130,112 @@ export default function EditProfileModal({ user, onClose, isOpen }) {
           <div className="flex flex-col gap-5">
             <div className="flex justify-between">
               <h2 className="font-bold text-[20px]">Ảnh bìa</h2>
-              <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Chỉnh sửa</button>
+              {/* <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Chỉnh sửa</button> */}
+              {coverPhoto != null ? (
+                <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Chỉnh sửa</button>
+              ) : (
+                <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Thêm</button>
+              )}
             </div>
             <div className="flex justify-center">
-              <div className="w-full max-w-[500px] mx-auto">
+              {/* <div className="w-full max-w-[500px] mx-auto">
                 <img
                   src={user.coverPhoto}
                   alt="avatar"
                   className="rounded-md object-cover w-full h-40"
                 />
-              </div>
+              </div> */}
+              {coverPhoto != null ? (
+                <div className="w-full max-w-[500px] mx-auto">
+                  <img
+                    src={coverPhoto}
+                    alt="avatar"
+                    className="rounded-md object-cover w-full h-40"
+                  />
+                </div>
+              ) : (
+                <div className="rounded-md object-cover w-full h-40 bg-gray-300"></div>
+              )}
             </div>
           </div>
           <div className="flex flex-col gap-5">
             <div className="flex justify-between">
               <h2 className="font-bold text-[20px]">Tiểu sử</h2>
-              <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Thêm</button>
             </div>
             <div className="flex justify-center">
-              <div className="text-gray-800">
-                {user.bio}
-              </div>
+              <textarea
+                className="text-gray-800 w-full h-[100px] p-1 resize-none overflow-y-auto text-start"
+                value={bio}
+                placeholder="Nhập tiểu sử của bạn..."
+                onChange={(e)=>setBio(e.target.value)}
+              />
             </div>
           </div>
           <div className="flex flex-col gap-5">
             <div className="flex justify-between">
               <h2 className="font-bold text-[20px]">Chỉnh sửa phần giới thiệu</h2>
-              <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Thêm</button>
+              {/* <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Thêm</button>
+              {user.biography != null ? (
+                <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Chỉnh sửa</button>
+              ) : (
+                <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Thêm</button>
+              )} */}
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-5 mb-2">
                 <div className="relative -top-[3px] mt-2 text-gray-600">
+                  Họ
+                </div>
+                {/* <div className="text-sm">{user.firstName + " " + user.lastName}</div> */}
+                <input className="rounded p-1 flex-1" value={firstName} onChange={(e) => setFirstName(e.target.value)}></input>
+              </div>
+              <div className="flex items-center gap-5 mb-2">
+                <div className="relative -top-[3px] mt-2 text-gray-600">
+                  Tên
+                </div>
+                {/* <div className="text-sm">{user.firstName + " " + user.lastName}</div> */}
+                <input className="rounded p-1 flex-1" value={lastName} onChange={(e) => setLastName(e.target.value)}></input>
+              </div>
+              <div className="flex items-center gap-5 mb-2">
+                <div className="relative -top-[3px] mt-2 text-gray-600">
+                  {gender == 'MALE' ? (
+                    <FaMale/>
+                  ) : (
+                    <FaFemale/>
+                  )}
+                </div>
+                {/* <div className="text-sm">{user.gender == 'MALE' ? "Nam" : "Nữ"}</div> */}
+                {/* <input className="rounded p-1 flex-1" value={user.gender == 'MALE' ? "Nam" : "Nữ"}  onChange={(e) => setFirstName(e.target.value)}></input> */}
+                <select className="rounded p-1 flex-1" value={gender} onChange={(e) => setGender(e.target.value)}>
+                  <option value='MALE'>Nam</option>
+                  <option value='FEMALE'>Nữ</option>
+                  <option value='UNDEFINED'>Khác</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-5 mb-2">
+                <div className="relative -top-[3px] mt-2 text-gray-600">
                   <FaBook />
                 </div>
-                <div className="text-sm">{user.email}</div>
+                {/* <div className="text-sm">{user.email}</div> */}
+                <input className="rounded p-1 flex-1" value={email} onChange={(e) => setEmail(e.target.value)}></input>
               </div>
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-5 mb-2">
                 <div className="relative -top-[3px] mt-2 text-gray-600">
                   <FaPhone />
                 </div>
-                <div className="text-sm">{user.phone}</div>
+                {/* <div className="text-sm">{user.phone}</div> */}
+                <input className="rounded p-1 flex-1" value={phone} onChange={(e) => setPhone(e.target.value)}></input>
+              </div>
+              <div className="flex items-center gap-5 mb-2">
+                <div className="relative -top-[3px] mt-2 text-gray-600">
+                  <FaBirthdayCake/>
+                </div>
+                {/* <div className="text-sm">{user.phone}</div> */}
+                <input className="rounded p-1 flex-1" value={birthday} onChange={(e) => setBirthDay(e.target.value)}></input>
               </div>
             </div>
           </div>
-          <div className="w-full relative flex flex-col gap-5">
-            <div className="flex justify-between">
-              <h2 className="font-bold text-[20px]">Chỉnh sửa phần giới thiệu</h2>
-              <button className="bg-white text-blue-500 hover:bg-gray-300 rounded-md p-2">Thêm</button>
-            </div>
-            <div className="w-full px-4 max-w-[500px] mx-auto p-5">
-                <Swiper
-                    slidesPerView={3}
-                    spaceBetween={15}
-                    navigation={{
-                        nextEl: ".swiper-button-next",
-                        prevEl: ".swiper-button-prev",
-                    }}
-                    modules={[Navigation]}
-                    className="mySwiper"
-                    onSlideChange={(swiper) => {
-                        setHidePrev(swiper.isBeginning);
-                        setHideNext(swiper.isEnd);
-                    }}
-                >
-                    {images.map((src, index) => (
-                        <SwiperSlide key={index} className="rounded-lg overflow-hidden shadow-md max-w-[160px]">
-                            <img
-                                src={src}
-                                alt={`Story ${index + 1}`}
-                                className="w-full h-60 object-cover rounded-md border border-gray-300"
-                            />
-                        </SwiperSlide>
-                    ))}
-                </Swiper>
-
-                {/* Custom Next & Previous Buttons */}
-                <div className={`swiper-button-prev custom-nav-btn-editprl ${hidePrev ? "hidden" : ""}`}></div>
-                <div className={`swiper-button-next custom-nav-btn-editprl ${hideNext ? "hidden" : ""}`}></div>
-            </div>
-          </div>
+          {/*  */}
           <button
             className="bg-blue-100 text-blue-700 font-semibold text-[17px] px-4 py-2 rounded-md hover:bg-blue-200"
             onClick={handleSave}

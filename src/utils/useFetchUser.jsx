@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getUser } from "../services/UserService";
 import { useFetcher } from "react-router-dom";
-
+import { getUserById } from "../services/profileService";
 export const useFetchUser = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);
@@ -23,5 +23,26 @@ export const useFetchUser = () => {
     }, []);
     return {users, loading, error};
 }
+export const useFetchUserById = (userId) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await getUserById(userId); // Lấy người dùng bằng ID
+                setUser(data);
+            } catch (error) {
+                console.error("Error while getting user by id:", error);
+                setError(error); // Cập nhật lỗi ở đây
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [userId]);
+
+    return { user, loading, error };
+};
 export default useFetchUser;

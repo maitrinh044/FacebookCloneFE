@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { useState, useEffect } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import 'swiper/swiper-bundle.css';
 import "../Css/customSwiper.css"; // Import file CSS tùy chỉnh
+import { div } from "framer-motion/client";
+import { FaUserCircle } from "react-icons/fa";
 
 const user = {
     workAt: "HoChiMinh City",
@@ -23,28 +24,18 @@ const images = [
     "https://via.placeholder.com/200x300?text=Story+5",
 ];
 
-export default function PersonalInformation({ isOwnProfile }) {
+export default function PersonalInformation({ isOwnProfile, user, listFriends }) {
     const [hidePrev, setHidePrev] = useState(true);
     const [hideNext, setHideNext] = useState(false);
     
-    const swiperRef = useRef(null);
-
-    useEffect(() => {
-        // Kiểm tra khi Swiper đã mount
-        if (swiperRef.current) {
-            const swiper = swiperRef.current.swiper;
-            if (swiper) {
-                setHidePrev(swiper.isBeginning);
-                setHideNext(swiper.isEnd);
-
-                // Cập nhật khi thay đổi slide
-                swiper.on('slideChange', () => {
-                    setHidePrev(swiper.isBeginning);
-                    setHideNext(swiper.isEnd);
-                });
-            }
-        }
-    }, []);
+    // useEffect(() => {
+    //     // Khi Swiper mount xong, kiểm tra trạng thái next/prev
+    //     setTimeout(() => {
+    //         const swiper = document.querySelector(".mySwiper").swiper;
+    //         setHidePrev(swiper.isBeginning);
+    //         setHideNext(swiper.isEnd);
+    //     }, 100);
+    // }, []);
 
     return (
         <div className="flex flex-col p-4 gap-5">
@@ -53,15 +44,19 @@ export default function PersonalInformation({ isOwnProfile }) {
 
                 {isOwnProfile && (
                     <div className="flex flex-col gap-6">
-                        <button className="w-full px-10 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300">
+                        {/* <button className="w-full px-10 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300">
                             Thêm tiểu sử
-                        </button>
-                        <button className="w-full px-10 py-2 bg-gray-200 text-black rounded-md hover:gray-300">
-                            Chỉnh sửa chi tiết
-                        </button>
+                        </button> */}
+                        {user.biography != null ? (
+                            <div className="w-full px-10 py-2 text-center text-black ">{user.biography}</div>
+                        ) : (
+                            <button className="w-full px-10 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300">
+                                Thêm tiểu sử
+                            </button>
+                        )}
 
                         {/* Story Section */}
-                        <div className="w-full px-4 relative">
+                        {/* <div className="w-full px-4 relative">
                             <Swiper
                                 slidesPerView={3}
                                 spaceBetween={10}
@@ -87,10 +82,9 @@ export default function PersonalInformation({ isOwnProfile }) {
                                 ))}
                             </Swiper>
 
-                            {/* Custom Next & Previous Buttons */}
                             <div className={`swiper-button-prev custom-nav-btn ${hidePrev ? "hidden" : ""}`}></div>
                             <div className={`swiper-button-next custom-nav-btn ${hideNext ? "hidden" : ""}`}></div>
-                        </div>
+                        </div> */}
                     </div>
                 )}
             </div>
@@ -106,11 +100,11 @@ export default function PersonalInformation({ isOwnProfile }) {
                     <h2 className="font-bold text-2xl">Bạn bè</h2>
                     <p className="text-blue-500 cursor-pointer">Xem tất cả bạn bè</p>
                 </div>
-                <div>176 bạn bè</div>
+                <div>{listFriends.length} bạn bè</div>
 
                 {/* Grid danh sách bạn bè */}
                 <div className="grid grid-cols-3 gap-3">
-                    <div className="p-1 flex flex-col gap-1">
+                    {/* <div className="p-1 flex flex-col gap-1">
                         <img
                             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi5sTqyWXMuHWDzEI_BGr_0x3sFTA3TBG3SQ&s"
                             alt="bạn bè 1"
@@ -165,8 +159,23 @@ export default function PersonalInformation({ isOwnProfile }) {
                             className="rounded-md object-cover"
                         />
                         <p className="text-xs font-bold">Nguyễn Văn A</p>
-                    </div>
-
+                    </div> */}
+                    {listFriends.slice(0, 7).map(e => (
+                        <div className="p-1 flex flex-col gap-1 shadow rounded">
+                            {e.imageUrl!=null ? (
+                                <img
+                                    src={e.imageUrl}
+                                    alt="bạn bè"
+                                    className="rounded-md object-cover"
+                                />
+                            ) : (
+                                <div className=" p-1">
+                                    <FaUserCircle className="rounded-md w-full h-full text-gray-300 object-cover"/>
+                                </div>
+                            )}
+                            <p className="text-xs font-bold ">{e.firstName + " " + e.lastName}</p>
+                        </div>
+                    ))}
                 </div>
             </div>
             <p className="text-[13px] color-gray-500">Quyền riêng tư  · Điều khoản  · Quảng cáo  · Lựa chọn quảng cáo   · Cookie  ·   · Meta © 2025</p>
