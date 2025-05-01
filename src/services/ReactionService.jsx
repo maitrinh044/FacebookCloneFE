@@ -48,12 +48,12 @@ export const getReactionTypes = async () => {
   } catch (error) {
     console.error('Error fetching reaction types:', error);
     return [
-      { id: "like", emoji: "👍", label: "Thích" },
-      { id: "love", emoji: "❤️", label: "Yêu thích" },
-      { id: "haha", emoji: "😆", label: "Haha" },
-      { id: "wow", emoji: "😮", label: "Wow" },
-      { id: "sad", emoji: "😢", label: "Buồn" },
-      { id: "angry", emoji: "😡", label: "Phẫn nộ" },
+      { id: "LIKE", emoji: "👍", label: "Thích" },
+      { id: "LOVE", emoji: "❤️", label: "Yêu thích" },
+      { id: "HAHA", emoji: "😆", label: "Haha" },
+      { id: "WOW", emoji: "😮", label: "Wow" },
+      { id: "SAD", emoji: "😢", label: "Buồn" },
+      { id: "ANGRY", emoji: "😡", label: "Phẫn nộ" },
     ]; // Fallback to static types
   }
 };

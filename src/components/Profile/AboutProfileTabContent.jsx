@@ -1,4 +1,5 @@
-import { FaEnvelope, FaLock, FaPencilAlt, FaPhone, FaPhoneAlt, FaPlusCircle, FaRegStar } from "react-icons/fa";
+import { div } from "framer-motion/client";
+import { FaBirthdayCake, FaEnvelope, FaFemale, FaLock, FaMale, FaPencilAlt, FaPhone, FaPhoneAlt, FaPlusCircle, FaRegStar } from "react-icons/fa";
 
 export default function AboutProfileTabContent ({activeAboutTab, user})  {
     switch (activeAboutTab) {
@@ -174,20 +175,59 @@ export default function AboutProfileTabContent ({activeAboutTab, user})  {
                                 <p className="text-blue-500 text-semibold">Thêm một ngôn ngữ</p>
                             </div>
                         </div>
-                        <div className="flex flex-col gap-3 ">
-                        <div className="flex justify-start items-center gap-3">
-                                <FaPlusCircle className="text-blue-500 h-6 w-6 mt-0.5"/>
-                                <p className="text-blue-500 text-semibold">Thêm giới tính</p>
+                        
+                        {user.gender!=null ? (
+                            <div className="flex justify-between">
+                                <div className="flex justify-start gap-3">
+                                    {user.gender=='MALE' ? (
+                                        <FaMale className="text-gray-500 h-4 w-4 mt-1"/>
+                                    ) : (
+                                        <FaFemale className="text-gray-500 h-4 w-4 mt-1"/>
+                                    )}
+                                    <div className="flex flex-col">
+                                        <p className="text-gray-500 text-semibold text-[15px]">{user.gender == 'MALE' ? 'Nam' : 'Nữ'}</p>
+                                        <p className="text-gray-500 text-[13px]">Giới tính</p>
+                                    </div>
+                                </div>
+                                <div className="flex justify-end gap-3">
+                                    <FaLock className="text-gray-500 h-4 w-4"/>
+                                    <FaPencilAlt className="text-gray-500 h-4 w-4"/>
+                                </div>
                             </div>
+                        ) : (
+                            <div className="flex flex-col gap-3 ">
+                                <div className="flex justify-start items-center gap-3">
+                                    <FaPlusCircle className="text-blue-500 h-6 w-6 mt-0.5"/>
+                                    <p className="text-blue-500 text-semibold">Thêm giới tính</p>
+                                </div>
+                            </div>
+                        )}
+                        {user.birthday != null ? (
+                            <div className="flex justify-between">
+                                <div className="flex justify-start gap-3">
+                                    <FaBirthdayCake className="text-gray-500 h-4 w-4 mt-1"/>
+                                    <div className="flex flex-col">
+                                        <p className="text-gray-500 text-semibold text-[15px]">{user.birthday}</p>
+                                        <p className="text-gray-500 text-[13px]">Sinh nhật</p>
+                                    </div>
+                                </div>
+                                <div className="flex justify-end gap-3">
+                                    <FaLock className="text-gray-500 h-4 w-4"/>
+                                    <FaPencilAlt className="text-gray-500 h-4 w-4"/>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-3 ">
+                                <div className="flex justify-start items-center gap-3">
+                                    <FaPlusCircle className="text-blue-500 h-6 w-6 mt-0.5"/>
+                                    <p className="text-blue-500 text-semibold">Thêm sinh nhật</p>
+                                </div>
+                            </div>
+                        )}
+                        <div className="flex justify-start items-center gap-3">
+                            <FaPlusCircle className="text-blue-500 h-6 w-6 mt-0.5"/>
+                            <p className="text-blue-500 text-semibold">Thêm xưng hô</p>
                         </div>
-                        <div className="flex justify-start items-center gap-3">
-                                <FaPlusCircle className="text-blue-500 h-6 w-6 mt-0.5"/>
-                                <p className="text-blue-500 text-semibold">Thêm sinh nhật</p>
-                            </div>
-                            <div className="flex justify-start items-center gap-3">
-                                <FaPlusCircle className="text-blue-500 h-6 w-6 mt-0.5"/>
-                                <p className="text-blue-500 text-semibold">Thêm xưng hô</p>
-                            </div>
                     </div>
                 </div>  
             );
