@@ -107,6 +107,18 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
         setActivePostDropDown(true); // Mở dropdown
     }
 };
+  function formatDateString(dateString) {
+    const date = new Date(dateString);
+    
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+  }
   if (activeTab === "posts") {
     return (
       <div className="bg-gray rounded-xl max-w-[1000px] mx-auto mb-4 flex flex-row">
@@ -122,13 +134,13 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
                 {/* Header */}
                 <div className="w-full h-10 flex items-center gap-2">
                   {user.profilePicture!=null?(
-                    <img src={user.avatar} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
+                    <img src={user.profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
                   ):(
                     <FaUserCircle className="rounded-full w-10 h-10 object-cover text-gray-300"/>
                   )}
                   <div>
                     <div className="font-bold text-[15px]">{user.firstName + " " + user.lastName}</div>
-                    <div className="text-[13px] flex gap-1">{posts.createdAt} <FaGlobe className="-top-[-3px] relative"/></div>
+                    <div className="text-[13px] flex gap-1">{formatDateString(posts.createdAt)} <FaGlobe className="-top-[-3px] relative"/></div>
                   </div>
                   <button className="ml-auto hover:bg-gray-200 p-2 rounded-full transition-all text-gray-300">
                     <FaEllipsisH className="w-4 h-4" onClick={() => handleClickActivePost(posts)}/>
@@ -311,18 +323,18 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
                         <div key={cmtIndex} className="border-b p-2">
                           <p className="font-semibold text-gray-800">👤 {getUserById(cmt.userId.id).firstName + " " + getUserById(cmt.userId.id).lastName}</p>
                           <p className="text-gray-700">{cmt.content}</p>
-                          <p className="text-xs text-gray-500">{cmt.createdAt}</p>
+                          <p className="text-xs text-gray-500">{formatDateString(cmt.createdAt)}</p>
                         </div>
                       ))
 
                     ) : (
                       <p className="text-gray-500 italic text-center">Chưa có bình luận nào.</p>
                     )}
-                    <div className="flex justify-between gap-3">
+                    <div className="flex justify-between gap-3 absolute bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-300">
                       <div className="w-[40px]">
-                        {currentUser.imageUrl != null ? (
+                        {currentUser.profilePicture != null ? (
                           <img
-                            src={currentUser.imageUrl}
+                            src={currentUser.profilePicture}
                             className="object-cover h-full w-full rounded-lg"
                           />
                         ) : (

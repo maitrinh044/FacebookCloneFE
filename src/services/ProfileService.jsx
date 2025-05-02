@@ -111,7 +111,7 @@ export const getReactionsByUserId = async (userId) => {
 export const update = async (user) => {
   try {
     const response = await axiosClient.put(
-      `/users/updateUser`, user
+      `/users/updateUser`,user
     );
     return response.data?.data;
   } catch (error) {

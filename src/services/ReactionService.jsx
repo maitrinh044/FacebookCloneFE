@@ -7,7 +7,15 @@ export const getReactionTypes = async () => {
     return response.data.data || [];
   } catch (error) {
     console.error("Error fetching reaction types:", error);
-    throw error;
+    return [
+      { id: "LIKE", emoji: "👍", label: "Thích" },
+      { id: "LOVE", emoji: "❤️", label: "Yêu thích" },
+      { id: "HAHA", emoji: "😆", label: "Haha" },
+      { id: "WOW", emoji: "😮", label: "Wow" },
+      { id: "SAD", emoji: "😢", label: "Buồn" },
+      { id: "ANGRY", emoji: "😡", label: "Phẫn nộ" },
+    ];
+    // throw error;
   }
 };
 
@@ -71,14 +79,11 @@ export const getReactionCountsByType = async (targetType, targetId) => {
 
     return counts;
   } catch (error) {
-    console.error('Error fetching reaction types:', error);
-    return [
-      { id: "like", emoji: "👍", label: "Thích" },
-      { id: "love", emoji: "❤️", label: "Yêu thích" },
-      { id: "haha", emoji: "😆", label: "Haha" },
-      { id: "wow", emoji: "😮", label: "Wow" },
-      { id: "sad", emoji: "😢", label: "Buồn" },
-      { id: "angry", emoji: "😡", label: "Phẫn nộ" },
-    ]; // Fallback to static types
+    console.error("Error getting reaction counts by type:", error);
+    // Trả về object với tất cả reaction types có giá trị 0 nếu có lỗi
+    return reactionTypes.reduce((acc, type) => {
+      acc[type] = 0;
+      return acc;
+    }, {});
   }
 };

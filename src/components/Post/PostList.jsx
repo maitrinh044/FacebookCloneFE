@@ -2,11 +2,16 @@ import { useState, useEffect } from "react";
 import PostItem from "../Post/PostItem";
 import CreatePost from "../Post/CreatePost";
 import { getAllPosts, createPost } from "../../services/PostService";
+import { controlActiveStatus, getUserById } from "../../services/profileService";
+import useFetchUser from "../../utils/useFetchUser";
 
 export default function PostList() {
   const [posts, setPosts] = useState([]); // Dữ liệu các bài viết
   const [loading, setLoading] = useState(true); // Trạng thái loading
   const [error, setError] = useState(null); // Trạng thái lỗi
+  const [user, setUser] = useState(null);
+  const id = localStorage.getItem("userId");
+  
 
   // Hàm gọi API để lấy danh sách các bài viết
   useEffect(() => {
@@ -14,6 +19,10 @@ export default function PostList() {
       try {
         const data = await getAllPosts(); // Lấy dữ liệu từ API
         console.log("Fetched posts:", data); // Kiểm tra dữ liệu nhận được
+        const response2 = await getUserById(id);
+        if (response2) {
+            setUser(response2);
+        }
         setPosts(data); // Lưu vào state posts
         setLoading(false); // Đổi trạng thái loading
       } catch (err) {
@@ -23,7 +32,7 @@ export default function PostList() {
       }
     };
     fetchPosts(); // Gọi hàm fetchPosts khi component mount
-  }, []); // Chỉ gọi một lần khi component mount
+  }, [id]); // Chỉ gọi một lần khi component mount
 
   // Hàm xử lý khi tạo bài viết mới
   const handlePostCreated = async (newPost) => {
@@ -53,6 +62,19 @@ export default function PostList() {
     }
   };
 
+  const controlActiveStatusPost = async (userId, postId) => {
+          try {
+              const response = await controlActiveStatus(postId); 
+  
+              const updatedComments = await getPostByUser(userId);
+              setPosts(updatedComments);
+          } catch (error) {
+              console.error("Lỗi khi điều chỉnh bài viết:", error);
+          }
+      }
+
+    const {users} = useFetchUser();
+    console.log("users: ", users);
   // Kiểm tra trạng thái loading và lỗi
   if (loading) return <div>Loading...</div>; // Hiển thị khi đang loading
   if (error) return <div>{error}</div>; // Hiển thị khi có lỗi
@@ -64,7 +86,7 @@ export default function PostList() {
         <div>No posts available</div> // Thông báo nếu không có bài viết
       ) : (
         posts.map((post) => (
-          <PostItem key={post.id} post={post} onShare={handleSharePost} /> // Hiển thị các bài viết
+          <PostItem key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
         ))
       )}
     </div>

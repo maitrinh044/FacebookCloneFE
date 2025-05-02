@@ -86,6 +86,8 @@ export const useFetchProfile = (userId, currentUserId) => {
             
             const data = await getReactionsByUserId(currentUserId); // Lấy người dùng bằng ID
             setReactionByUser(data);
+            const tmp2 = await getReactionByPostId(post.id);
+            setReactionByPost(tmp2);
         } catch (error) {
             const data = await getReactionsByUserId(currentUserId); // Lấy người dùng bằng ID
             setReactionByUser(data);
