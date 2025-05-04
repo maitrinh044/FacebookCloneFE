@@ -12,6 +12,7 @@ import AuthLayout from "../Layout/AuthLayout";
 import MainLayout from "../Layout/MainLayout";
 import GroupPage from "../pages/GroupPage";
 import PrivateRoute from "./PrivateRoute";
+import AdminPage from "../pages/AdminPage";
 
 export default function AppRouter({ onOpenChat }) {
   return (
@@ -35,6 +36,9 @@ export default function AppRouter({ onOpenChat }) {
         {/* Groups */}
         <Route path="/groups" element={<MainLayout><GroupPage /></MainLayout>} />
         <Route path="/groups/:id" element={<MainLayout><GroupPage /></MainLayout>} />
+
+        {/* Admin */}
+        <Route path="/admin" element={<MainLayout><AdminPage /></MainLayout>} />
       </Route>
 
     </Routes>

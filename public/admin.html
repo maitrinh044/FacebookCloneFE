@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+        #root {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module">
+        import React from 'https://esm.sh/react@18.2.0';
+        import ReactDOM from 'https://esm.sh/react-dom@18.2.0';
+        import { ThemeProvider, createTheme } from 'https://esm.sh/@mui/material@5.15.0';
+        import AdminPage from '../src/pages/AdminPage.jsx';
+
+        const theme = createTheme();
+
+        ReactDOM.render(
+            <React.StrictMode>
+                <ThemeProvider theme={theme}>
+                    <AdminPage />
+                </ThemeProvider>
+            </React.StrictMode>,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html> 

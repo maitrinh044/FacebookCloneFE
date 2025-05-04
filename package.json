@@ -5,11 +5,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:admin": "vite --open /admin"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
     "@reduxjs/toolkit": "^1.9.5",
     "@stomp/stompjs": "^7.1.1",
     "antd": "^5.24.5",
