@@ -1,5 +1,4 @@
-// src/contexts/StompContext.jsx
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback, useRef } from "react";
 import { Client } from "@stomp/stompjs";
 
 const StompContext = createContext();
@@ -7,20 +6,27 @@ const StompContext = createContext();
 export const StompProvider = ({ children }) => {
   const [client, setClient] = useState(null);
   const [connected, setConnected] = useState(false);
+  const userIdRef = useRef(null);
 
-  const connect = (userId) => {
-    if (client && connected) return;  // Nếu đã kết nối, tránh kết nối lại
+  const connect = useCallback((userId) => {
+    if (client && connected) return;
+
+    userIdRef.current = userId;
 
     const stompClient = new Client({
       brokerURL: "ws://localhost:8080/ws",
       reconnectDelay: 5000,
       onConnect: () => {
         console.log("STOMP connected");
-        stompClient.publish({
-          destination: "/app/online",
-          body: userId,
-        });
         setConnected(true);
+
+        // Publish sau khi kết nối thành công
+        if (userIdRef.current) {
+          stompClient.publish({
+            destination: "/app/online",
+            body: userIdRef.current,
+          });
+        }
       },
       onDisconnect: () => {
         console.log("STOMP disconnected");
@@ -30,30 +36,23 @@ export const StompProvider = ({ children }) => {
 
     stompClient.activate();
     setClient(stompClient);
-  };
+  }, [client, connected]);
 
-  const disconnect = (userId) => {
+  const disconnect = useCallback((userId) => {
     if (client && connected) {
-      client.publish({
-        destination: "/app/offline",
-        body: userId,
-      });
-  
-      // Ngắt kết nối STOMP client
-      client.deactivate();
-  
-      // Cập nhật trạng thái "không kết nối"
-      setConnected(false);
-  
-      // Gọi sự kiện onDisconnect của STOMP Client
-      if (client.onDisconnect) {
-        client.onDisconnect();  // Bạn có thể thêm callback ở đây nếu cần xử lý thêm.
+      try {
+        client.publish({
+          destination: "/app/offline",
+          body: userId,
+        });
+      } catch (err) {
+        console.warn("Cannot publish offline message:", err.message);
       }
-  
-      console.log(`User ${userId} has been logged out.`);
+
+      client.deactivate();
+      setConnected(false);
     }
-  };
-  
+  }, [client, connected]);
 
   return (
     <StompContext.Provider value={{ client, connect, disconnect, connected }}>
