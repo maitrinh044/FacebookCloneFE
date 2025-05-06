@@ -89,3 +89,18 @@ export const deletePost = async (id) => {
     throw error;
   }
 };
+
+export const shareToProfile = async (userId, postId, caption) => {
+  try {
+    const data = {
+      userId: userId,
+      originalPostId: postId,
+      caption: caption
+    }
+    const response = await axiosClient.post(`/posts/shareToProfile`, data);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API shareToProfile:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
