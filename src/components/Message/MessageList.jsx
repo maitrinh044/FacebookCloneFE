@@ -11,11 +11,6 @@ const MessageList = ({ currentUserId, receiverId, messageList }) => {
     }
   }, [messageList]);
 
-  console.log(messageList);
-  console.log("current id: ", currentUserId);
-
-  console.log( typeof currentUserId);
-
 
   return (
     <div className="h-[300px] bg-white shadow-md">
