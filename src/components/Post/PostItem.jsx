@@ -65,16 +65,16 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                 setComments(commentData);
 
                 // Lấy số lượng phản ứng
-                const count = await countReactions("post", post.id);
+                const count = await countReactions("POST", post.id);
                 setLikeCount(count);
 
                 // Lấy phản ứng của người dùng hiện tại
-                const userReaction = await getReactions("post", post.id, userId);
+                const userReaction = await getReactions("POST", post.id, userId);
                 setSelectedReaction(userReaction || null);
                 setIsLiked(!!userReaction);
 
                 // Lấy số lượng phản ứng theo loại
-                const counts = await getReactionCountsByType("post", post.id);
+                const counts = await getReactionCountsByType("POST", post.id);
                 setReactionCounts(counts);
 
                 // Lấy danh sách loại phản ứng
@@ -114,7 +114,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
         const defaultReaction = reactionTypes.find(r => r.id === "LIKE") || { id: "LIKE", emoji: "👍", label: "Thích" };
         try {
             setError(null);
-            const result = await toggleReaction({ targetType: "post", targetId: post.id, reactionType: "LIKE" }, userId);
+            const result = await toggleReaction({ targetType: "POST", targetId: post.id, reactionType: "LIKE" }, userId);
             if (selectedReaction) {
                 // Xóa phản ứng hiện tại
                 setLikeCount(prev => prev - 1);
@@ -137,7 +137,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
     const handleSelectReaction = async (reaction) => {
         try {
             setError(null);
-            const result = await toggleReaction({ targetType: "post", targetId: post.id, reactionType: reaction.id }, userId);
+            const result = await toggleReaction({ targetType: "POST", targetId: post.id, reactionType: reaction.id }, userId);
             if (selectedReaction) {
                 // Cập nhật từ phản ứng cũ sang phản ứng mới
                 setReactionCounts(prev => ({

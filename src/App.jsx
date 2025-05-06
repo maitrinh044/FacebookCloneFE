@@ -18,20 +18,24 @@ function MainApp() {
 
   const currentUserId = localStorage.getItem("userId");
 
-    useEffect(() => {
-        // Kiểm tra nếu người dùng đã đăng nhập và có userId
-        const userId = localStorage.getItem("userId");
-        if (userId) {
-            connect(userId); // Kết nối WebSocket khi ứng dụng load nếu người dùng đã đăng nhập
-        }
-        
-        // Cleanup khi component bị unmount
-        return () => {
-            if (userId) {
-                disconnect(userId); // Ngắt kết nối khi ứng dụng tắt hoặc logout
-            }
-        };
-    }, [connect, disconnect]);
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      connect(userId);
+    }
+
+    return () => {
+      if (userId) {
+        disconnect(userId);
+      }
+    };
+  }, [connect, disconnect]);
+
+  useEffect(() => {
+    if (!currentUserId) {
+      setOpenChats([]); // Đóng tất cả các chat khi người dùng đăng xuất
+    }
+  }, [currentUserId]);
 
   const handleOpenChat = (friend) => {
     if (!openChats.find((chat) => chat.id === friend.id)) {
@@ -49,7 +53,7 @@ function MainApp() {
       <ScrollToTop />
       <AppRouter onOpenChat={handleOpenChat} />
       <div className="fixed bottom-4 right-4 flex gap-4">
-        {openChats.map((chat, index) => (
+        {currentUserId && openChats.map((chat, index) => (
           <MessagePanel
             key={chat.id}
             friend={chat}
@@ -67,7 +71,7 @@ export default function App() {
   return (
     <LoadingProvider>
       <MainApp />
-      <ToastContainer 
+      <ToastContainer
         position="top-right"
         autoClose={1000}
         hideProgressBar={true}
