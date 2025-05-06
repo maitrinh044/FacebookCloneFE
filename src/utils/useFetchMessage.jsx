@@ -10,6 +10,7 @@ export function useFetchMessages(currentUserId, friendId) {
         setLoading(true);
         const response = await getMessageList(currentUserId, friendId);
         setMessageList(response);  // Đảm bảo dữ liệu có trả về từ API
+        console.log("Fetched messages:", response);
         return response; // Trả về dữ liệu để sử dụng trong refetch
       } catch (error) {
         console.error("Lỗi khi lấy tin nhắn:", error);
