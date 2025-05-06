@@ -4,6 +4,9 @@ import MessageList from "./MessageList";
 import SendMessageForm from "./SendMessageForm";
 import { addNewMessage } from "../../services/MessageService";
 import { useLocation } from "react-router-dom";
+import { getMessageList } from '../../services/MessageService';
+import { useChatSocket } from "../../utils/useChatSocket";
+
 import {
   FaChevronDown,
   FaChevronUp,
@@ -16,10 +19,8 @@ import { useNavigate } from "react-router-dom";
 import CallModal from "../Message/CallModal";
 import CallOverlay from "../Message/CallOverlay";
 
-export default function MessagePanel({ friend, onClose, positionOffset, currentUserId = 1 }) {
+export default function MessagePanel({ friend, onClose, positionOffset, currentUserId }) {
   const navigate = useNavigate();
-  const { messageList = [], loading, refetch } = useFetchMessages(currentUserId, friend.id); // thêm refetch để làm mới danh sách tin nhắn
-  const [localMessages, setLocalMessages] = useState([]);  // Lưu tin nhắn đã gửi
   const [isMinimized, setIsMinimized] = useState(false);
   const [callType, setCallType] = useState(null);
   const [callInfo, setCallInfo] = useState(null);
@@ -28,28 +29,44 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
   const avatarUrl = "https://placehold.co/40x40";
   const inputRef = useRef(null);
   const location = useLocation();
+  const [messageList, setMessageList] = useState([]);
+  const [localMessages, setLocalMessages] = useState([]);
+
+  let receiverId = friend.id;
+
+  const { sendMessage } = useChatSocket({
+    userId: currentUserId,
+    onMessageReceived: (msg) => {
+      setMessageList((prevMessages) => [...prevMessages, msg]);
+    },
+  });
+
+  const fetchMessages = async () => {
+    try {
+      const data = await getMessageList(currentUserId, receiverId);
+      setMessageList(data);
+    } catch (e) {
+      console.error("Lỗi khi fetch messages:", e);
+    }
+  };
 
   useEffect(() => {
-    if (!isMinimized && inputRef.current) {
-      inputRef.current.focus();
+    if (currentUserId && receiverId) {
+      fetchMessages();
     }
-  }, [isMinimized]);
+  }, [currentUserId, receiverId]);
 
-  // Cuộn xuống khi tin nhắn mới được gửi hoặc nhận
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (container) {
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          container.scrollTop = container.scrollHeight;
-        });
-      }, 0);
+
+  const handleSendMessage = async (msgObj) => {
+    try {
+      setLocalMessages((prev) => [...prev, msgObj]); // Thêm tin nhắn vào UI tạm thời
+      await addNewMessage(msgObj); // Gửi tin nhắn vào server
+      sendMessage(msgObj); // Gửi tin nhắn qua WebSocket
+      await fetchMessages(); // Cập nhật lại tin nhắn từ server
+      setLocalMessages([]); // Xóa tin nhắn tạm thời
+    } catch (e) {
+      console.error("Gửi tin nhắn lỗi:", e);
     }
-  }, [messageList, localMessages]);  // Thêm localMessages vào dependency để đảm bảo khi có tin nhắn mới sẽ cuộn xuống
-
-  const handleCall = (type) => {
-    setCallType(type);
-    setCallInfo({ type, friendName: friend.firstName, avatarUrl });
   };
 
   const handleEndCall = () => setCallInfo(null);
@@ -58,18 +75,6 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
   const spacing = 16;
   const rightOffset = positionOffset * (panelWidth + spacing);
 
-  const handleSendMessage = async (msgObj) => {
-    try {
-      const savedMessage = await addNewMessage(msgObj);
-      setLocalMessages((prev) => [...prev, savedMessage]);  // Thêm tin nhắn đã gửi vào localMessages
-      await refetch();  // Đảm bảo làm mới danh sách tin nhắn từ server
-    } catch (error) {
-      console.error("Lỗi gửi tin nhắn:", error);
-    }
-  };
-
-  console.log("local1", localMessages);
-  console.log("messageList: ", messageList);
   return (
     <>
       {location.pathname !== "/messages" && (
@@ -87,9 +92,8 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
                   className="w-8 h-8 rounded-full border-2 border-white"
                 />
                 <span
-                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-                    friend.online ? "bg-green-500" : "bg-gray-400"
-                  }`}></span>
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${friend.online ? "bg-green-500" : "bg-gray-400"
+                    }`}></span>
               </div>
               <span>{friend.firstName} {friend.lastName}</span>
             </div>

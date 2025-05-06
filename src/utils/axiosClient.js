@@ -31,23 +31,26 @@ axiosClient.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Kiểm tra lỗi 401 (Unauthorized) - Token hết hạn
       const refreshToken = localStorage.getItem('refreshToken');  // Lấy refreshToken từ localStorage
+      console.log(refreshToken);
       if (refreshToken) {
         try {
           // Gửi yêu cầu làm mới token
           const refreshResponse = await axios.post('http://localhost:8080/auth/refresh-token', {
-            refreshToken, // Gửi refreshToken đến server
+            refreshToken: yourToken
           });
-          
+
           // Lưu lại accessToken mới vào localStorage
           const newAccessToken = refreshResponse.data.accessToken;
           localStorage.setItem('accessToken', newAccessToken);
 
           // Thử lại yêu cầu ban đầu với token mới
           error.config.headers['Authorization'] = `Bearer ${newAccessToken}`;
-          return axios(error.config);
+          return axiosClient(error.config);
         } catch (refreshError) {
-          console.error('Lỗi làm mới token:', refreshError);
-          // Có thể xử lý đăng xuất người dùng hoặc điều hướng đến trang login ở đây
+          // console.error('Lỗi làm mới token:', refreshError);
+          // localStorage.removeItem('accessToken');
+          // localStorage.removeItem('refreshToken');
+          // window.location.href = "/login"; // hoặc dùng useNavigate nếu trong React component
         }
       }
     }

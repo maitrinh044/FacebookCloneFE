@@ -16,6 +16,8 @@ function MainApp() {
 
   const { connect, disconnect } = useStomp(); // Lấy hàm connect và disconnect từ context
 
+  const currentUserId = localStorage.getItem("userId");
+
     useEffect(() => {
         // Kiểm tra nếu người dùng đã đăng nhập và có userId
         const userId = localStorage.getItem("userId");
@@ -53,6 +55,7 @@ function MainApp() {
             friend={chat}
             onClose={() => handleCloseChat(chat)}
             positionOffset={index}
+            currentUserId={currentUserId}
           />
         ))}
       </div>
