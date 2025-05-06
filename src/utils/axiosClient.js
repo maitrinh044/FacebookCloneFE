@@ -22,37 +22,45 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// Thêm interceptor để xử lý khi token hết hạn và làm mới token
 axiosClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401) {
-      // Kiểm tra lỗi 401 (Unauthorized) - Token hết hạn
-      const refreshToken = localStorage.getItem('refreshToken');  // Lấy refreshToken từ localStorage
+    const originalRequest = error.config;
+
+    // Không xử lý lại nếu lỗi không phải 401 hoặc đã xử lý 1 lần rồi
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      if (originalRequest.url.includes('/auth/refresh-token')) {
+        // Không can thiệp vào chính request refresh-token
+        return Promise.reject(error);
+      }
+
+      originalRequest._retry = true; // Đánh dấu là đã retry 1 lần
+
+      const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
         try {
-          // Gửi yêu cầu làm mới token
           const refreshResponse = await axios.post('http://localhost:8080/auth/refresh-token', {
-            refreshToken, // Gửi refreshToken đến server
+            refreshToken: refreshToken
           });
-          
-          // Lưu lại accessToken mới vào localStorage
+
           const newAccessToken = refreshResponse.data.accessToken;
           localStorage.setItem('accessToken', newAccessToken);
 
-          // Thử lại yêu cầu ban đầu với token mới
-          error.config.headers['Authorization'] = `Bearer ${newAccessToken}`;
-          return axios(error.config);
+          // Gắn token mới vào header và gửi lại request cũ
+          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+          return axiosClient(originalRequest);
         } catch (refreshError) {
-          console.error('Lỗi làm mới token:', refreshError);
-          // Có thể xử lý đăng xuất người dùng hoặc điều hướng đến trang login ở đây
+          // Làm mới token thất bại => clear localStorage và logout
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          window.location.href = '/login';
         }
       }
     }
+
     return Promise.reject(error);
   }
 );
+
 
 export default axiosClient;
