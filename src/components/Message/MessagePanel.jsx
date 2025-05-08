@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { useFetchMessages } from "../../utils/useFetchMessage";
 import MessageList from "./MessageList";
 import SendMessageForm from "./SendMessageForm";
 import { addNewMessage } from "../../services/MessageService";
