@@ -4,12 +4,20 @@ import CreatePost from "../Post/CreatePost";
 import { getAllPosts, createPost, shareToProfile } from "../../services/PostService";
 import { controlActiveStatus, getUserById } from "../../services/profileService";
 import useFetchUser from "../../utils/useFetchUser";
+import { func } from "prop-types";
+import { FaEllipsisH, FaFacebookMessenger, FaGlobe, FaShare, FaThumbsUp, FaUserCircle } from "react-icons/fa";
+import PostByShare from "./PostByShare";
 
 export default function PostList() {
   const [posts, setPosts] = useState([]); // Dữ liệu các bài viết
   const [loading, setLoading] = useState(true); // Trạng thái loading
   const [error, setError] = useState(null); // Trạng thái lỗi
   const [user, setUser] = useState(null);
+  const [reactionByPost, setReactionByPost] = useState([]);
+  const [commentByPost, setCommentByPost] = useState([]);
+  const [reactionByUser, setReactionByUser] = useState([]);
+  const [reactionTypes, setReactionTypes] = useState([]);
+
   const id = localStorage.getItem("userId");
   
 
@@ -47,20 +55,15 @@ export default function PostList() {
   };
 
   // Hàm xử lý khi chia sẻ bài viết
-  const handleSharePost = async (sharedPost) => {
-    try {
-      const newSharedPost = await createPost({
-        ...sharedPost,
-        isShared: true,
-        sharedTime: new Date().toISOString(),
-      });
-      console.log("Created shared post:", newSharedPost); // Kiểm tra bài viết chia sẻ
-      setPosts([newSharedPost, ...posts]); // Thêm bài viết chia sẻ vào danh sách
-    } catch (err) {
-      console.error("Error sharing post:", err); // Log lỗi nếu có
-      setError("Failed to share post"); // Thiết lập lỗi nếu có
-    }
+  const handleSharePost = async (userId, postId, caption) => {
+    
     console.log("ban dang share post den profile")
+    try {
+      const response = await shareToProfile(userId, postId, caption);
+      // const list = await
+    } catch (error) {
+      console.error("Lỗi khi share bài viết! ", error);
+    }
   };
 
   const controlActiveStatusPost = async (userId, postId) => {
@@ -83,7 +86,28 @@ export default function PostList() {
     console.log("Bạn đã click share post!");
   }
     const {users} = useFetchUser();
-    console.log("users: ", users);
+    // console.log("users: ", users);
+    function getUserById(userId) {
+      const user = users.find(e => e.id === userId);
+      return user || [];
+    }
+    function getPostById(postId) {
+      const post = posts.find(e => e.id === postId);
+      return post || [];
+    }
+    function formatDateString(dateString) {
+      const date = new Date(dateString);
+      
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+  }
+    
   // Kiểm tra trạng thái loading và lỗi
   if (loading) return <div>Loading...</div>; // Hiển thị khi đang loading
   if (error) return <div>{error}</div>; // Hiển thị khi có lỗi
@@ -95,7 +119,14 @@ export default function PostList() {
         <div>No posts available</div> // Thông báo nếu không có bài viết
       ) : (
         posts.map((post) => (
-          <PostItem key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
+          <div>
+            {post.originalPostId == null ? (
+              <PostItem key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
+            )  : (
+              <PostByShare posts={posts} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
+            )}
+          </div>
+          
         ))
       )}
     </div>

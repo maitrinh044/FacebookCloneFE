@@ -97,6 +97,7 @@ export const shareToProfile = async (userId, postId, caption) => {
       originalPostId: postId,
       caption: caption
     }
+    console.log("data to share: ", data);
     const response = await axiosClient.post(`/posts/shareToProfile`, data);
     return response.data?.data;
   } catch (error) {

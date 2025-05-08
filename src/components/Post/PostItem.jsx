@@ -8,6 +8,7 @@ import { addComment, controlReaction, getCommentByPost, getReactionByPostId, get
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { func } from "prop-types";
+import { getUser } from "../../services/UserService";
 
 export default function PostItem({ post, onShare, user, controlActiveStatusPost,users }) {
     const [isLiked, setIsLiked] = useState(false);
@@ -29,6 +30,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
     const [reactionByUser, setReactionByUser] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const userid = localStorage.getItem('userId');
 
     useEffect(() => {
     const handleClickOutside = (event) => {
@@ -82,7 +84,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                 setReactionTypes(types);
 
                 /////////
-                const tmp1 = await getReactionsByUserId(user.id); // Lấy người dùng bằng ID
+                const tmp1 = await getReactionsByUserId(userid); // Lấy người dùng bằng ID
                 setReactionByUser(tmp1);
 
                 const tmp2 = await getReactionByPostId(post.id);
@@ -179,8 +181,8 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
         }
     };
 
-    const handleSharePost = (sharedPost) => {
-        onShare(sharedPost);
+    const handleSharePost = (userId, postId, caption) => {
+        onShare(userId, postId, caption);
         setShowShareModal(false);
     };
 
@@ -277,6 +279,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
 
         return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
     }
+    console.log('user in postitem: ', user)
 
     if (loading) return <div>Loading...</div>;
 
@@ -404,13 +407,13 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                       <div  className="bg-white shadow-md p-4 rounded-md text-gray-700 mb-3 flex flex-col">
                         {/* Header */}
                         <div className="w-full h-10 flex items-center gap-2">
-                          {user.profilePicture!=null?(
-                            <img src={user.profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
+                          {getUserById(post.userId).profilePicture!=null?(
+                            <img src={getUserById(post.userId).profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
                           ):(
                             <FaUserCircle className="rounded-full w-10 h-10 object-cover text-gray-300"/>
                           )}
                           <div>
-                            <div className="font-bold text-[15px]">{user.firstName + " " + user.lastName}</div>
+                            <div className="font-bold text-[15px]">{getUserById(post.userId).firstName + " " + getUserById(post.userId).lastName}</div>
                             <div className="text-[13px] flex gap-1">{formatDateString(post.createdAt)} <FaGlobe className="-top-[-3px] relative"/></div>
                           </div>
                           <button className="ml-auto hover:bg-gray-200 p-2 rounded-full transition-all text-gray-300">
@@ -628,7 +631,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                                                       icon={faPaperPlane} 
                                                       onClick={() => {
                                                           if (commentContent.trim()) { // Kiểm tra xem có nội dung bình luận không
-                                                              addCommentByUser(user.id, selectedPost.id, commentContent);
+                                                              addCommentByUser(userid, selectedPost.id, commentContent);
                                                               setCommentContent(""); // Xóa nội dung input sau khi thêm bình luận
                                                           }
                                                       }} 
