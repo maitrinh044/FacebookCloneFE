@@ -27,15 +27,10 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Không xử lý lại nếu lỗi không phải 401 hoặc đã xử lý 1 lần rồi
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      if (originalRequest.url.includes('/auth/refresh-token')) {
-        // Không can thiệp vào chính request refresh-token
-        return Promise.reject(error);
-      }
-
-      originalRequest._retry = true; // Đánh dấu là đã retry 1 lần
-
+    // Không cố gắng refresh nếu lỗi đến từ chính refresh-token hoặc đã retry 1 lần
+    const isRefreshURL = originalRequest.url.includes("/auth/refresh-token");
+    if (error.response?.status === 401 && !isRefreshURL && !originalRequest._retry) {
+      originalRequest._retry = true;
       const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
         try {
@@ -46,14 +41,14 @@ axiosClient.interceptors.response.use(
           const newAccessToken = refreshResponse.data.accessToken;
           localStorage.setItem('accessToken', newAccessToken);
 
-          // Gắn token mới vào header và gửi lại request cũ
+          // Cập nhật header và thử lại request ban đầu
           originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
           return axiosClient(originalRequest);
         } catch (refreshError) {
-          // Làm mới token thất bại => clear localStorage và logout
+          console.error('Lỗi làm mới token:', refreshError);
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          window.location.href = "/login";
         }
       }
     }

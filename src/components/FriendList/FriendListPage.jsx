@@ -4,7 +4,7 @@ import { FaRegCommentDots, FaUserLock, FaUserSlash, FaSearch } from "react-icons
 import { message } from "antd";
 import Sidebar from "./Sidebar";
 import * as FriendlistService from "../../services/FriendlistService";
-import { getUserById } from "../../services/userService";
+import { getUserById } from "../../services/UserService";
 import { getMessageList } from "../../services/MessageService";
 import MessagePanel from "../Message/MessagePanel";
 

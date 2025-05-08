@@ -37,9 +37,10 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
   const { sendMessage } = useChatSocket({
     userId: currentUserId,
     onMessageReceived: (msg) => {
-      setMessageList((prevMessages) => [...prevMessages, msg]);
+      console.log("Nhận được tin nhắn mới: ", msg);
+      setMessageList((prevMessages) => [...prevMessages, msg]); // Cập nhật UI
     },
-  });
+  });  
 
   const fetchMessages = async () => {
     try {

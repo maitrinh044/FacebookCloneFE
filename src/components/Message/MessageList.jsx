@@ -11,7 +11,6 @@ const MessageList = ({ currentUserId, receiverId, messageList }) => {
     }
   }, [messageList]);
 
-
   return (
     <div className="h-[300px] bg-white shadow-md">
       <div className="overflow-y-auto h-full px-4 py-2">

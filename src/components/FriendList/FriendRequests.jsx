@@ -3,7 +3,7 @@ import { FaUserCheck, FaTimes } from "react-icons/fa";
 import { message } from "antd";
 import Sidebar from "./Sidebar";
 import * as FriendlistService from "../../services/FriendlistService";
-import { getUserById } from "../../services/userService";
+import { getUserById } from "../../services/UserService";
 
 export default function FriendRequestsPage() {
     const [requests, setRequests] = useState([]);

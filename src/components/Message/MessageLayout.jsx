@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
-import SendMessageForm from "./SendMessageForm";  // import SendMessageForm
-import { addNewMessage, getMessageList } from "../../services/MessageService";
+import SendMessageForm from "./SendMessageForm"; 
+import { useChatSocket } from "../../utils/useChatSocket";
+import { addNewMessage } from "../../services/MessageService";
+import { useStomp } from "../../contexts/StompContext";
 
 export default function MessageLayout({
   chatList,
@@ -12,55 +14,69 @@ export default function MessageLayout({
 }) {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
-  const [localSelectedChat, setLocalSelectedChat] = useState(selectedChat);
+  // const [localSelectedChat, setLocalSelectedChat] = useState(selectedChat);
+  const { connect, connected } = useStomp();
 
   useEffect(() => {
-    setLocalSelectedChat(selectedChat);
-  }, [selectedChat]);
-  
-  // Scroll xuống dưới khi có tin nhắn mới
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (currentUserId) {
+      connect(currentUserId);
     }
+  }, [currentUserId, connect]);
+
+  const { sendMessage } = useChatSocket({
+    userId: currentUserId,
+    onMessageReceived: (newMessage) => {
+      const updatedMessages = [...selectedChat.messages, newMessage];
+      const updatedChatList = chatList.map(chat =>
+        chat.user.id === selectedChat.user.id
+          ? { ...chat, messages: updatedMessages }
+          : chat
+      );
+      onUpdateChatList(updatedChatList);
+      onSelectChat(updatedChatList.find(chat => chat.user.id === selectedChat.user.id));
+    },
+  });
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [selectedChat?.messages]);
 
   const handleSend = async (newMessage) => {
-    try {
-      const savedMessage = await addNewMessage(newMessage);
-      const updatedMessages = await getMessageList(currentUserId, selectedChat.user.id);
-  
-      const updatedChatList = chatList.map(chat => {
-        if (chat.user.id === selectedChat.user.id) {
-          return {
+    const receiverId = selectedChat?.user?.id;
+    if (!receiverId) return;
+
+    console.log("new msg: ", newMessage);
+    const savedMessage = await addNewMessage(newMessage);
+    if (savedMessage != null) {
+      sendMessage(newMessage);
+    }
+    const updatedMessages = [...selectedChat.messages, newMessage];
+
+    const updatedChatList = chatList.map(chat =>
+      chat.user.id === receiverId
+        ? {
             ...chat,
             messages: updatedMessages,
             lastMessage: {
-              content: savedMessage.content,
-              senderId: savedMessage.senderId.id,
+              content: newMessage.content,
+              senderId: newMessage.senderId,
               senderName: "Bạn",
-            }
-          };
-        }
-        return chat;
-      });
-  
-      // Cập nhật danh sách chat và selectedChat đồng bộ
-      onUpdateChatList(updatedChatList);
-      
-      const updatedSelectedChat = updatedChatList.find(chat => chat.user.id === selectedChat.user.id);
-      onSelectChat(updatedSelectedChat);
-  
-    } catch (error) {
-      console.error("Lỗi gửi tin nhắn:", error);
-    }
+            },
+          }
+        : chat
+    );
+
+    onUpdateChatList(updatedChatList);
+    onSelectChat(updatedChatList.find(chat => chat.user.id === receiverId));
   };
-  
-  
-  
-  console.log(selectedChat);
-  console.log(chatList);
-  
+
+
+
+
+  console.log("selected chat: ", selectedChat);
+  // console.log(chatList);
+  console.log("current id: ", currentUserId);
+
 
   return (
     <div className="flex bg-white shadow overflow-hidden h-full w-full">
@@ -71,9 +87,8 @@ export default function MessageLayout({
           {chatList.map((chat) => (
             <li
               key={chat.user.id}
-              className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-100 ${
-                chat.user.id === selectedChat?.user.id ? "bg-blue-100 font-semibold" : ""
-              }`}
+              className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-100 ${chat.user.id == selectedChat?.user.id ? "bg-blue-100 font-semibold" : ""
+                }`}
               onClick={() => onSelectChat(chat)}
             >
               <div className="relative">
@@ -83,15 +98,14 @@ export default function MessageLayout({
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <span
-                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border border-white ${
-                    chat.user.online ? "bg-green-500" : "bg-gray-400"
-                  }`}></span>
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border border-white ${chat.user.online ? "bg-green-500" : "bg-gray-400"
+                    }`}></span>
               </div>
               <div className="flex flex-col">
                 <div className="text-base">{chat.user.firstName} {chat.user.lastName}</div>
                 <div className="text-sm text-gray-500 truncate">
                   {chat.lastMessage.content
-                    ? chat.lastMessage?.senderId === currentUserId
+                    ? chat.lastMessage?.senderId.id == currentUserId
                       ? `Bạn: ${chat.lastMessage?.content}`
                       : `${chat.lastMessage.senderId?.firstName}: ${chat.lastMessage?.content}`
                     : ""}
@@ -111,11 +125,10 @@ export default function MessageLayout({
               {selectedChat.messages.map((msg, index) => (
                 <div
                   key={index}
-                  className={`max-w-xs px-3 py-2 rounded-lg transition-all duration-200 ease-in-out ${
-                    msg.senderId.id === currentUserId
+                  className={`max-w-xs px-3 py-2 rounded-lg transition-all duration-200 ease-in-out ${msg.senderId.id == currentUserId
                       ? "bg-blue-500 text-white ml-auto"
                       : "bg-gray-100 text-gray-800"
-                  }`}
+                    }`}
                 >
                   {msg.content}
                 </div>
