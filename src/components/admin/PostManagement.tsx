@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { Block as BlockIcon } from '@mui/icons-material';
 import { getAllPosts, toggleActiveStatusPost, updatePost } from '../../services/PostService';
-
+import { countReactions } from '../../services/ReactionService';
 
 const PostManagement: React.FC = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -88,10 +88,10 @@ const PostManagement: React.FC = () => {
           <Card key={post.id} sx={{ mb: 2 }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Avatar src={post?.author.avatar} alt={post?.author.name} />
+                <Avatar src={post.userId?.profilePicture} alt={post.userId?.firstName} />
                 <Box sx={{ ml: 2 }}>
                   <Typography variant="subtitle1" component="div">
-                    {post.author.name}
+                    {post.userId.firstName} {post.userId.lastName}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {new Date(post.createdAt).toLocaleString()}
@@ -102,9 +102,9 @@ const PostManagement: React.FC = () => {
                 {post.content}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Chip label={`${post.likes} likes`} size="small" />
-                <Chip label={`${post.comments} comments`} size="small" />
-                <Chip label={`${post.shares} shares`} size="small" />
+                <Chip label={`12 likes`} size="small" />
+                <Chip label={`2 comments`} size="small" />
+                <Chip label={`2 shares`} size="small" />
                 <Chip
                   label={post.activeStatus === 'ACTIVE' ? 'Đang hiển thị' : 'Đã ẩn'}
                   color={post.activeStatus === 'ACTIVE' ? 'success' : 'error'}
