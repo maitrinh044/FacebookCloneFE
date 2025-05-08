@@ -2,11 +2,6 @@ import axiosClient from "../utils/axiosClient";
 import { getLocalISOStringWithoutMs } from "../utils/dateUtil";
 
 export const getReactionTypes = async () => {
-  try {
-    const response = await axiosClient.get("/reactions/types");
-    return response.data.data || [];
-  } catch (error) {
-    console.error("Error fetching reaction types:", error);
     return [
       { id: "LIKE", emoji: "👍", label: "Thích" },
       { id: "LOVE", emoji: "❤️", label: "Yêu thích" },
@@ -15,8 +10,6 @@ export const getReactionTypes = async () => {
       { id: "SAD", emoji: "😢", label: "Buồn" },
       { id: "ANGRY", emoji: "😡", label: "Phẫn nộ" },
     ];
-    // throw error;
-  }
 };
 
 export const toggleReaction = async (reaction, userId) => {

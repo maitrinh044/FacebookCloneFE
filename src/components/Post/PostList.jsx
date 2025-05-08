@@ -60,6 +60,7 @@ export default function PostList() {
       console.error("Error sharing post:", err); // Log lỗi nếu có
       setError("Failed to share post"); // Thiết lập lỗi nếu có
     }
+    console.log("ban dang share post den profile")
   };
 
   const controlActiveStatusPost = async (userId, postId) => {
@@ -73,12 +74,13 @@ export default function PostList() {
           }
       }
   const share = async (userId, postId, caption) => {
-    try {
-      const response = await shareToProfile(userId, postId, caption);
-      // const list = await
-    } catch (error) {
-      console.error("Lỗi khi share bài viết! ", error);
-    }
+    // try {
+    //   const response = await shareToProfile(userId, postId, caption);
+    //   // const list = await
+    // } catch (error) {
+    //   console.error("Lỗi khi share bài viết! ", error);
+    // }
+    console.log("Bạn đã click share post!");
   }
     const {users} = useFetchUser();
     console.log("users: ", users);

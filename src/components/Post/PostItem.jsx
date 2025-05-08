@@ -399,7 +399,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
         //         />
         //     )}
         // </div>
-
+        
         <div className="space-y-4">
                       <div  className="bg-white shadow-md p-4 rounded-md text-gray-700 mb-3 flex flex-col">
                         {/* Header */}

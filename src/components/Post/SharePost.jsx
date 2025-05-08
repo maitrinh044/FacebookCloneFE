@@ -1,4 +1,5 @@
 
+import { caption } from "framer-motion/client";
 import PropTypes from "prop-types";
 
 export default function SharePost({ post, onClose, onShare, currentUser }) {
@@ -11,6 +12,7 @@ export default function SharePost({ post, onClose, onShare, currentUser }) {
         onShare(sharedPost);
     };
 
+    console.log("caption:", caption);
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-4 w-96">

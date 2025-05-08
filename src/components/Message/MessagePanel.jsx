@@ -43,6 +43,7 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
 
   const fetchMessages = async () => {
     try {
+      console.log("current id: ",currentUserId);
       const data = await getMessageList(currentUserId, receiverId);
       setMessageList(data);
     } catch (e) {
