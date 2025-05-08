@@ -13,6 +13,9 @@ import MainLayout from "../Layout/MainLayout";
 import GroupPage from "../pages/GroupPage";
 import PrivateRoute from "./PrivateRoute";
 import AdminPage from "../pages/AdminPage";
+import SettingsPage from "../pages/SettingsPage";
+import WatchPage from "../pages/WatchPage";
+import MarketPage from "../pages/MarketPage";
 
 export default function AppRouter({ onOpenChat }) {
   return (
@@ -36,6 +39,12 @@ export default function AppRouter({ onOpenChat }) {
         {/* Groups */}
         <Route path="/groups" element={<MainLayout><GroupPage /></MainLayout>} />
         <Route path="/groups/:id" element={<MainLayout><GroupPage /></MainLayout>} />
+        
+        <Route path="/settings" element={<MainLayout><SettingsPage /></MainLayout>}></Route>
+
+        <Route path="/watch" element={<MainLayout><WatchPage /></MainLayout>}></Route>
+        <Route path="/marketplace" element={<MainLayout><MarketPage /></MainLayout>}></Route>
+
 
         {/* Admin */}
         <Route path="/admin" element={<MainLayout><AdminPage /></MainLayout>} />

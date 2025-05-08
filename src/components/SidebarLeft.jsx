@@ -65,13 +65,15 @@ export default function SidebarLeft() {
           </div>
         </li>
         <li>
-          <div className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
+          <div onClick={() => navigate("/watch")}
+               className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
             <FaVideo className="text-blue-600" />
             <span>Watch</span>
           </div>
         </li>
         <li>
-          <div className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
+          <div onClick={() => navigate("/marketplace")}
+              className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
             <FaStore className="text-blue-600" />
             <span>Marketplace</span>
           </div>
