@@ -13,6 +13,9 @@ import MainLayout from "../Layout/MainLayout";
 import GroupPage from "../pages/GroupPage";
 import PrivateRoute from "./PrivateRoute";
 import AdminPage from "../pages/AdminPage";
+import SettingsPage from "../pages/SettingsPage";
+import WatchPage from "../pages/WatchPage";
+import MarketPage from "../pages/MarketPage";
 
 export default function AppRouter({ onOpenChat }) {
   return (
@@ -21,6 +24,9 @@ export default function AppRouter({ onOpenChat }) {
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
       <Route path="/register" element={<AuthLayout><RegisterPage /></AuthLayout>} />
 
+      {/* Admin */}
+      <Route path="/admin" element={<AuthLayout><AdminPage /></AuthLayout>} />
+      
       {/* Protected Routes - CÓ Header */}
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<MainLayout><Home onOpenChat={onOpenChat} /></MainLayout>} />
@@ -37,8 +43,12 @@ export default function AppRouter({ onOpenChat }) {
         <Route path="/groups" element={<MainLayout><GroupPage /></MainLayout>} />
         <Route path="/groups/:id" element={<MainLayout><GroupPage /></MainLayout>} />
 
-        {/* Admin */}
-        <Route path="/admin" element={<MainLayout><AdminPage /></MainLayout>} />
+        <Route path="/settings" element={<MainLayout><SettingsPage /></MainLayout>}></Route>
+
+        <Route path="/watch" element={<MainLayout><WatchPage /></MainLayout>}></Route>
+        <Route path="/marketplace" element={<MainLayout><MarketPage /></MainLayout>}></Route>
+
+
       </Route>
 
     </Routes>

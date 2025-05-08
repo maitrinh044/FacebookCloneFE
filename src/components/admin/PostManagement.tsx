@@ -15,25 +15,11 @@ import {
   Button,
 } from '@mui/material';
 import { Block as BlockIcon } from '@mui/icons-material';
-import { getAllPosts, toggleActiveStatusPost } from '../../services/PostService';
-
-interface Post {
-  id: string;
-  content: string;
-  author: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
-  createdAt: string;
-  likes: number;
-  comments: number;
-  shares: number;
-  activeStatus: 'ACTIVE' | 'INACTIVE';
-}
+import { getAllPosts, toggleActiveStatusPost, updatePost } from '../../services/PostService';
+import { countReactions } from '../../services/ReactionService';
 
 const PostManagement: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [hideDialogOpen, setHideDialogOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -64,7 +50,9 @@ const PostManagement: React.FC = () => {
       try {
         const updatedPost = await toggleActiveStatusPost(selectedPostId);
         setPosts(posts.map(post =>
-          post.id === selectedPostId ? { ...post, activeStatus: updatedPost.activeStatus } : post
+          post.id === selectedPostId
+            ? { ...post, activeStatus: updatedPost.activeStatus }
+            : post
         ));
         setHideDialogOpen(false);
         setSelectedPostId(null);
@@ -78,6 +66,8 @@ const PostManagement: React.FC = () => {
     setHideDialogOpen(false);
     setSelectedPostId(null);
   };
+
+  console.log(posts);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -98,10 +88,10 @@ const PostManagement: React.FC = () => {
           <Card key={post.id} sx={{ mb: 2 }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Avatar src={post.author.avatar} alt={post.author.name} />
+                <Avatar src={post.userId?.profilePicture} alt={post.userId?.firstName} />
                 <Box sx={{ ml: 2 }}>
                   <Typography variant="subtitle1" component="div">
-                    {post.author.name}
+                    {post.userId.firstName} {post.userId.lastName}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {new Date(post.createdAt).toLocaleString()}
@@ -112,9 +102,9 @@ const PostManagement: React.FC = () => {
                 {post.content}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Chip label={`${post.likes} likes`} size="small" />
-                <Chip label={`${post.comments} comments`} size="small" />
-                <Chip label={`${post.shares} shares`} size="small" />
+                <Chip label={`12 likes`} size="small" />
+                <Chip label={`2 comments`} size="small" />
+                <Chip label={`2 shares`} size="small" />
                 <Chip
                   label={post.activeStatus === 'ACTIVE' ? 'Đang hiển thị' : 'Đã ẩn'}
                   color={post.activeStatus === 'ACTIVE' ? 'success' : 'error'}
