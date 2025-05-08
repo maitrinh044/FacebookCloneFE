@@ -80,7 +80,7 @@ function MainApp() {
             positionOffset={index}
             currentUserId={currentUserId}
           />
-        ))}
+        )}
       </div>
     </div>
   );
