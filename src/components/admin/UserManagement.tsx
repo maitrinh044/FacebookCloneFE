@@ -29,34 +29,18 @@ import {
   CheckCircle as CheckCircleIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
-import { getUser, getUserById } from '../../services/userService';
-
-interface User {
-  id: string;
-  active_status: string;
-  biography: string;
-  birthday: string;
-  cover_photo: string;
-  create_at: string;
-  email: string;
-  first_name: string;
-  gender: string;
-  is_online: boolean;
-  last_name: string;
-  password: string;
-  avatar: string;
-}
+import { getUser, getUserById } from '../../services/UserService';
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [editForm, setEditForm] = useState({
-    first_name: '',
-    last_name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     gender: '',
     biography: '',
@@ -79,20 +63,20 @@ const UserManagement: React.FC = () => {
     fetchUsers();
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'active':
+  const getStatusColor = (activeStatus) => {
+    switch (activeStatus) {
+      case 'ACTIVE':
         return 'success';
-      case 'inactive':
-        return 'warning';
-      case 'banned':
+      case 'INACTIVE':
+        return 'WARNING';
+      case 'BANNED':
         return 'error';
       default:
         return 'default';
     }
   };
 
-  const handleViewUser = async (user: User) => {
+  const handleViewUser = async (user) => {
     try {
       const userData = await getUserById(user.id);
       setSelectedUser(userData);
@@ -102,11 +86,11 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const handleEditClick = (user: User) => {
+  const handleEditClick = (user) => {
     setSelectedUser(user);
     setEditForm({
-      first_name: user.first_name,
-      last_name: user.last_name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       gender: user.gender,
       biography: user.biography || '',
@@ -114,7 +98,7 @@ const UserManagement: React.FC = () => {
     setEditDialogOpen(true);
   };
 
-  const handleStatusClick = (user: User) => {
+  const handleStatusClick = (user) => {
     setSelectedUser(user);
     setStatusDialogOpen(true);
   };
@@ -141,7 +125,7 @@ const UserManagement: React.FC = () => {
         // await toggleUserStatus(selectedUser.id);
         setUsers(users.map(user =>
           user.id === selectedUser.id
-            ? { ...user, active_status: user.active_status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' }
+            ? { ...user, activeStatus: user.activeStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' }
             : user
         ));
         setStatusDialogOpen(false);
@@ -159,7 +143,7 @@ const UserManagement: React.FC = () => {
   };
 
   const filteredUsers = users.filter(user =>
-    `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -215,15 +199,15 @@ const UserManagement: React.FC = () => {
               {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
-                    <Avatar src={user.avatar} alt={`${user.first_name} ${user.last_name}`} />
+                    <Avatar src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
                   </TableCell>
-                  <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
+                  <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.gender === 'MALE' ? 'Nam' : 'Nữ'}</TableCell>
                   <TableCell>
                     <Chip
-                      label={user.active_status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
-                      color={getStatusColor(user.active_status)}
+                      label={user.activeStatus === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
+                      color={getStatusColor(user.activeStatus)}
                       size="small"
                     />
                   </TableCell>
@@ -243,7 +227,7 @@ const UserManagement: React.FC = () => {
                     </IconButton>
                     <IconButton
                       onClick={() => handleStatusClick(user)}
-                      color={user.active_status === 'ACTIVE' ? 'error' : 'success'}
+                      color={user.activeStatus === 'ACTIVE' ? 'error' : 'success'}
                     >
                       <BlockIcon />
                     </IconButton>
@@ -261,16 +245,16 @@ const UserManagement: React.FC = () => {
           {selectedUser && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar src={selectedUser.avatar} alt={selectedUser.first_name + ' ' + selectedUser.last_name} sx={{ width: 64, height: 64 }} />
+                <Avatar src={selectedUser.avatar} alt={selectedUser.firstName + ' ' + selectedUser.lastName} sx={{ width: 64, height: 64 }} />
                 <Box>
-                  <Typography variant="h6">{selectedUser.first_name + ' ' + selectedUser.last_name}</Typography>
+                  <Typography variant="h6">{selectedUser.firstName + ' ' + selectedUser.lastName}</Typography>
                   <Typography variant="body2" color="text.secondary">
                     {selectedUser.email}
                   </Typography>
                 </Box>
               </Box>
               <Typography variant="body2">
-                Ngày tham gia: {new Date(selectedUser.create_at).toLocaleDateString()}
+                Ngày tham gia: {new Date(selectedUser.creatAt).toLocaleDateString()}
               </Typography>
             </Box>
           )}
@@ -285,15 +269,15 @@ const UserManagement: React.FC = () => {
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
             <TextField
-              name="first_name"
+              name="firstName"
               label="Tên"
-              value={editForm.first_name}
+              value={editForm.firstName}
               onChange={handleFormChange}
             />
             <TextField
-              name="last_name"
+              name="lastName"
               label="Họ"
-              value={editForm.last_name}
+              value={editForm.lastName}
               onChange={handleFormChange}
             />
             <TextField
@@ -332,11 +316,11 @@ const UserManagement: React.FC = () => {
 
       <Dialog open={statusDialogOpen} onClose={() => setStatusDialogOpen(false)}>
         <DialogTitle>
-          {selectedUser?.active_status === 'ACTIVE' ? 'Vô hiệu hóa người dùng' : 'Kích hoạt người dùng'}
+          {selectedUser?.activeStatus === 'ACTIVE' ? 'Vô hiệu hóa người dùng' : 'Kích hoạt người dùng'}
         </DialogTitle>
         <DialogContent>
           <Typography>
-            {selectedUser?.active_status === 'ACTIVE'
+            {selectedUser?.activeStatus === 'ACTIVE'
               ? 'Bạn có chắc chắn muốn vô hiệu hóa người dùng này không?'
               : 'Bạn có chắc chắn muốn kích hoạt người dùng này không?'}
           </Typography>
@@ -345,10 +329,10 @@ const UserManagement: React.FC = () => {
           <Button onClick={() => setStatusDialogOpen(false)}>Hủy</Button>
           <Button
             onClick={handleStatusChange}
-            color={selectedUser?.active_status === 'ACTIVE' ? 'error' : 'success'}
+            color={selectedUser?.activeStatus === 'ACTIVE' ? 'error' : 'success'}
             variant="contained"
           >
-            {selectedUser?.active_status === 'ACTIVE' ? 'Vô hiệu hóa' : 'Kích hoạt'}
+            {selectedUser?.activeStatus === 'ACTIVE' ? 'Vô hiệu hóa' : 'Kích hoạt'}
           </Button>
         </DialogActions>
       </Dialog>
