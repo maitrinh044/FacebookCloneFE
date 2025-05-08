@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -20,7 +20,6 @@ import {
   DialogContent,
   DialogActions,
   MenuItem,
-  Grid,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -30,6 +29,7 @@ import {
   CheckCircle as CheckCircleIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
+import { getUser, getUserById } from '../../services/userService';
 
 interface User {
   id: string;
@@ -47,132 +47,8 @@ interface User {
   avatar: string;
 }
 
-// Mock data
-const mockUsers: User[] = [
-  {
-    id: '1',
-    active_status: 'ACTIVE',
-    biography: 'Frontend Developer with 5 years of experience',
-    birthday: '1990-05-15',
-    cover_photo: 'https://picsum.photos/800/300?random=1',
-    create_at: '2023-01-01T10:00:00',
-    email: 'john.doe@example.com',
-    first_name: 'John',
-    gender: 'MALE',
-    is_online: true,
-    last_name: 'Doe',
-    password: 'hashed_password_1',
-    avatar: 'https://i.pravatar.cc/150?img=1',
-  },
-  {
-    id: '2',
-    active_status: 'INACTIVE',
-    biography: 'Backend Developer specializing in Node.js',
-    birthday: '1992-08-20',
-    cover_photo: 'https://picsum.photos/800/300?random=2',
-    create_at: '2023-02-15T14:30:00',
-    email: 'jane.smith@example.com',
-    first_name: 'Jane',
-    gender: 'FEMALE',
-    is_online: false,
-    last_name: 'Smith',
-    password: 'hashed_password_2',
-    avatar: 'https://i.pravatar.cc/150?img=2',
-  },
-  {
-    id: '3',
-    active_status: 'ACTIVE',
-    biography: 'Full Stack Developer and UI/UX Designer',
-    birthday: '1988-03-10',
-    cover_photo: 'https://picsum.photos/800/300?random=3',
-    create_at: '2023-03-20T09:15:00',
-    email: 'mike.wilson@example.com',
-    first_name: 'Mike',
-    gender: 'MALE',
-    is_online: true,
-    last_name: 'Wilson',
-    password: 'hashed_password_3',
-    avatar: 'https://i.pravatar.cc/150?img=3',
-  },
-  {
-    id: '4',
-    active_status: 'ACTIVE',
-    biography: 'DevOps Engineer with cloud expertise',
-    birthday: '1995-11-25',
-    cover_photo: 'https://picsum.photos/800/300?random=4',
-    create_at: '2023-04-05T16:45:00',
-    email: 'sarah.johnson@example.com',
-    first_name: 'Sarah',
-    gender: 'FEMALE',
-    is_online: false,
-    last_name: 'Johnson',
-    password: 'hashed_password_4',
-    avatar: 'https://i.pravatar.cc/150?img=4',
-  },
-  {
-    id: '5',
-    active_status: 'INACTIVE',
-    biography: 'Mobile App Developer',
-    birthday: '1993-07-08',
-    cover_photo: 'https://picsum.photos/800/300?random=5',
-    create_at: '2023-05-12T11:20:00',
-    email: 'david.brown@example.com',
-    first_name: 'David',
-    gender: 'MALE',
-    is_online: true,
-    last_name: 'Brown',
-    password: 'hashed_password_5',
-    avatar: 'https://i.pravatar.cc/150?img=5',
-  },
-  {
-    id: '6',
-    active_status: 'ACTIVE',
-    biography: 'Data Scientist and Machine Learning Engineer',
-    birthday: '1991-04-30',
-    cover_photo: 'https://picsum.photos/800/300?random=6',
-    create_at: '2023-06-18T13:20:00',
-    email: 'emma.wilson@example.com',
-    first_name: 'Emma',
-    gender: 'FEMALE',
-    is_online: true,
-    last_name: 'Wilson',
-    password: 'hashed_password_6',
-    avatar: 'https://i.pravatar.cc/150?img=6',
-  },
-  {
-    id: '7',
-    active_status: 'INACTIVE',
-    biography: 'UI/UX Designer with 4 years of experience',
-    birthday: '1994-09-12',
-    cover_photo: 'https://picsum.photos/800/300?random=7',
-    create_at: '2023-07-22T08:45:00',
-    email: 'alex.turner@example.com',
-    first_name: 'Alex',
-    gender: 'MALE',
-    is_online: false,
-    last_name: 'Turner',
-    password: 'hashed_password_7',
-    avatar: 'https://i.pravatar.cc/150?img=7',
-  },
-  {
-    id: '8',
-    active_status: 'ACTIVE',
-    biography: 'Product Manager with strong technical background',
-    birthday: '1989-12-05',
-    cover_photo: 'https://picsum.photos/800/300?random=8',
-    create_at: '2023-08-30T15:10:00',
-    email: 'lisa.martin@example.com',
-    first_name: 'Lisa',
-    gender: 'FEMALE',
-    is_online: true,
-    last_name: 'Martin',
-    password: 'hashed_password_8',
-    avatar: 'https://i.pravatar.cc/150?img=8',
-  }
-];
-
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -185,9 +61,26 @@ const UserManagement: React.FC = () => {
     gender: '',
     biography: '',
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const data = await getUser();
+        setUsers(data);
+        setLoading(false);
+      } catch (err) {
+        setError('Không thể tải danh sách người dùng');
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'active':
         return 'success';
       case 'inactive':
@@ -199,22 +92,14 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'primary';
-      case 'moderator':
-        return 'secondary';
-      case 'user':
-        return 'default';
-      default:
-        return 'default';
+  const handleViewUser = async (user: User) => {
+    try {
+      const userData = await getUserById(user.id);
+      setSelectedUser(userData);
+      setViewDialogOpen(true);
+    } catch (err) {
+      setError('Không thể tải thông tin người dùng');
     }
-  };
-
-  const handleViewUser = (user: User) => {
-    setSelectedUser(user);
-    setViewDialogOpen(true);
   };
 
   const handleEditClick = (user: User) => {
@@ -224,7 +109,7 @@ const UserManagement: React.FC = () => {
       last_name: user.last_name,
       email: user.email,
       gender: user.gender,
-      biography: '',
+      biography: user.biography || '',
     });
     setEditDialogOpen(true);
   };
@@ -234,17 +119,35 @@ const UserManagement: React.FC = () => {
     setStatusDialogOpen(true);
   };
 
-  const handleEditSubmit = () => {
+  const handleEditSubmit = async () => {
     if (selectedUser) {
-      // Implement the logic to update the user in the backend
-      setViewDialogOpen(false);
+      try {
+        // TODO: Call API to update user (e.g., updateUser)
+        // await updateUser({ id: selectedUser.id, ...editForm });
+        setUsers(users.map(user =>
+          user.id === selectedUser.id ? { ...user, ...editForm } : user
+        ));
+        setEditDialogOpen(false);
+      } catch (err) {
+        setError('Không thể cập nhật thông tin người dùng');
+      }
     }
   };
 
-  const handleStatusChange = () => {
+  const handleStatusChange = async () => {
     if (selectedUser) {
-      // Implement the logic to update the user status in the backend
-      setStatusDialogOpen(false);
+      try {
+        // TODO: Call API to toggle user status (e.g., toggleUserStatus)
+        // await toggleUserStatus(selectedUser.id);
+        setUsers(users.map(user =>
+          user.id === selectedUser.id
+            ? { ...user, active_status: user.active_status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' }
+            : user
+        ));
+        setStatusDialogOpen(false);
+      } catch (err) {
+        setError('Không thể thay đổi trạng thái người dùng');
+      }
     }
   };
 
@@ -255,14 +158,19 @@ const UserManagement: React.FC = () => {
     });
   };
 
+  const filteredUsers = users.filter(user =>
+    `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4" component="h1">
-          User Management
+          Quản lý người dùng
         </Typography>
         <Button variant="contained" color="primary">
-          Add New User
+          Thêm người dùng mới
         </Button>
       </Box>
 
@@ -270,7 +178,7 @@ const UserManagement: React.FC = () => {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Search users..."
+          placeholder="Tìm kiếm người dùng..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
@@ -283,64 +191,72 @@ const UserManagement: React.FC = () => {
         />
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Avatar</TableCell>
-              <TableCell>Tên</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Giới tính</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Online</TableCell>
-              <TableCell>Thao tác</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {mockUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  <Avatar src={user.avatar} alt={`${user.first_name} ${user.last_name}`} />
-                </TableCell>
-                <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.gender === 'MALE' ? 'Nam' : 'Nữ'}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={user.active_status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
-                    color={user.active_status === 'ACTIVE' ? 'success' : 'error'}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={user.is_online ? 'Online' : 'Offline'}
-                    color={user.is_online ? 'success' : 'default'}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleViewUser(user)} color="primary">
-                    <ViewIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleEditClick(user)} color="primary">
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleStatusClick(user)}
-                    color={user.active_status === 'ACTIVE' ? 'error' : 'success'}
-                  >
-                    <BlockIcon />
-                  </IconButton>
-                </TableCell>
+      {loading ? (
+        <Typography>Đang tải...</Typography>
+      ) : error ? (
+        <Typography color="error">{error}</Typography>
+      ) : filteredUsers.length === 0 ? (
+        <Typography>Không tìm thấy người dùng nào</Typography>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Avatar</TableCell>
+                <TableCell>Tên</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Giới tính</TableCell>
+                <TableCell>Trạng thái</TableCell>
+                <TableCell>Online</TableCell>
+                <TableCell>Thao tác</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <Avatar src={user.avatar} alt={`${user.first_name} ${user.last_name}`} />
+                  </TableCell>
+                  <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.gender === 'MALE' ? 'Nam' : 'Nữ'}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={user.active_status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
+                      color={getStatusColor(user.active_status)}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={user.is_online ? 'Online' : 'Offline'}
+                      color={user.is_online ? 'success' : 'default'}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleViewUser(user)} color="primary">
+                      <ViewIcon />
+                    </IconButton>
+                    <IconButton onClick={() => handleEditClick(user)} color="primary">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleStatusClick(user)}
+                      color={user.active_status === 'ACTIVE' ? 'error' : 'success'}
+                    >
+                      <BlockIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <Dialog open={viewDialogOpen} onClose={() => setViewDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>User Details</DialogTitle>
+        <DialogTitle>Chi tiết người dùng</DialogTitle>
         <DialogContent>
           {selectedUser && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
@@ -354,17 +270,16 @@ const UserManagement: React.FC = () => {
                 </Box>
               </Box>
               <Typography variant="body2">
-                Join Date: {selectedUser.create_at.split('T')[0]}
+                Ngày tham gia: {new Date(selectedUser.create_at).toLocaleDateString()}
               </Typography>
             </Box>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setViewDialogOpen(false)}>Close</Button>
+          <Button onClick={() => setViewDialogOpen(false)}>Đóng</Button>
         </DialogActions>
       </Dialog>
 
-      {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
         <DialogTitle>Chỉnh sửa thông tin người dùng</DialogTitle>
         <DialogContent>
@@ -415,7 +330,6 @@ const UserManagement: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Status Dialog */}
       <Dialog open={statusDialogOpen} onClose={() => setStatusDialogOpen(false)}>
         <DialogTitle>
           {selectedUser?.active_status === 'ACTIVE' ? 'Vô hiệu hóa người dùng' : 'Kích hoạt người dùng'}
@@ -442,4 +356,4 @@ const UserManagement: React.FC = () => {
   );
 };
 
-export default UserManagement; 
+export default UserManagement;

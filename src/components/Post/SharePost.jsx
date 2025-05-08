@@ -16,6 +16,11 @@ export default function SharePost({ post, onClose, onShare, currentUser }) {
             <div className="bg-white rounded-lg p-4 w-96">
                 <h2 className="text-lg font-semibold mb-4">Chia sẻ bài viết</h2>
                 <p className="mb-4">{post.content}</p>
+                {post.imageUrl!=null&&(
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                    <img key={imgIndex} src={post.imageUrl} alt={`Ảnh`} className="w-full h-40 object-cover rounded-md" />
+                    </div>
+                )}
                 <div className="flex justify-end gap-2">
                     <button
                         onClick={onClose}

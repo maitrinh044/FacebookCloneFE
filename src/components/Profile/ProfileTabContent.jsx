@@ -317,7 +317,7 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
                   </div>
                   {/* Bình luận */}
                               
-                  <div className="space-y-3">
+                  <div className="space-y-3 mb-[50px]">
                     {getCommentByPostId(selectedPost.id).length > 0 ? (
                       getCommentByPostId(selectedPost.id).map((cmt, cmtIndex) => (
                         <div key={cmtIndex} className="border-b p-2">
@@ -330,7 +330,9 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
                     ) : (
                       <p className="text-gray-500 italic text-center">Chưa có bình luận nào.</p>
                     )}
-                    <div className="flex justify-between gap-3 absolute bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-300">
+                    
+                  </div>
+                  <div className="flex justify-between gap-3 absolute bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-300">
                       <div className="w-[40px]">
                         {currentUser.profilePicture != null ? (
                           <img
@@ -360,7 +362,6 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
                             />
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
             </div>

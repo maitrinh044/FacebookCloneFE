@@ -3,7 +3,7 @@ import axiosClient from "../utils/axiosClient";
 export const getPostByUser = async (userId) => {
   try {
     const response = await axiosClient.get(
-      `/posts/getPostsByUser/${userId}`
+      `/posts/getPostByUser/${userId}`
     );
     // console.log("response: ", response.data?.data);
     return response.data?.data;

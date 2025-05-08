@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PostItem from "../Post/PostItem";
 import CreatePost from "../Post/CreatePost";
-import { getAllPosts, createPost } from "../../services/PostService";
+import { getAllPosts, createPost, shareToProfile } from "../../services/PostService";
 import { controlActiveStatus, getUserById } from "../../services/profileService";
 import useFetchUser from "../../utils/useFetchUser";
 
@@ -72,7 +72,14 @@ export default function PostList() {
               console.error("Lỗi khi điều chỉnh bài viết:", error);
           }
       }
-
+  const share = async (userId, postId, caption) => {
+    try {
+      const response = await shareToProfile(userId, postId, caption);
+      // const list = await
+    } catch (error) {
+      console.error("Lỗi khi share bài viết! ", error);
+    }
+  }
     const {users} = useFetchUser();
     console.log("users: ", users);
   // Kiểm tra trạng thái loading và lỗi

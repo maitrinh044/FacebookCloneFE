@@ -72,7 +72,7 @@ function MainApp() {
       <ScrollToTop />
       <AppRouter onOpenChat={handleOpenChat} />
       <div className="fixed bottom-4 right-4 flex gap-4">
-        {openChats && openChats.map((chat, index) => (
+        {openChats && openChats.map((chat, index) => 
           <MessagePanel
             key={chat.id}
             friend={chat}

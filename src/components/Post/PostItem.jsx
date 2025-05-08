@@ -65,16 +65,16 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                 setComments(commentData);
 
                 // Lấy số lượng phản ứng
-                const count = await countReactions("post", post.id);
+                const count = await countReactions("POST", post.id);
                 setLikeCount(count);
 
                 // Lấy phản ứng của người dùng hiện tại
-                const userReaction = await getReactions("post", post.id, userId);
+                const userReaction = await getReactions("POST", post.id, userId);
                 setSelectedReaction(userReaction || null);
                 setIsLiked(!!userReaction);
 
                 // Lấy số lượng phản ứng theo loại
-                const counts = await getReactionCountsByType("post", post.id);
+                const counts = await getReactionCountsByType("POST", post.id);
                 setReactionCounts(counts);
 
                 // Lấy danh sách loại phản ứng
@@ -114,7 +114,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
         const defaultReaction = reactionTypes.find(r => r.id === "LIKE") || { id: "LIKE", emoji: "👍", label: "Thích" };
         try {
             setError(null);
-            const result = await toggleReaction({ targetType: "post", targetId: post.id, reactionType: "LIKE" }, userId);
+            const result = await toggleReaction({ targetType: "POST", targetId: post.id, reactionType: "LIKE" }, userId);
             if (selectedReaction) {
                 // Xóa phản ứng hiện tại
                 setLikeCount(prev => prev - 1);
@@ -137,7 +137,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
     const handleSelectReaction = async (reaction) => {
         try {
             setError(null);
-            const result = await toggleReaction({ targetType: "post", targetId: post.id, reactionType: reaction.id }, userId);
+            const result = await toggleReaction({ targetType: "POST", targetId: post.id, reactionType: reaction.id }, userId);
             if (selectedReaction) {
                 // Cập nhật từ phản ứng cũ sang phản ứng mới
                 setReactionCounts(prev => ({
@@ -454,7 +454,8 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                               {commentByPost.length || 0}
                             </div>
                             <div className="flex gap-1">
-                              <FaShare className="relative top-[3px]" />
+            
+                            <FaShare className="relative top-[3px]" />
                               {/* {post.amountOfShare} */}
                             </div>
                           </div>
@@ -498,11 +499,19 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                           <button className="flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all" onClick={() => openModal(post)}>
                             <FaComment className="w-5 h-5" /> Bình luận
                           </button>
-                          <button className="flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all">
+                          <button onClick={() => setShowShareModal(true)} className="flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all">
                             <FaShare className="w-5 h-5" /> Chia sẻ
                           </button>
                         </div>
                       </div>
+                        {showShareModal && (
+                            <SharePost
+                                post={post}
+                                onClose={() => setShowShareModal(false)}
+                                onShare={handleSharePost}
+                                currentUser={user}
+                            />
+                        )}
                       {isModalOpen && selectedPost && (
                                   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                                     <div className="fixed relative bg-white p-5 rounded-lg shadow-lg w-[800px] max-w-full relative flex flex-col max-h-[110vh] overflow-hidden">
@@ -631,6 +640,8 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                                     </div>
                                   </div>
                                 )}
+                                
                       </div>
+                    
     );
 }

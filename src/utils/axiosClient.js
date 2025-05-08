@@ -22,7 +22,6 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// Thêm interceptor để xử lý khi token hết hạn và làm mới token
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -32,12 +31,11 @@ axiosClient.interceptors.response.use(
     const isRefreshURL = originalRequest.url.includes("/auth/refresh-token");
     if (error.response?.status === 401 && !isRefreshURL && !originalRequest._retry) {
       originalRequest._retry = true;
-
       const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
         try {
           const refreshResponse = await axios.post('http://localhost:8080/auth/refresh-token', {
-            refreshToken,
+            refreshToken: refreshToken
           });
 
           const newAccessToken = refreshResponse.data.accessToken;
