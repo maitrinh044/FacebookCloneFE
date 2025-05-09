@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getUser } from "../services/UserService";
-import { useFetcher } from "react-router-dom";
 import { getUserById } from "../services/profileService";
 export const useFetchUser = () => {
     const [users, setUsers] = useState([]);
@@ -23,6 +22,7 @@ export const useFetchUser = () => {
     }, []);
     return {users, loading, error};
 }
+
 export const useFetchUserById = (userId) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -32,6 +32,7 @@ export const useFetchUserById = (userId) => {
         const fetchData = async () => {
             try {
                 const data = await getUserById(userId); // Lấy người dùng bằng ID
+                console.log("Data: ", data);
                 setUser(data);
             } catch (error) {
                 console.error("Error while getting user by id:", error);
@@ -45,4 +46,3 @@ export const useFetchUserById = (userId) => {
 
     return { user, loading, error };
 };
-export default useFetchUser;

@@ -21,7 +21,6 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
 
     const userId = user?.id || 1; // Giả định userId từ currentUser, thay bằng logic auth thực tế
     const userid = localStorage.getItem('userId');
-    console.log('userId in postshare: ', user);
     
     useEffect(() => {
         const fetchData = async () => {
@@ -34,7 +33,6 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
 
                 // Lấy danh sách loại phản ứng
                 const types = await getReactionTypes();
-                console.log("types: ", types);
                 setReactionTypes(types);
 
                 /////////
@@ -67,7 +65,7 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
         setSelectedPost(null);
     };
     function getReactionByUserIdAndPost(postid) {
-        const reaction = reactionByUser.find(e=>e.targetId === postid);
+        const reaction = reactionByUser?.find(e=>e.targetId === postid);
         return reaction || [];
     }
     function getReaction(id) {
@@ -154,12 +152,10 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
     // posts.forEach(element => {
     //     console.log('post: ', getUserById(getPostById(element.originalPostId).userId));
     // });
-    console.log('users: ', users);
     function getUserById(userId) {
         const user = users.find(e => e.id === userId);
         return user || [];
     }
-    console.log('posts: ', posts);
     // posts.forEach(element => {
     //     console.log('post: ' + element.id, getUserById(getPostById(element.originalPostId).userId).firstName);
     // });
@@ -174,13 +170,13 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
                 <div  className="bg-white shadow-md p-4 rounded-md text-gray-700 mb-3 flex flex-col">
                   {/* Header */}
                   <div className="w-full h-10 flex items-center gap-2">
-                    {getUserById(post.userId).profilePicture!=null?(
-                      <img src={getUserById(post.userId).profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
+                    {post.userId?.profilePicture!=null?(
+                      <img src={post.userId?.profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
                     ):(
                       <FaUserCircle className="rounded-full w-10 h-10 object-cover text-gray-300"/>
                     )}
                     <div>
-                      <div className="font-bold text-[15px]">{getUserById(post.userId).firstName + " " + getUserById(post.userId).lastName}</div>
+                      <div className="font-bold text-[15px]">{post.userId.firstName + " " + post.userId.lastName}</div>
                       <div className="text-[13px] flex gap-1">{formatDateString(post.createdAt)} <FaGlobe className="-top-[-3px] relative"/></div>
                     </div>
                     <button className="ml-auto hover:bg-gray-200 p-2 rounded-full transition-all text-gray-300">
@@ -203,13 +199,13 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
                   {post.content && <p className="mt-2">{post.content}</p>}
                   <div className="shadow rounded p-3">
                     <div className="w-full h-10 flex items-center gap-2">
-                      {getUserById(getPostById(post.originalPostId).userId).profilePicture!=null?(
-                        <img src={getUserById(post.userId).profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
+                      {getPostById(post.originalPostId).userId?.profilePicture!=null?(
+                        <img src={post.userId?.profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
                       ):(
                         <FaUserCircle className="rounded-full w-10 h-10 object-cover text-gray-300"/>
                       )}
                       <div>
-                        <div className="font-bold text-[15px]">{getUserById(getPostById(post.originalPostId).userId).firstName + " " + getUserById(getPostById(post.originalPostId).userId).lastName}</div>
+                        <div className="font-bold text-[15px]">{getPostById(post.originalPostId)?.userId?.firstName + " " + getPostById(post.originalPostId)?.userId?.lastName}</div>
                         <div className="text-[13px] flex gap-1">{formatDateString(getPostById(post.originalPostId).createdAt)} <FaGlobe className="-top-[-3px] relative"/></div>
                       </div>
                       <button className="ml-auto hover:bg-gray-200 p-2 rounded-full transition-all text-gray-300">
@@ -392,9 +388,9 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
                                 )}
                                 <div className="flex justify-between gap-3 absolute bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-300">
                                 <div className="w-[40px]">
-                                    {user.profilePicture != null ? (
+                                    {user?.profilePicture != null ? (
                                     <img
-                                        src={user.profilePicture}
+                                        src={user?.profilePicture}
                                         className="object-cover h-full w-full rounded-lg"
                                     />
                                     ) : (

@@ -279,7 +279,6 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
 
         return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
     }
-    console.log('user in postitem: ', user)
 
     if (loading) return <div>Loading...</div>;
 
@@ -407,13 +406,13 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                       <div  className="bg-white shadow-md p-4 rounded-md text-gray-700 mb-3 flex flex-col">
                         {/* Header */}
                         <div className="w-full h-10 flex items-center gap-2">
-                          {getUserById(post.userId).profilePicture!=null?(
-                            <img src={getUserById(post.userId).profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
+                          {post.userId.profilePicture!=null?(
+                            <img src={post.userId.profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
                           ):(
                             <FaUserCircle className="rounded-full w-10 h-10 object-cover text-gray-300"/>
                           )}
                           <div>
-                            <div className="font-bold text-[15px]">{getUserById(post.userId).firstName + " " + getUserById(post.userId).lastName}</div>
+                            <div className="font-bold text-[15px]">{post.userId.firstName + " " + post.userId.lastName}</div>
                             <div className="text-[13px] flex gap-1">{formatDateString(post.createdAt)} <FaGlobe className="-top-[-3px] relative"/></div>
                           </div>
                           <button className="ml-auto hover:bg-gray-200 p-2 rounded-full transition-all text-gray-300">
@@ -599,7 +598,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                                           {commentByPost.length > 0 ? (
                                             commentByPost.map((cmt, cmtIndex) => (
                                               <div key={cmtIndex} className="border-b p-2">
-                                                <p className="font-semibold text-gray-800">👤 {getUserById(cmt.userId.id).firstName + " " + getUserById(cmt.userId.id).lastName}</p>
+                                                <p className="font-semibold text-gray-800">👤 {cmt.userId.ido.firstName + " " + cmt.userId.id.lastName}</p>
                                                 <p className="text-gray-700">{cmt.content}</p>
                                                 <p className="text-xs text-gray-500">{formatDateString(cmt.createdAt)}</p>
                                               </div>

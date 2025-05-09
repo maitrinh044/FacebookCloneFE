@@ -13,21 +13,11 @@ export default function ProfilePage() {
   const { id } = useParams();
   const currentUserId = localStorage.getItem("userId");
   const currentUserId2 = localStorage.getItem("userId");
-  console.log("urlUserId: ", id);
   const {user} = useFetchUserById(currentUserId);
-  console.log("currentUserId: ", currentUserId);
-  console.log("currentUser: ", user);
   // const {reactionByUser} = getReactionsByUser(currentUserId);
   // console.log("reactionByCurrentUser: ", reactionByUser);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const {listPost, userData, reactionByPost,commentByPost,reactionTypes,listFriends,controlReactionUser,addCommentByUser,reactionByUser,controlActiveStatusPost,updateUser,loading} = useFetchProfile(id, currentUserId2);
-  console.log("listPost: ", listPost);
-  console.log("userData: ", userData);
-  console.log("reactionByPost: ", reactionByPost);
-  console.log("commentByPost: ", commentByPost);
-  console.log("reactionTypes: ", reactionTypes);
-  console.log("listFriends: ", listFriends);
-  console.log("reactionByCurrentUser: ", reactionByUser);
 
   
   const {users, error} = useFetchUser();

@@ -139,7 +139,6 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
   }
   const handleSharePost = async (userId, postId, caption) => {
       
-      console.log("ban dang share post den profile")
       try {
         const response = await shareToProfile(userId, postId, caption);
         // const list = await

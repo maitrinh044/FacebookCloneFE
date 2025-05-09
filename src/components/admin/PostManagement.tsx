@@ -67,8 +67,6 @@ const PostManagement: React.FC = () => {
     setSelectedPostId(null);
   };
 
-  console.log(posts);
-
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>

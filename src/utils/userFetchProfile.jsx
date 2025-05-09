@@ -44,11 +44,10 @@ export const useFetchProfile = (userId, currentUserId) => {
         try {
             setLoading(true);
             const response1 = await getPostByUser(userId);
-            // console.log("Response posts: ", response1);
             setListPost(response1); // Đảm bảo dữ liệu có trả về từ API
 
             const response2 = await getUserById(userId);
-            if (response2) {
+            if (response2) {2
                 setUserData(response2);
             }
             // Tạo mảng các Promise cho reactions

@@ -25,7 +25,6 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
   const [callInfo, setCallInfo] = useState(null);
   const scrollRef = useRef(null);
 
-  const avatarUrl = "https://placehold.co/40x40";
   const inputRef = useRef(null);
   const location = useLocation();
   const [messageList, setMessageList] = useState([]);
@@ -36,14 +35,12 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
   const { sendMessage } = useChatSocket({
     userId: currentUserId,
     onMessageReceived: (msg) => {
-      console.log("Nhận được tin nhắn mới: ", msg);
       setMessageList((prevMessages) => [...prevMessages, msg]); // Cập nhật UI
     },
   });  
 
   const fetchMessages = async () => {
     try {
-      console.log("current id: ",currentUserId);
       const data = await getMessageList(currentUserId, receiverId);
       setMessageList(data);
     } catch (e) {
@@ -88,7 +85,7 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
             <div className="flex items-center gap-2">
               <div className="relative">
                 <img
-                  src={avatarUrl}
+                  src={friend.profilePicture}
                   alt="avatar"
                   className="w-8 h-8 rounded-full border-2 border-white"
                 />

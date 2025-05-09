@@ -71,13 +71,6 @@ export default function MessageLayout({
   };
 
 
-
-
-  console.log("selected chat: ", selectedChat);
-  // console.log(chatList);
-  console.log("current id: ", currentUserId);
-
-
   return (
     <div className="flex bg-white shadow overflow-hidden h-full w-full">
       {/* Sidebar danh sách chat */}

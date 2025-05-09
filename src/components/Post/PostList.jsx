@@ -3,7 +3,7 @@ import PostItem from "../Post/PostItem";
 import CreatePost from "../Post/CreatePost";
 import { getAllPosts, createPost, shareToProfile } from "../../services/PostService";
 import { controlActiveStatus, getUserById } from "../../services/profileService";
-import useFetchUser from "../../utils/useFetchUser";
+import { useFetchUser} from "../../utils/useFetchUser";
 import { func } from "prop-types";
 import { FaEllipsisH, FaFacebookMessenger, FaGlobe, FaShare, FaThumbsUp, FaUserCircle } from "react-icons/fa";
 import PostByShare from "./PostByShare";
@@ -26,8 +26,7 @@ export default function PostList() {
     const fetchPosts = async () => {
       try {
         const data = await getAllPosts(); // Lấy dữ liệu từ API
-        console.log("Fetched posts:", data); // Kiểm tra dữ liệu nhận được
-        const response2 = await getUserById(id);
+        const response2 = getUserById(id);
         if (response2) {
             setUser(response2);
         }
@@ -46,7 +45,6 @@ export default function PostList() {
   const handlePostCreated = async (newPost) => {
     try {
       const createdPost = await createPost(newPost); // Gửi dữ liệu tạo bài viết mới đến API
-      console.log("Created post:", createdPost); // Kiểm tra post mới tạo
       setPosts([createdPost, ...posts]); // Thêm bài viết mới vào đầu danh sách
     } catch (err) {
       console.error("Error creating post:", err); // Log lỗi nếu có
@@ -57,7 +55,6 @@ export default function PostList() {
   // Hàm xử lý khi chia sẻ bài viết
   const handleSharePost = async (userId, postId, caption) => {
     
-    console.log("ban dang share post den profile")
     try {
       const response = await shareToProfile(userId, postId, caption);
       // const list = await
@@ -83,10 +80,8 @@ export default function PostList() {
     // } catch (error) {
     //   console.error("Lỗi khi share bài viết! ", error);
     // }
-    console.log("Bạn đã click share post!");
   }
     const {users} = useFetchUser();
-    // console.log("users: ", users);
     function getUserById(userId) {
       const user = users.find(e => e.id === userId);
       return user || [];

@@ -35,7 +35,7 @@ export default function SidebarLeft() {
         className="flex items-center gap-3 mb-6 hover:bg-gray-100 p-2 rounded-md transition"
       >
         <img
-          src={currentUser.avatar || "/default-avatar.png"}
+          src={currentUser.profilePicture || "/default-avatar.png"}
           alt="Avatar"
           className="w-10 h-10 rounded-full object-cover"
         />

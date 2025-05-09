@@ -25,10 +25,11 @@ import useFetchUserFriends from "../utils/useFetchUserFriends";
 import MessagePanel from "./Message/MessagePanel";
 import { getLastMessage } from "../services/MessageService";
 import { useStomp } from "../contexts/StompContext";
+import { useFetchUserById } from "../utils/useFetchUser";
 
 export default function Header() {
   const navigate = useNavigate();
-  const {disconnect} = useStomp();
+  const { disconnect } = useStomp();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMessagePopup, setShowMessagePopup] = useState(false);
@@ -40,7 +41,10 @@ export default function Header() {
   const [openChats, setOpenChats] = useState([]);
   const location = useLocation();
 
+  const userId = localStorage.getItem("userId");
+  const { user, loading, error } = useFetchUserById(userId);
 
+  // console.log(user);
   const notifications = [
     {
       avatar: "https://randomuser.me/api/portraits/men/32.jpg",
@@ -227,7 +231,11 @@ export default function Header() {
 
         <div className="relative" ref={profileRef}>
           <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="p-2 rounded-full hover:bg-gray-100">
-            <FaUserCircle className="text-2xl text-gray-700" />
+            <img
+              src={user?.profilePicture || "/default-avatar.png"}
+              alt="Avatar"
+              className="w-10 h-10 rounded-full object-cover"
+            />
           </button>
           {showProfileMenu && (
             <div className="absolute right-0 top-12 w-48 bg-white shadow-lg rounded-xl border border-gray-200 z-50">
