@@ -39,11 +39,12 @@ export default function LoginPage() {
       if (success) {
         let userId = localStorage.getItem("userId");
         const user = await getUserById(userId);
-        if (user.role.id == 1) {
-          navigate("/admin");
-        } else {
-          navigate("/"); // Điều hướng về trang chủ
-        }
+        // if (user.role.id == 1) {
+        //   navigate("/admin");
+        // } else {
+        //   navigate("/"); // Điều hướng về trang chủ
+        // }
+        navigate("/"); 
         toast.success('Đăng nhập thành công!');
       } else {
         toast.error('Đăng nhập thất bại!');
