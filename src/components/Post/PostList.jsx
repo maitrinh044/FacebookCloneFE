@@ -26,10 +26,12 @@ export default function PostList() {
     const fetchPosts = async () => {
       try {
         const data = await getAllPosts(); // Lấy dữ liệu từ API
-        const response2 = getUserById(id);
+        const response2 = await getUserById(id);
         if (response2) {
+          console.log('user in useEffect: ', response2);
             setUser(response2);
         }
+        // setUser(res)
         setPosts(data); // Lưu vào state posts
         setLoading(false); // Đổi trạng thái loading
       } catch (err) {
@@ -67,7 +69,7 @@ export default function PostList() {
           try {
               const response = await controlActiveStatus(postId); 
   
-              const updatedComments = await getPostByUser(userId);
+              const updatedComments = await getAllPosts();
               setPosts(updatedComments);
           } catch (error) {
               console.error("Lỗi khi điều chỉnh bài viết:", error);
@@ -81,11 +83,12 @@ export default function PostList() {
     //   console.error("Lỗi khi share bài viết! ", error);
     // }
   }
+
     const {users} = useFetchUser();
-    function getUserById(userId) {
-      const user = users.find(e => e.id === userId);
-      return user || [];
-    }
+    // function getUserById(userId) {
+    //   const user = users.find(e => e.id === userId);
+    //   return user || [];
+    // }
     function getPostById(postId) {
       const post = posts.find(e => e.id === postId);
       return post || [];
@@ -102,7 +105,7 @@ export default function PostList() {
 
       return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
   }
-    
+  console.log('posts: ', posts);
   // Kiểm tra trạng thái loading và lỗi
   if (loading) return <div>Loading...</div>; // Hiển thị khi đang loading
   if (error) return <div>{error}</div>; // Hiển thị khi có lỗi
@@ -115,11 +118,16 @@ export default function PostList() {
       ) : (
         posts.map((post) => (
           <div>
-            {post.originalPostId == null ? (
-              <PostItem key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
-            )  : (
-              <PostByShare posts={posts} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
+            {post.activeStatus === 'ACTIVE' && (
+              <div>
+                {post.originalPostId == null ? (
+                <PostItem isOwnProfile={user.id == id} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
+                )  : (
+                  <PostByShare isOwnProfile={user.id == id} posts={posts} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
+                )}
+              </div>
             )}
+            
           </div>
           
         ))

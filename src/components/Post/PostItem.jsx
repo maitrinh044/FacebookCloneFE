@@ -10,7 +10,7 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { func } from "prop-types";
 import { getUser } from "../../services/UserService";
 
-export default function PostItem({ post, onShare, user, controlActiveStatusPost,users }) {
+export default function PostItem({ post, isOwnProfile, onShare, user, controlActiveStatusPost,users }) {
     const [isLiked, setIsLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [reactionCounts, setReactionCounts] = useState({});
@@ -55,7 +55,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
     setIsModalOpen(false);
     setSelectedPost(null);
     };
-
+    const userIdCurrent = localStorage.getItem('userId');
     const userId = user?.id || 1; // Giả định userId từ currentUser, thay bằng logic auth thực tế
 
     useEffect(() => {
@@ -419,7 +419,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                             <FaEllipsisH className="w-4 h-4" onClick={() => handleClickActivePost(post)}/>
                           </button>
                           
-                          {/* {activePostDropDown && activePost === post && (
+                          {activePostDropDown && activePost === post && (
                               <div className="absolute bg-white border border-gray-300 rounded-lg shadow-md p-2 ml-[570px] mt-[100px] h-[115px] w-[240px]" 
                                   id="emojiDropdown">
                                   {isOwnProfile && (
@@ -430,7 +430,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                                   )}
                                   
                               </div>
-                          )} */}
+                          )}
                         </div>
         
                         {/* Nội dung bài viết */}
@@ -492,7 +492,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                                         <span key={e.id} 
                                               id={e.id} 
                                               className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
-                                              onClick={() => controlReactionUser(user.id, 'POST', post.id, e.id)}>{e.emoji}</span>
+                                              onClick={() => controlReactionUser(userIdCurrent, 'POST', post.id, e.id)}>{e.emoji}</span>
                                       ))}
                                   </div>
                               </div>
@@ -578,7 +578,7 @@ export default function PostItem({ post, onShare, user, controlActiveStatusPost,
                                                       {reactionTypes.map(e => (
                                                         <span id={e.id} 
                                                         className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
-                                                        onClick={() => controlReactionUser(user.id, 'POST', selectedPost.id, e.id)}
+                                                        onClick={() => controlReactionUser(userIdCurrent, 'POST', selectedPost.id, e.id)}
                                                         >{e.emoji}</span>
                                                       ))}
                                                   </div>

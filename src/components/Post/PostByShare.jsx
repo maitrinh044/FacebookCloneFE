@@ -7,7 +7,7 @@ import SharePost from "./SharePost";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
-export default function PostByShare({posts, post, onShare, user, controlActiveStatusPost,users}) {
+export default function PostByShare({posts, post, isOwnProfile, onShare, user, controlActiveStatusPost,users}) {
     const [reactionTypes, setReactionTypes] = useState([]);
     const [reactionByPost, setReactionByPost] = useState([]);
     const [commentByPost, setCommentByPost] = useState([]);
@@ -17,6 +17,7 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
+    
     // const [commentContent, setCommentContent] = useState("");
 
     const userId = user?.id || 1; // Giả định userId từ currentUser, thay bằng logic auth thực tế
@@ -65,7 +66,7 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
         setSelectedPost(null);
     };
     function getReactionByUserIdAndPost(postid) {
-        const reaction = reactionByUser?.find(e=>e.targetId === postid);
+        const reaction = reactionByUser.find(e=>e.targetId === postid);
         return reaction || [];
     }
     function getReaction(id) {
@@ -183,7 +184,7 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
                       <FaEllipsisH className="w-4 h-4" onClick={() => handleClickActivePost(post)}/>
                     </button>
                     
-                    {/* {activePostDropDown && activePost === post && (
+                    {activePostDropDown && activePost === post && (
                         <div className="absolute bg-white border border-gray-300 rounded-lg shadow-md p-2 ml-[570px] mt-[100px] h-[115px] w-[240px]" 
                             id="emojiDropdown">
                             {isOwnProfile && (
@@ -194,7 +195,7 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
                             )}
                             
                         </div>
-                    )} */}
+                    )}
                   </div>
                   {post.content && <p className="mt-2">{post.content}</p>}
                   <div className="shadow rounded p-3">
@@ -357,7 +358,7 @@ export default function PostByShare({posts, post, onShare, user, controlActiveSt
                                             {reactionTypes.map(e => (
                                             <span id={e.id} 
                                             className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
-                                            onClick={() => controlReactionUser(user.id, 'POST', selectedPost.id, e.id)}
+                                            onClick={() => controlReactionUser(userid, 'POST', selectedPost.id, e.id)}
                                             >{e.emoji}</span>
                                             ))}
                                         </div>

@@ -158,10 +158,19 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
           {listPost && listPost.length > 0 ? (
             listPost.map((posts, index) => (
               <div>
-                {posts.originalPostId == null ? (
+                {/* {posts.originalPostId == null ? (
                   <PostItem key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
                 ) : (
                   <PostByShare posts={allpost} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
+                )} */}
+                {posts.activeStatus === 'ACTIVE' && (
+                  <div>
+                    {posts.originalPostId == null ? (
+                      <PostItem isOwnProfile={user.id == currentUser.id} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
+                    ) : (
+                      <PostByShare isOwnProfile={user.id == currentUser.id} posts={allpost} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
+                    )}
+                  </div>
                 )}
               </div>
               

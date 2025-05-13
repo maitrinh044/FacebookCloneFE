@@ -32,7 +32,7 @@ export const useFetchUserById = (userId) => {
         const fetchData = async () => {
             try {
                 const data = await getUserById(userId); // Lấy người dùng bằng ID
-                console.log("Data: ", data);
+                // console.log("Data: ", data);
                 setUser(data);
             } catch (error) {
                 console.error("Error while getting user by id:", error);
