@@ -103,6 +103,9 @@ export default function PostItem({ post, isOwnProfile, onShare, user, controlAct
 
         fetchData();
     }, [post.id, userId]);
+
+    console.log('comment by post: ', commentByPost);
+
     function getReactionByUserIdAndPost(postid) {
         const reaction = reactionByUser.find(e=>e.targetId === postid);
         return reaction || [];
@@ -598,7 +601,7 @@ export default function PostItem({ post, isOwnProfile, onShare, user, controlAct
                                           {commentByPost.length > 0 ? (
                                             commentByPost.map((cmt, cmtIndex) => (
                                               <div key={cmtIndex} className="border-b p-2">
-                                                <p className="font-semibold text-gray-800">👤 {cmt.userId.ido.firstName + " " + cmt.userId.id.lastName}</p>
+                                                <p className="font-semibold text-gray-800">👤 {cmt.userId.firstName + " " + cmt.userId.lastName}</p>
                                                 <p className="text-gray-700">{cmt.content}</p>
                                                 <p className="text-xs text-gray-500">{formatDateString(cmt.createdAt)}</p>
                                               </div>

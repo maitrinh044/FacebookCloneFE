@@ -39,3 +39,15 @@ export const deleteComment = async (id) => {
     throw error;
   }
 };
+
+export const controlActiveStatusComment = async(id) => {
+  try {
+    const response = await axiosClient.put(
+      `/comments/controlActiveStatus/${id}`
+    );
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API controlActiveStatusComment:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
