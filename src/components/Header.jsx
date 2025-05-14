@@ -46,25 +46,7 @@ export default function Header() {
 
   // console.log(user);
   const notifications = [
-    {
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      name: "An Nguyễn",
-      message: "đã bình luận về bài viết của bạn.",
-      time: "2 phút trước",
-    },
-    {
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-      name: "Dũng Trần",
-      message: "đã thích bài viết của bạn.",
-      time: "10 phút trước",
-    },
-    {
-      avatar: "https://randomuser.me/api/portraits/women/30.jpg",
-      name: "Chi Nguyễn",
-      message: "đã gửi cho bạn lời mời kết bạn.",
-      time: "1 giờ trước",
-      action: { accept: "Xác nhận", reject: "Xóa" },
-    },
+    
   ];
 
 
@@ -217,12 +199,12 @@ export default function Header() {
             <div className="absolute right-0 top-12 w-64 bg-white shadow-lg rounded-xl border border-gray-200 z-50">
               <h4 className="p-3 font-semibold text-gray-700 border-b">Thông báo</h4>
               <ul className="max-h-64 overflow-y-auto">
-                {notifications.map((noti, index) => (
+                {notifications.length > 0 ? notifications.map((noti, index) => (
                   <li key={index} className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
                     <div>{noti.message}</div>
                     <div className="text-xs text-gray-400">{noti.time}</div>
                   </li>
-                ))}
+                )) : <li><div className="text-s text-gray-400">Không có thông báo</div> </li>}
               </ul>
             </div>
           )}
