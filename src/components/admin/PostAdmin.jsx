@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { controlActiveStatus, getAllPosts, getPostByKeyword, getPostByStartAndEnd } from "../../services/PostService";
 import { p } from "framer-motion/client";
-import { FaAlignLeft, FaAngleLeft, FaAngleRight } from "react-icons/fa";
+import { FaAlignLeft, FaAngleLeft, FaAngleRight, FaTimes } from "react-icons/fa";
 import { func } from "prop-types";
+import { getCommentByPost } from "../../services/profileService";
+import { controlActiveStatusComment } from "../../services/CommentService";
 
 export default function ({}) {
     const [listPost, setListPost] = useState([]);
@@ -12,11 +14,26 @@ export default function ({}) {
     const currentUserId = localStorage.getItem('userId');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
+    const [modalCT, setModalCT] = useState(false);
+    const [selectedPost, setSelectedPost] = useState(null);
+    const [commentByPost, setCommentByPost] = useState([]);
+    const onClose = () => {
+        setSelectedPost(null);
+    }
     useEffect(() => {
     const fetchPosts = async () => {
         try {
         const data = await getAllPosts(); // Lấy dữ liệu từ API
         setListPost(data);
+
+        const commentPromises = data.map(post => {
+            return getCommentByPost(post.id).then(comments => ({
+                postId: post.id,
+                comments
+            }));
+        });
+        const tmp2 = await Promise.all(commentPromises);
+        setCommentByPost(tmp2);
         } catch (err) {
         console.error("Error fetching posts:", err); 
         setError("Failed to fetch posts"); 
@@ -60,6 +77,16 @@ export default function ({}) {
         }
     }
 
+    const controlActiveComment = async(cmtId) => {
+        try {
+            const response = await controlActiveStatusComment(cmtId);
+            // const data = await getAllPosts(); // Lấy dữ liệu từ API
+            // setListPost(data);
+        } catch (error) {
+            console.error("Lỗi khi điều chỉnh trạng thái bài viết! ", error);
+        }
+    }
+
     const getByKeyword = async (keyword) => {
         try {
             const response = await getPostByKeyword(keyword);
@@ -79,6 +106,14 @@ export default function ({}) {
             console.error("Lỗi khi điều chỉnh trạng thái bài viết! ", error);
         }
     }
+
+    function getListCmtByPost(postid) {
+        const post = commentByPost.find(e => e.postId == postid);
+        return post || [];
+    }
+
+    console.log('commentByPost: ', commentByPost);
+    console.log('commentByPost in 1: ', getListCmtByPost(1));
 
     /////////
     return (
@@ -131,8 +166,13 @@ export default function ({}) {
                             <td>{post.userId.firstName} {post.userId.lastName}</td>
                             <td>{formatDateString(post.createdAt)}</td>
                             <td>{post.activeStatus === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}</td>
-                            <td>
-                                <button className="p-1 rounded bg-red-500" onClick={() => controlActive(post.id)}>Xóa</button>
+                            <td className="flex flex-row gap-3">
+                                <button className="p-1 rounded bg-blue-500" onClick={() => setSelectedPost(post)}>Chi tiết</button>
+                                {post.activeStatus == 'ACTIVE' ? (
+                                    <button className="p-1 rounded bg-red-500" onClick={() => controlActive(post.id)}>Ẩn</button>
+                                ) : (
+                                    <button className="p-1 rounded bg-green-500" onClick={() => controlActive(post.id)}>Hiện</button>
+                                )}
                             </td>
                         </tr>
                         ))
@@ -171,6 +211,61 @@ export default function ({}) {
                 </button>
                 </div>
             </div>
+
+            {/* Modal chi tiết bài viết */}
+            {selectedPost && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]">
+                    <div className="relative bg-white p-5 rounded-lg shadow-lg w-[800px] max-w-full flex flex-col max-h-[90vh] overflow-y-auto z-[1001]">
+                        <div className="flex justify-between items-center border-b-2 border-gray-500 p-4">
+                            <h1 className="text-xl font-bold mb-1 flex-1 text-center">Chi tiết bài viết</h1>
+                            <button className="text-gray-600 hover:text-red-500" onClick={onClose}>
+                                <FaTimes className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="overflow-y-auto p-2 flex-1">
+                            <p>{selectedPost.content}</p>
+                            {/* <p><strong>Người dùng:</strong> {selectedPost.userId.firstName} {selectedPost.userId.lastName}</p>
+                            <p><strong>Thời gian tạo:</strong> {formatDateString(selectedPost.createdAt)}</p>
+                            <p><strong>Trạng thái:</strong> {selectedPost.activeStatus}</p> */}
+                            {selectedPost.imageUrl && (
+                                <div>
+                                    <p><strong>Hình ảnh:</strong></p>
+                                    <img src={selectedPost.imageUrl} className="w-[100%] mt-2 rounded" />
+                                </div>
+                            )}
+                            <hr/>
+                            {getListCmtByPost(selectedPost.id).comments.length > 0 ? (
+                                <div>
+                                    {getListCmtByPost(selectedPost.id).comments.map((cmt, index)=> (
+                                        <div>
+                                            <div key={index} className="border-b p-2 flex justify-between">
+                                                <div className="flex flex-col gap-2">
+                                                    <p className="font-semibold text-gray-800">👤 {cmt.userId.firstName + " " + cmt.userId.lastName}</p>
+                                                    <p className="text-gray-700">{cmt.content}</p>
+                                                    <p className="text-xs text-gray-500">{formatDateString(cmt.createdAt)}</p>
+                                                </div>
+                                                <div>
+                                                    {cmt.activeStatus == 'ACTIVE' ? (
+                                                        <button className="bg-red-500 p-1 rounded" onClick={() => controlActiveComment(cmt.id)}>Ẩn</button>
+                                                    ) : (
+                                                        <button className="bg-green-500 p-1 rounded" onClick={() => controlActiveComment(cmt.id)}>Hiện</button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        <hr/>
+                                        </div>
+                                        
+                                    ))}
+                                </div>
+                            ) : (
+                                <div>
+                                    Chưa có bình luận nào.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

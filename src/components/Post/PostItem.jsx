@@ -467,6 +467,7 @@ export default function PostItem({ post, isOwnProfile, onShare, user, controlAct
                             onClick={() => controlReactionUser(userIdCurrent, 'POST', selectedPost.id, e.id)}
                           >{e.emoji}</span>
                         ))}
+
                       </div>
                     </div>
                   )}
