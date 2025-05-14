@@ -132,3 +132,13 @@ export const getPostByStartAndEnd = async (start, end) => {
     throw error;
   }
 }
+
+export const getFriendPosts = async (userId) => {
+  try {
+    const response = await axiosClient.get(`/posts/getFriendPosts/${userId}`);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API getFriendPosts:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}

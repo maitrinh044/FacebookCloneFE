@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import PostItem from "../Post/PostItem";
 import CreatePost from "../Post/CreatePost";
-import { getAllPosts, createPost, shareToProfile } from "../../services/PostService";
+import { getFriendPosts, createPost, shareToProfile } from "../../services/PostService";
 import { controlActiveStatus, getUserById } from "../../services/profileService";
-import { useFetchUser} from "../../utils/useFetchUser";
+import { useFetchUser } from "../../utils/useFetchUser";
 import { func } from "prop-types";
 import { FaEllipsisH, FaFacebookMessenger, FaGlobe, FaShare, FaThumbsUp, FaUserCircle } from "react-icons/fa";
 import PostByShare from "./PostByShare";
@@ -19,17 +19,17 @@ export default function PostList() {
   const [reactionTypes, setReactionTypes] = useState([]);
 
   const id = localStorage.getItem("userId");
-  
+
 
   // Hàm gọi API để lấy danh sách các bài viết
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const data = await getAllPosts(); // Lấy dữ liệu từ API
+        const data = await getFriendPosts(id); // Lấy dữ liệu từ API
         const response2 = await getUserById(id);
         if (response2) {
           console.log('user in useEffect: ', response2);
-            setUser(response2);
+          setUser(response2);
         }
         // setUser(res)
         setPosts(data); // Lưu vào state posts
@@ -56,7 +56,7 @@ export default function PostList() {
 
   // Hàm xử lý khi chia sẻ bài viết
   const handleSharePost = async (userId, postId, caption) => {
-    
+
     try {
       const response = await shareToProfile(userId, postId, caption);
       // const list = await
@@ -66,15 +66,15 @@ export default function PostList() {
   };
 
   const controlActiveStatusPost = async (userId, postId) => {
-          try {
-              const response = await controlActiveStatus(postId); 
-  
-              const updatedComments = await getAllPosts();
-              setPosts(updatedComments);
-          } catch (error) {
-              console.error("Lỗi khi điều chỉnh bài viết:", error);
-          }
-      }
+    try {
+      const response = await controlActiveStatus(postId);
+
+      const updatedComments = await getFriendPosts(id);
+      setPosts(updatedComments);
+    } catch (error) {
+      console.error("Lỗi khi điều chỉnh bài viết:", error);
+    }
+  }
   const share = async (userId, postId, caption) => {
     // try {
     //   const response = await shareToProfile(userId, postId, caption);
@@ -84,35 +84,37 @@ export default function PostList() {
     // }
   }
 
-    const {users} = useFetchUser();
-    // function getUserById(userId) {
-    //   const user = users.find(e => e.id === userId);
-    //   return user || [];
-    // }
-    function getPostById(postId) {
-      const post = posts.find(e => e.id === postId);
-      return post || [];
-    }
-    function formatDateString(dateString) {
-      const date = new Date(dateString);
-      
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      const seconds = String(date.getSeconds()).padStart(2, '0');
+  const { users } = useFetchUser();
+  // function getUserById(userId) {
+  //   const user = users.find(e => e.id === userId);
+  //   return user || [];
+  // }
+  function getPostById(postId) {
+    const post = posts.find(e => e.id === postId);
+    return post || [];
+  }
+  function formatDateString(dateString) {
+    const date = new Date(dateString);
 
-      return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
   }
   console.log('posts: ', posts);
   // Kiểm tra trạng thái loading và lỗi
   if (loading) return <div>Loading...</div>; // Hiển thị khi đang loading
   if (error) return <div>{error}</div>; // Hiển thị khi có lỗi
 
+  console.log("user: ", user);
+
   return (
     <div>
-      <CreatePost onPostCreated={handlePostCreated} /> {/* Component tạo bài viết mới */}
+      <CreatePost onPostCreated={handlePostCreated}  currentUser={user}/> {/* Component tạo bài viết mới */}
       {posts.length === 0 ? (
         <div>No posts available</div> // Thông báo nếu không có bài viết
       ) : (
@@ -121,15 +123,15 @@ export default function PostList() {
             {post.activeStatus === 'ACTIVE' && (
               <div>
                 {post.originalPostId == null ? (
-                <PostItem isOwnProfile={user.id == id} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
-                )  : (
-                  <PostByShare isOwnProfile={user.id == id} posts={posts} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
+                  <PostItem isOwnProfile={user.id == id} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} /> // Hiển thị các bài viết
+                ) : (
+                  <PostByShare isOwnProfile={user.id == id} posts={posts} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} />
                 )}
               </div>
             )}
-            
+
           </div>
-          
+
         ))
       )}
     </div>
