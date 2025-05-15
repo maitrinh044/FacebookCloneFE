@@ -1,11 +1,15 @@
 import { useState, useRef } from "react";
 import axiosClient from "../../utils/axiosClient";
+import { uploadMedia } from "../../services/MediaService";
+import { toast } from "react-toastify";
 
 export default function CreatePost({ onPostCreated, currentUser }) {
   const [postContent, setPostContent] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const fileInputRef = useRef(null);
+
+  console.log(currentUser);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -37,23 +41,23 @@ export default function CreatePost({ onPostCreated, currentUser }) {
     }
 
     try {
-      const formData = new FormData();
-      formData.append("userId", userId);
-      formData.append("content", postContent.trim());
-
       let imageUrl = null;
       if (selectedImage) {
         // Giả sử bạn đã upload ảnh lên một dịch vụ lưu trữ, và lấy được URL ảnh.
-        imageUrl = await uploadImage(selectedImage);
+        imageUrl = await uploadMedia(selectedImage, userId);
+        setSelectedImage(imageUrl.url);
       }
 
-      // Gửi dữ liệu bài viết, bao gồm content và imageUrl (nếu có)
-      const response = await axiosClient.post("/posts/createPost", {
-        userId,
+      const post = {
+        userId: {id: parseInt(userId)},
         content: postContent.trim(),
-        imageUrl,
+        imageUrl: imageUrl ? imageUrl.url : null,
         activeStatus: "ACTIVE",  // Bạn có thể thay đổi trạng thái tùy theo nhu cầu
-      });
+      };
+
+      console.log("send post: ", post);
+      // Gửi dữ liệu bài viết, bao gồm content và imageUrl (nếu có)
+      const response = await axiosClient.post("/posts/createPost", post);
 
       console.log("Kết quả từ API:", response.data);
 
@@ -62,32 +66,14 @@ export default function CreatePost({ onPostCreated, currentUser }) {
         setPostContent("");
         setSelectedImage(null);
         setImagePreview("");
+        toast.success("Bài viết đã được đăng thành công!");
         if (fileInputRef.current) fileInputRef.current.value = "";
       } else {
         alert(`Lỗi khi tạo bài viết: ${response.data.message}`);
       }
     } catch (error) {
       console.error("❌ Lỗi khi gửi bài viết:", error.response?.data || error);
-      alert("Đã có lỗi xảy ra khi đăng bài viết. Vui lòng thử lại!");
-    }
-  };
-
-  const uploadImage = async (image) => {
-    // Tạo FormData để upload ảnh lên dịch vụ lưu trữ, ví dụ như AWS S3
-    const formData = new FormData();
-    formData.append("file", image);
-
-    try {
-      // Giả sử bạn có API upload ảnh, và trả về URL ảnh
-      const response = await axiosClient.post("/image/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      return response.data?.url;  // Giả sử API trả về URL ảnh sau khi upload
-    } catch (error) {
-      console.error("❌ Lỗi khi upload ảnh:", error);
-      return null;  // Trả về null nếu có lỗi
+      toast.error("Đã có lỗi xảy ra khi đăng bài viết. Vui lòng thử lại!");
     }
   };
 
@@ -95,7 +81,7 @@ export default function CreatePost({ onPostCreated, currentUser }) {
     <div className="bg-white rounded-xl shadow-md p-4 mb-4">
       <div className="flex items-center gap-3 mb-3">
         <img
-          src={currentUser?.avatar || "https://via.placeholder.com/40"}
+          src={currentUser?.profilePicture || "https://via.placeholder.com/40"}
           alt="User Avatar"
           className="w-10 h-10 rounded-full object-cover"
         />

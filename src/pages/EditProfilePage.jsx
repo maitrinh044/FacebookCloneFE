@@ -6,14 +6,6 @@ export default function EditProfilePage() {
   const { userId } = useParams();
   const navigate = useNavigate();
 
-  // Giả lập dữ liệu user ban đầu (sau này bạn có thể fetch từ API)
-  const [formData, setFormData] = useState({
-    name: 'Nguyễn Văn A',
-    bio: 'Yêu thích lập trình, sống chậm.',
-    avatar: 'https://via.placeholder.com/150',
-    coverPhoto: 'https://via.placeholder.com/600x200',
-  });
-
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files && files[0]) {
