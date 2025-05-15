@@ -82,6 +82,7 @@ export default function ({}) {
             const response = await controlActiveStatusComment(cmtId);
             // const data = await getAllPosts(); // Lấy dữ liệu từ API
             // setListPost(data);
+            console.log('Control activeStatus success!');
         } catch (error) {
             console.error("Lỗi khi điều chỉnh trạng thái bài viết! ", error);
         }
@@ -238,21 +239,25 @@ export default function ({}) {
                                 <div>
                                     {getListCmtByPost(selectedPost.id).comments.map((cmt, index)=> (
                                         <div>
-                                            <div key={index} className="border-b p-2 flex justify-between">
-                                                <div className="flex flex-col gap-2">
-                                                    <p className="font-semibold text-gray-800">👤 {cmt.userId.firstName + " " + cmt.userId.lastName}</p>
-                                                    <p className="text-gray-700">{cmt.content}</p>
-                                                    <p className="text-xs text-gray-500">{formatDateString(cmt.createdAt)}</p>
-                                                </div>
+                                            {cmt.activeStatus == 'ACTIVE' && (
                                                 <div>
-                                                    {cmt.activeStatus == 'ACTIVE' ? (
-                                                        <button className="bg-red-500 p-1 rounded" onClick={() => controlActiveComment(cmt.id)}>Ẩn</button>
-                                                    ) : (
-                                                        <button className="bg-green-500 p-1 rounded" onClick={() => controlActiveComment(cmt.id)}>Hiện</button>
-                                                    )}
+                                                <div key={index} className="border-b p-2 flex justify-between">
+                                                    <div className="flex flex-col gap-2">
+                                                        <p className="font-semibold text-gray-800">👤 {cmt.userId.firstName + " " + cmt.userId.lastName}</p>
+                                                        <p className="text-gray-700">{cmt.content}</p>
+                                                        <p className="text-xs text-gray-500">{formatDateString(cmt.createdAt)}</p>
+                                                    </div>
+                                                    <div>
+                                                        {cmt.activeStatus == 'ACTIVE' ? (
+                                                            <button className="bg-red-500 p-1 rounded" onClick={() => controlActiveComment(cmt.id)}>Ẩn</button>
+                                                        ) : (
+                                                            <button className="bg-green-500 p-1 rounded" onClick={() => controlActiveComment(cmt.id)}>Hiện</button>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        <hr/>
+                                                <hr/>
+                                                </div>
+                                            )}
                                         </div>
                                         
                                     ))}
