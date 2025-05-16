@@ -4,7 +4,8 @@ import { FaFacebook } from "react-icons/fa";
 import { toast } from 'react-toastify';
 import { login } from "../utils/auth";
 import { useStomp } from "../contexts/StompContext";
-import { getUserById } from "../services/UserService";
+import { getUserById } from "../services/userService";
+// import { getUserById } from "../services/UserService";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -39,12 +40,12 @@ export default function LoginPage() {
       if (success) {
         let userId = localStorage.getItem("userId");
         const user = await getUserById(userId);
-        // if (user.role.id == 1) {
-        //   navigate("/admin");
-        // } else {
-        //   navigate("/"); // Điều hướng về trang chủ
-        // }
-        navigate("/"); 
+        if (user.role.id == 1) {
+          navigate("/admin");
+        } else {
+          navigate("/"); // Điều hướng về trang chủ
+        }
+        // navigate("/"); 
         toast.success('Đăng nhập thành công!');
       } else {
         toast.error('Đăng nhập thất bại!');

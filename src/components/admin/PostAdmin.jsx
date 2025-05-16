@@ -57,7 +57,7 @@ export default function ({}) {
     }
 
     const [currentPage, setCurrentPage] = useState(1);
-    const postsPerPage = 8;
+    const postsPerPage = 6;
 
     // Tính chỉ số bắt đầu và kết thúc của bài viết trong trang hiện tại
     const indexOfLastPost = currentPage * postsPerPage;
@@ -82,6 +82,16 @@ export default function ({}) {
             const response = await controlActiveStatusComment(cmtId);
             // const data = await getAllPosts(); // Lấy dữ liệu từ API
             // setListPost(data);
+            const data = await getAllPosts(); // Lấy dữ liệu từ API
+            setListPost(data);
+            const commentPromises = data.map(post => {
+                return getCommentByPost(post.id).then(comments => ({
+                    postId: post.id,
+                    comments
+                }));
+            });
+            const tmp2 = await Promise.all(commentPromises);
+            setCommentByPost(tmp2);
             console.log('Control activeStatus success!');
         } catch (error) {
             console.error("Lỗi khi điều chỉnh trạng thái bài viết! ", error);
@@ -139,7 +149,7 @@ export default function ({}) {
                 
             </div>
             <div className="">
-                <table className="w-[1200px] rounded p-4 rounded-t-lg table-auto">
+                <table className="w-[1200px] rounded p-4 rounded-t-lg table-auto border-separate border-spacing-2">
                     <thead className="bg-gray-200 p-5 rounded-lg h-[50px]">
                         <tr className="rounded-lg">
                             <th>STT</th>

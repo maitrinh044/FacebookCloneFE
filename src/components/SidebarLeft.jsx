@@ -1,7 +1,8 @@
-import { FaUser, FaUsers, FaStore, FaVideo } from "react-icons/fa";
+import { FaUser, FaUsers, FaStore, FaVideo, FaMagento } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { getUserById } from "../services/UserService";
+// import { getUserById } from "../services/UserService";
 import { useState, useEffect } from "react";
+import { getUserById } from "../services/userService";
 
 export default function SidebarLeft() {
   const navigate = useNavigate();
@@ -78,6 +79,15 @@ export default function SidebarLeft() {
             <span>Marketplace</span>
           </div>
         </li>
+        {currentUser.role.id == 1 && (
+          <li>
+            <div onClick={() => navigate("/admin")}
+                className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
+              <FaMagento className="text-blue-600" />
+              <span>Trang quản trị</span>
+            </div>
+          </li>
+        )}
       </ul>
     </div>
   );

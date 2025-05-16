@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import MessageLayout from "../components/Message/MessageLayout";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getUserFriends } from "../services/UserService";
+// import { getUserFriends } from "../services/UserService";
 import { getMessageList } from "../services/MessageService";
+import { getUserFriends } from "../services/userService";
 
 
 export default function MessagePage() {

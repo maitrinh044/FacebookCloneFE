@@ -12,6 +12,7 @@ import {
   FaUsers,
   FaTv,
   FaStore,
+  FaMagento,
 
 } from "react-icons/fa";
 
@@ -152,6 +153,12 @@ export default function Header() {
           className={`p-2 rounded-md ${location.pathname === "/marketplace" ? "text-blue-600 border-b-4 border-blue-600" : "text-gray-700 hover:bg-gray-100"}`}
         >
           <FaStore className="text-2xl" />
+        </Link>
+        <Link
+          to="/admin"
+          className={`p-2 rounded-md ${location.pathname === "/admin" ? "text-blue-600 border-b-4 border-blue-600" : "text-gray-700 hover:bg-gray-100"}`}
+        >
+          <FaMagento className="text-2xl" />
         </Link>
       </div>
 

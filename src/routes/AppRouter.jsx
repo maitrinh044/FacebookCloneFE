@@ -25,13 +25,14 @@ export default function AppRouter({ onOpenChat }) {
       <Route path="/register" element={<AuthLayout><RegisterPage /></AuthLayout>} />
 
       {/* Admin */}
-      <Route path="/admin" element={<AuthLayout><AdminPage /></AuthLayout>} />
       
       {/* Protected Routes - CÓ Header */}
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<MainLayout><Home onOpenChat={onOpenChat} /></MainLayout>} />
         <Route path="/profile/:id" element={<MainLayout><ProfilePage /></MainLayout>} />
         <Route path="/messages" element={<MainLayout><Messages /></MainLayout>} />
+        <Route path="/admin" element={<MainLayout><AdminPage /></MainLayout>} />
+
         <Route path="/profile/:userId/edit" element={<MainLayout><EditProfilePage /></MainLayout>} />
 
         {/* Friends */}
