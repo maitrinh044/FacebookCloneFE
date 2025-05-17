@@ -57,9 +57,13 @@ export default function PostList() {
 
   console.log('reactionByPost: ', reactionByPost);
   console.log('reactionByUser: ', reactionByUser);
+  // function getReactionByPost(postId) {
+  //   const reaction = reactionByPost.find(e => e.postId == postId);
+  //   return reaction || [];
+  // }
   function getReactionByPost(postId) {
     const reaction = reactionByPost.find(e => e.postId == postId);
-    return reaction || [];
+    return reaction ? reaction.reactions : []; // Trả về mảng rỗng nếu không tìm thấy phản ứng
   }
   console.log('reactionByPost in id = 2: ', getReactionByPost(2).reactions != [] ? getReactionByPost(2).reactions : []);
   console.log('reactionByPost in id = 6: ', getReactionByPost(6).reactions != [] ? getReactionByPost(6).reactions : []);
@@ -169,9 +173,9 @@ export default function PostList() {
             {post.activeStatus === 'ACTIVE' && (
               <div>
                 {post.originalPostId == null ? (
-                  <PostItem isOwnProfile={user.id == id} reactionByUser={reactionByUser} reactionByPost={getReactionByPost(post.id).reactions != [] ? getReactionByPost(post.id).reactions : []} controlReactionUser={controlReactionUser} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} /> // Hiển thị các bài viết
+                  <PostItem isOwnProfile={user.id == id} reactionByUser={reactionByUser} reactionByPost={getReactionByPost(post.id)} controlReactionUser={controlReactionUser} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} /> // Hiển thị các bài viết
                 ) : (
-                  <PostByShare isOwnProfile={user.id == id} reactionByUser={reactionByUser} reactionByPost={getReactionByPost(post.id).reactions != [] ? getReactionByPost(post.id).reactions : []} controlReactionUser={controlReactionUser} posts={posts} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} />
+                  <PostByShare isOwnProfile={user.id == id} reactionByUser={reactionByUser} reactionByPost={getReactionByPost(post.id)} controlReactionUser={controlReactionUser} posts={posts} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} />
                 )}
               </div>
             )}
