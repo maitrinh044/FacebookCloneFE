@@ -377,6 +377,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
       </div>
     ));
   };
+  // console.log('reactionByCurrentUser in PostItem: ', reactionByUser);
 
   if (loading) return <div>Loading...</div>;
 

@@ -86,6 +86,10 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
     fetchPosts(); // Gọi hàm fetchPosts khi component mount
   }, [user.id]); // 
 
+  function getReactionByPost(postId) {
+    const reaction = reactionByPost.find(e => e.postId == postId);
+    return reaction || [];
+  }
   function getCommentByPostId(postId) {
     const post = commentByPost.find(e => e.postId === postId);
     return post.comments || [];
@@ -146,6 +150,7 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
         console.error("Lỗi khi share bài viết! ", error);
       }
     };
+  // console.log('reactionByCurrentUser in profileTabContent: ', reactionByCurrentUser);
   if (activeTab === "posts") {
     return (
       <div className="bg-gray rounded-xl max-w-[1000px] mx-auto mb-4 flex flex-row">
@@ -166,9 +171,9 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
                 {posts.activeStatus === 'ACTIVE' && (
                   <div>
                     {posts.originalPostId == null ? (
-                      <PostItem isOwnProfile={user.id == currentUser.id} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
+                      <PostItem isOwnProfile={user.id == currentUser.id} reactionByUser={reactionByCurrentUser} reactionByPost={getReactionByPost(posts.id).reactions != [] ? getReactionByPost(posts.id).reactions : []} controlReactionUser={controlReactionUser} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
                     ) : (
-                      <PostByShare isOwnProfile={user.id == currentUser.id} posts={allpost} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
+                      <PostByShare isOwnProfile={user.id == currentUser.id} reactionByUser={reactionByCurrentUser} reactionByPost={getReactionByPost(posts.id).reactions != [] ? getReactionByPost(posts.id).reactions : []} controlReactionUser={controlReactionUser} posts={allpost} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
                     )}
                   </div>
                 )}
