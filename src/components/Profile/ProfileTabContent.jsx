@@ -9,9 +9,9 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { addComment } from "../../services/profileService";
 import PostByShare from "../Post/PostByShare";
 import PostItem from "../Post/PostItem";
-import { getAllPosts } from "../../services/PostService";
+import { getAllPosts, shareToProfile } from "../../services/PostService";
 
-export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab, user, listPost, listFriends, commentByPost, reactionByPost, reactionTypes, users, reactionByCurrentUser, controlReactionUser,addCommentByUser,controlActiveStatusPost }) {
+export default function ProfileTabContent({ isOwnProfile, share, currentUser, activeTab, user, listPost, listFriends, commentByPost, reactionByPost, reactionTypes, users, reactionByCurrentUser, controlReactionUser,addCommentByUser,controlActiveStatusPost }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [activeAboutTab, setActiveAboutTab] = useState('tongquan');
@@ -143,14 +143,8 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
   }
   const handleSharePost = async (userId, postId, caption) => {
       
-      try {
-        const response = await shareToProfile(userId, postId, caption);
-        // const list = await
-      } catch (error) {
-        console.error("Lỗi khi share bài viết! ", error);
-      }
+      share(userId, postId, caption);
     };
-  // console.log('reactionByCurrentUser in profileTabContent: ', reactionByCurrentUser);
   if (activeTab === "posts") {
     return (
       <div className="bg-gray rounded-xl max-w-[1000px] mx-auto mb-4 flex flex-row">

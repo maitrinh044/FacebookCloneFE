@@ -266,6 +266,7 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
   };
 
   if (loading) return <div>Loading...</div>;
+  console.log('reactionByPost in PostByShare: ', reactionByPost);
 
   return (
     <div className="space-y-4">

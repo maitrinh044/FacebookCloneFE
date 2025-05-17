@@ -10,6 +10,7 @@ import useFetchProfile, { getReactionsByUser } from "../utils/userFetchProfile";
 import { useFetchUser, useFetchUserById } from "../utils/useFetchUser";
 import { getPostByUser, getReactionByPostId, getReactionsByUserId } from "../services/profileService";
 import { controlReaction } from "../services/CommentService";
+import { shareToProfile } from "../services/PostService";
 
 export default function ProfilePage() {
   const { id } = useParams();
@@ -63,7 +64,7 @@ export default function ProfilePage() {
       // Chờ cho tất cả các yêu cầu reactions hoàn thành
       const tmp1 = await Promise.all(reactionPromises);
       setReactionByPost(tmp1);
-      setPosts(updatedComments);
+      setListPost(updatedComments);
     } catch (error) {
       const tmp2 = await getReactionsByUserId(userId); // Lấy người dùng bằng ID
       setReactionByUser(tmp2);
@@ -77,7 +78,7 @@ export default function ProfilePage() {
       // Chờ cho tất cả các yêu cầu reactions hoàn thành
       const tmp1 = await Promise.all(reactionPromises);
       setReactionByPost(tmp1);
-      setPosts(updatedComments);
+      setListPost(updatedComments);
       console.error("Lỗi khi điều khiển phản ứng:", error);
     }
   };
@@ -90,6 +91,26 @@ export default function ProfilePage() {
   function getUserById(userId) {
     const user = users.find(e => e.id === userId);
     return user || [];
+  }
+  const share = async(userId, postId, caption)=> {
+    try {
+      const response = await shareToProfile(userId, postId, caption);
+      const response1 = await getPostByUser(id);
+      const data = await getReactionsByUserId(userId); // Lấy người dùng bằng ID
+      setReactionByUser(data);
+      const reactionPromises = response1.map(post1 => {
+          return getReactionByPostId(post1.id).then(reactions => ({
+              postId: post1.id,
+              reactions
+          }));
+      });
+      // Chờ cho tất cả các yêu cầu reactions hoàn thành
+      const tmp1 = await Promise.all(reactionPromises);
+      setReactionByPost(tmp1);
+      setListPost(response1);
+    } catch (error) {
+      console.error("Lỗi khi share bài viết! ", error);
+    }
   }
   const [activeTab, setActiveTab] = useState("posts");
   const [showEdit, setShowEdit] = useState(false);
@@ -143,6 +164,7 @@ export default function ProfilePage() {
                                 controlReactionUser={controlReactionUser}
                                 addCommentByUser={addCommentByUser}
                                 controlActiveStatusPost={controlActiveStatusPost}
+                                share={share}
                                 />
             </div>
           </div>

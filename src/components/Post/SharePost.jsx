@@ -24,7 +24,7 @@ export default function SharePost({ post, onClose, onShare, currentUser }) {
                 <p className="mb-4">{post.content}</p>
                 {post.imageUrl!=null&&(
                     <div className="grid grid-cols-3 gap-2 mt-2">
-                    <img key={imgIndex} src={post.imageUrl} alt={`Ảnh`} className="w-full h-40 object-cover rounded-md" />
+                    <img  src={post.imageUrl} alt={`Ảnh`} className="w-full h-40 object-cover rounded-md" />
                     </div>
                 )}
                 <div className="flex justify-end gap-2">
