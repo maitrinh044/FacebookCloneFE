@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import PostItem from "../Post/PostItem";
 import CreatePost from "../Post/CreatePost";
 import { getFriendPosts, createPost, shareToProfile } from "../../services/PostService";
-import { controlActiveStatus, getUserById } from "../../services/profileService";
+import { controlActiveStatus, getReactionByPostId, getReactionsByUserId, getUserById } from "../../services/profileService";
 import { useFetchUser } from "../../utils/useFetchUser";
 import { func } from "prop-types";
 import { FaEllipsisH, FaFacebookMessenger, FaGlobe, FaShare, FaThumbsUp, FaUserCircle } from "react-icons/fa";
 import PostByShare from "./PostByShare";
+import { controlReaction } from "../../services/CommentService";
 
 export default function PostList() {
   const [posts, setPosts] = useState([]); // Dữ liệu các bài viết
@@ -28,12 +29,23 @@ export default function PostList() {
         const data = await getFriendPosts(id); // Lấy dữ liệu từ API
         const response2 = await getUserById(id);
         if (response2) {
-          console.log('user in useEffect: ', response2);
+          // console.log('user in useEffect: ', response2);
           setUser(response2);
         }
         // setUser(res)
         setPosts(data); // Lưu vào state posts
         setLoading(false); // Đổi trạng thái loading
+        const tmp2 = await getReactionsByUserId(id); // Lấy người dùng bằng ID
+        setReactionByUser(tmp2);
+        const reactionPromises = data.map(post1 => {
+            return getReactionByPostId(post1.id).then(reactions => ({
+                postId: post1.id,
+                reactions
+            }));
+        });
+        // Chờ cho tất cả các yêu cầu reactions hoàn thành
+        const tmp1 = await Promise.all(reactionPromises);
+        setReactionByPost(tmp1);
       } catch (err) {
         console.error("Error fetching posts:", err); // Log lỗi
         setError("Failed to fetch posts"); // Thiết lập lỗi nếu có
@@ -43,6 +55,14 @@ export default function PostList() {
     fetchPosts(); // Gọi hàm fetchPosts khi component mount
   }, [id]); // Chỉ gọi một lần khi component mount
 
+  console.log('reactionByPost: ', reactionByPost);
+  console.log('reactionByUser: ', reactionByUser);
+  function getReactionByPost(postId) {
+    const reaction = reactionByPost.find(e => e.postId == postId);
+    return reaction || [];
+  }
+  console.log('reactionByPost in id = 2: ', getReactionByPost(2).reactions != [] ? getReactionByPost(2).reactions : []);
+  console.log('reactionByPost in id = 6: ', getReactionByPost(6).reactions != [] ? getReactionByPost(6).reactions : []);
   // Hàm xử lý khi tạo bài viết mới
   const handlePostCreated = async (newPost) => {
     try {
@@ -75,20 +95,46 @@ export default function PostList() {
       console.error("Lỗi khi điều chỉnh bài viết:", error);
     }
   }
-  const share = async (userId, postId, caption) => {
-    // try {
-    //   const response = await shareToProfile(userId, postId, caption);
-    //   // const list = await
-    // } catch (error) {
-    //   console.error("Lỗi khi share bài viết! ", error);
-    // }
-  }
+
+  const controlReactionUser = async (userId, targetType, targetId, reactionType) => {
+    try {
+      const newReaction = await controlReaction(userId, targetType, targetId, reactionType);
+      const data = await getReactionsByUserId(userId);
+      setReactionByUser(data);
+      const updatedComments = await getFriendPosts(userId);
+      const tmp2 = await getReactionsByUserId(userId); // Lấy người dùng bằng ID
+      setReactionByUser(tmp2);
+      const reactionPromises = updatedComments.map(post1 => {
+          return getReactionByPostId(post1.id).then(reactions => ({
+              postId: post1.id,
+              reactions
+          }));
+      });
+      // Chờ cho tất cả các yêu cầu reactions hoàn thành
+      const tmp1 = await Promise.all(reactionPromises);
+      setReactionByPost(tmp1);
+      setPosts(updatedComments);
+    } catch (error) {
+      const tmp2 = await getReactionsByUserId(userId); // Lấy người dùng bằng ID
+      setReactionByUser(tmp2);
+      const updatedComments = await getFriendPosts(userId);
+      const reactionPromises = updatedComments.map(post1 => {
+          return getReactionByPostId(post1.id).then(reactions => ({
+              postId: post1.id,
+              reactions
+          }));
+      });
+      // Chờ cho tất cả các yêu cầu reactions hoàn thành
+      const tmp1 = await Promise.all(reactionPromises);
+      setReactionByPost(tmp1);
+      setPosts(updatedComments);
+      console.error("Lỗi khi điều khiển phản ứng:", error);
+    }
+  };
+
 
   const { users } = useFetchUser();
-  // function getUserById(userId) {
-  //   const user = users.find(e => e.id === userId);
-  //   return user || [];
-  // }
+
   function getPostById(postId) {
     const post = posts.find(e => e.id === postId);
     return post || [];
@@ -105,12 +151,12 @@ export default function PostList() {
 
     return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
   }
-  console.log('posts: ', posts);
+  // console.log('posts: ', posts);
   // Kiểm tra trạng thái loading và lỗi
   if (loading) return <div>Loading...</div>; // Hiển thị khi đang loading
   if (error) return <div>{error}</div>; // Hiển thị khi có lỗi
 
-  console.log("user: ", user);
+  // console.log("user: ", user);
 
   return (
     <div>
@@ -123,9 +169,9 @@ export default function PostList() {
             {post.activeStatus === 'ACTIVE' && (
               <div>
                 {post.originalPostId == null ? (
-                  <PostItem isOwnProfile={user.id == id} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} /> // Hiển thị các bài viết
+                  <PostItem isOwnProfile={user.id == id} reactionByUser={reactionByUser} reactionByPost={getReactionByPost(post.id).reactions != [] ? getReactionByPost(post.id).reactions : []} controlReactionUser={controlReactionUser} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} /> // Hiển thị các bài viết
                 ) : (
-                  <PostByShare isOwnProfile={user.id == id} posts={posts} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} />
+                  <PostByShare isOwnProfile={user.id == id} reactionByUser={reactionByUser} reactionByPost={getReactionByPost(post.id).reactions != [] ? getReactionByPost(post.id).reactions : []} controlReactionUser={controlReactionUser} posts={posts} key={post.id} post={post} onShare={handleSharePost} user={user} controlActiveStatusPost={controlActiveStatusPost} users={users} />
                 )}
               </div>
             )}

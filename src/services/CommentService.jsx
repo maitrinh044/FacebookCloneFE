@@ -79,5 +79,7 @@ export const controlReaction = async (userId, targetType, targetId, reactionType
   } catch (error) {
     console.error('Lỗi khi thả cảm xúc:', error);
     throw error;
+    // return response.data.data;
+
   }
 };

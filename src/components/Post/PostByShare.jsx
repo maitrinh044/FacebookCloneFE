@@ -10,11 +10,11 @@ import { getPostById } from "../../services/PostService";
 import { useNavigate } from "react-router-dom";
 import ReactionPopup from "./ReactionPopup";
 
-export default function PostByShare({ posts, post, isOwnProfile, onShare, user, controlActiveStatusPost, users }) {
+export default function PostByShare({ posts, reactionByPost, reactionByUser, controlReactionUser, post, isOwnProfile, onShare, user, controlActiveStatusPost, users }) {
   const [reactionTypes, setReactionTypes] = useState([]);
-  const [reactionByPost, setReactionByPost] = useState([]);
+  // const [reactionByPost, setReactionByPost] = useState([]);
   const [commentByPost, setCommentByPost] = useState([]);
-  const [reactionByUser, setReactionByUser] = useState([]);
+  // const [reactionByUser, setReactionByUser] = useState([]);
   const [showShareModal, setShowShareModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState(false);
@@ -63,10 +63,10 @@ export default function PostByShare({ posts, post, isOwnProfile, onShare, user, 
         setReactionTypes(types);
 
         // Lấy reactions
-        const userReactions = await getReactionsByUserId(userid);
-        setReactionByUser(userReactions);
-        const postReactions = await getReactionByPostId(post.id);
-        setReactionByPost(postReactions);
+        // const userReactions = await getReactionsByUserId(userid);
+        // setReactionByUser(userReactions);
+        // const postReactions = await getReactionByPostId(post.id);
+        // setReactionByPost(postReactions);
 
         setLoading(false);
       } catch (err) {
@@ -111,19 +111,19 @@ export default function PostByShare({ posts, post, isOwnProfile, onShare, user, 
       setShowShareModal(false);
     };
 
-  const controlReactionUser = async (userId, targetType, targetId, reactionType) => {
-    try {
-      await controlReaction(userId, targetType, targetId, reactionType);
-      const userReactions = await getReactionsByUserId(userId);
-      setReactionByUser(userReactions);
-      if (targetType === "POST") {
-        const postReactions = await getReactionByPostId(post.id);
-        setReactionByPost(postReactions);
-      }
-    } catch (error) {
-      console.error("Lỗi khi điều khiển phản ứng:", error);
-    }
-  };
+  // const controlReactionUser = async (userId, targetType, targetId, reactionType) => {
+  //   try {
+  //     await controlReaction(userId, targetType, targetId, reactionType);
+  //     const userReactions = await getReactionsByUserId(userId);
+  //     setReactionByUser(userReactions);
+  //     if (targetType === "POST") {
+  //       const postReactions = await getReactionByPostId(post.id);
+  //       setReactionByPost(postReactions);
+  //     }
+  //   } catch (error) {
+  //     console.error("Lỗi khi điều khiển phản ứng:", error);
+  //   }
+  // };
 
   const addCommentByUser = async (userId, postId, content, parentCommentId = null) => {
     try {

@@ -9,7 +9,7 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import ReactionPopup from "./ReactionPopup";
 
-export default function PostItem({ post, isOwnProfile, onShare, user, controlActiveStatusPost, users }) {
+export default function PostItem({ post,reactionByPost, reactionByUser, controlReactionUser, isOwnProfile, onShare, user, controlActiveStatusPost, users }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [reactionCounts, setReactionCounts] = useState({});
@@ -22,9 +22,9 @@ export default function PostItem({ post, isOwnProfile, onShare, user, controlAct
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [reactionByPost, setReactionByPost] = useState([]);
+  // const [reactionByPost, setReactionByPost] = useState([]);
   const [commentByPost, setCommentByPost] = useState([]);
-  const [reactionByUser, setReactionByUser] = useState([]);
+  // const [reactionByUser, setReactionByUser] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [replyInputs, setReplyInputs] = useState({}); // State để quản lý input reply
@@ -58,7 +58,6 @@ export default function PostItem({ post, isOwnProfile, onShare, user, controlAct
 
   const userIdCurrent = localStorage.getItem('userId');
   const userId = user?.id || 1; // Giả định userId từ currentUser, thay bằng logic auth thực tế
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -92,11 +91,11 @@ export default function PostItem({ post, isOwnProfile, onShare, user, controlAct
         setReactionTypes(types);
 
         // Lấy reactions của user và post
-        const tmp1 = await getReactionsByUserId(userid);
-        setReactionByUser(tmp1);
+        // const tmp1 = await getReactionsByUserId(userid);
+        // setReactionByUser(tmp1);
 
-        const tmp2 = await getReactionByPostId(post.id);
-        setReactionByPost(tmp2);
+        // const tmp2 = await getReactionByPostId(post.id);
+        // setReactionByPost(tmp2);
 
         const tmp3 = await getCommentByPost(post.id);
         setCommentByPost(tmp3);
@@ -226,21 +225,21 @@ export default function PostItem({ post, isOwnProfile, onShare, user, controlAct
     return user || [];
   }
 
-  const controlReactionUser = async (userId, targetType, targetId, reactionType) => {
-    try {
-      const newReaction = await controlReaction(userId, targetType, targetId, reactionType);
-      const data = await getReactionsByUserId(userId);
-      setReactionByUser(data);
-      if (targetType === "POST") {
-        const tmp2 = await getReactionByPostId(post.id);
-        setReactionByPost(tmp2);
-      }
-    } catch (error) {
-      const data = await getReactionsByUserId(userId);
-      setReactionByUser(data);
-      console.error("Lỗi khi điều khiển phản ứng:", error);
-    }
-  };
+  // const controlReactionUser = async (userId, targetType, targetId, reactionType) => {
+  //   try {
+  //     const newReaction = await controlReaction(userId, targetType, targetId, reactionType);
+  //     const data = await getReactionsByUserId(userId);
+  //     setReactionByUser(data);
+  //     if (targetType === "POST") {
+  //       const tmp2 = await getReactionByPostId(post.id);
+  //       setReactionByPost(tmp2);
+  //     }
+  //   } catch (error) {
+  //     const data = await getReactionsByUserId(userId);
+  //     setReactionByUser(data);
+  //     console.error("Lỗi khi điều khiển phản ứng:", error);
+  //   }
+  // };
 
   const addCommentByUser = async (userId, postId, content, parentCommentId = null) => {
     try {
