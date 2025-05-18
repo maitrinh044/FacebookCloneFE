@@ -3,7 +3,7 @@ import axiosClient from "../utils/axiosClient";
 export const getPostByUser = async (userId) => {
   try {
     const response = await axiosClient.get(
-      `/posts/getPostsByUser/${userId}`
+      `/posts/getPostByUser/${userId}`
     );
     // console.log("response: ", response.data?.data);
     return response.data?.data;
@@ -88,7 +88,7 @@ export const addComment = async (userId, postId, content) => {
 export const controlActiveStatus = async (postId) => {
   try {
     const response = await axiosClient.put(
-      `/posts/controlActiveStatusPost/${postId}`
+      `/posts/controlActiveStatus/${postId}`
     );
     return response.data?.data;
   } catch (error) {

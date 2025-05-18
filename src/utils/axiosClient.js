@@ -22,37 +22,40 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// Thêm interceptor để xử lý khi token hết hạn và làm mới token
 axiosClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401) {
-      // Kiểm tra lỗi 401 (Unauthorized) - Token hết hạn
-      const refreshToken = localStorage.getItem('refreshToken');  // Lấy refreshToken từ localStorage
+    const originalRequest = error.config;
+
+    // Không cố gắng refresh nếu lỗi đến từ chính refresh-token hoặc đã retry 1 lần
+    const isRefreshURL = originalRequest.url.includes("/auth/refresh-token");
+    if (error.response?.status === 401 && !isRefreshURL && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
         try {
-          // Gửi yêu cầu làm mới token
           const refreshResponse = await axios.post('http://localhost:8080/auth/refresh-token', {
-            refreshToken, // Gửi refreshToken đến server
+            refreshToken: refreshToken
           });
-          
-          // Lưu lại accessToken mới vào localStorage
+
           const newAccessToken = refreshResponse.data.accessToken;
           localStorage.setItem('accessToken', newAccessToken);
 
-          // Thử lại yêu cầu ban đầu với token mới
-          error.config.headers['Authorization'] = `Bearer ${newAccessToken}`;
-          return axios(error.config);
+          // Cập nhật header và thử lại request ban đầu
+          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+          return axiosClient(originalRequest);
         } catch (refreshError) {
           console.error('Lỗi làm mới token:', refreshError);
-          // Có thể xử lý đăng xuất người dùng hoặc điều hướng đến trang login ở đây
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          window.location.href = "/login";
         }
       }
     }
+
     return Promise.reject(error);
   }
 );
+
 
 export default axiosClient;

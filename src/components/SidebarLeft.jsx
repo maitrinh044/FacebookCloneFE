@@ -1,31 +1,55 @@
-import { FaUser, FaUsers, FaStore, FaVideo } from "react-icons/fa";
+import { FaUser, FaUsers, FaStore, FaVideo, FaMagento } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+// import { getUserById } from "../services/UserService";
+import { useState, useEffect } from "react";
+import { getUserById } from "../services/userService";
 
 export default function SidebarLeft() {
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const friends = [];
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+
+      try {
+        const user = await getUserById(userId);
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Lỗi khi lấy người dùng:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  if (!currentUser) {
+    return <div className="p-4">Đang tải người dùng...</div>;
+  }
 
   return (
     <div className="w-64 p-4 bg-white shadow-md min-h-screen border-r border-gray-200 rounded-[10px]">
       {/* Avatar + Tên người dùng */}
       <Link
-        to="/profile/1"
+        to={`/profile/${currentUser.id}`}
         className="flex items-center gap-3 mb-6 hover:bg-gray-100 p-2 rounded-md transition"
       >
         <img
-          src="https://scontent.fsgn2-6.fna.fbcdn.net/v/t39.30808-6/458161522_2243394162660512_7913931544320209269_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeFE4H0KfJHUauSeB90nsw9jIBJwHuSktOAgEnAe5KS04F5KUxSkb8DlPyoPUcf2mlb9fV6MzqCuAtSLoc7Ay6-A&_nc_ohc=iQ1tx_TxP1wQ7kNvgEsi-8q&_nc_oc=Adl7a3TL-zADKRet04rIUkN5YGnAppZNAejwZqaFDN5p9iDJSDeQtBSNmFpPrZxpRYwZgVihbsaV4VUAC8Hqi4vW&_nc_zt=23&_nc_ht=scontent.fsgn2-6.fna&_nc_gid=GLdi76HG6Fi9sQ2kcxc3XA&oh=00_AYFuq-gT_PkH4GCHcNvxKn4njYAN4dKrHlA42kRRUEgG6A&oe=67E1E019"
+          src={currentUser.profilePicture || "/default-avatar.png"}
           alt="Avatar"
           className="w-10 h-10 rounded-full object-cover"
         />
-        <span className="font-medium text-gray-800">Nguyễn Mai Trinh</span>
+        <span className="font-medium text-gray-800">
+          {currentUser.lastName} {currentUser.firstName}
+        </span>
       </Link>
 
       {/* Menu bên dưới */}
       <ul className="space-y-4 text-gray-700">
         <li>
           <Link
-            to="/profile/1"
+            to={`/profile/${currentUser.id}`}
             className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition"
           >
             <FaUser className="text-blue-600" />
@@ -42,17 +66,28 @@ export default function SidebarLeft() {
           </div>
         </li>
         <li>
-          <div className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
+          <div onClick={() => navigate("/watch")}
+               className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
             <FaVideo className="text-blue-600" />
             <span>Watch</span>
           </div>
         </li>
         <li>
-          <div className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
+          <div onClick={() => navigate("/marketplace")}
+              className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
             <FaStore className="text-blue-600" />
             <span>Marketplace</span>
           </div>
         </li>
+        {currentUser.role.id == 1 && (
+          <li>
+            <div onClick={() => navigate("/admin")}
+                className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
+              <FaMagento className="text-blue-600" />
+              <span>Trang quản trị</span>
+            </div>
+          </li>
+        )}
       </ul>
     </div>
   );

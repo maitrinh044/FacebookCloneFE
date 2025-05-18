@@ -3,9 +3,9 @@ import useFetchUserFriends from "../utils/useFetchUserFriends";
 import { useState, useEffect } from "react";
 
 export default function SidebarRight({ onOpenChat }) {
-  const { friends , loading, error} = useFetchUserFriends();
+  const { friends, loading, error } = useFetchUserFriends();
 
-  let sortedFriends = []; 
+  let sortedFriends = [];
   const { onlineUsers } = ["1"];
 
 
@@ -28,12 +28,15 @@ export default function SidebarRight({ onOpenChat }) {
             className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer"
             onClick={() => onOpenChat(friend)}
           >
-            <FaUserCircle className="text-blue-500 text-2xl" />
+            <img
+              src={friend.profilePicture || "/default-avatar.png"}
+              alt="Avatar"
+              className="w-10 h-10 rounded-full object-cover"
+            />
             <span className="text-sm">{`${friend.firstName} ${friend.lastName}`}</span>
             <span
-              className={`w-2 h-2 rounded-full ml-auto ${
-                friend.online ? "bg-green-500" : ""
-              }`}
+              className={`w-2 h-2 rounded-full ml-auto ${friend.online ? "bg-green-500" : ""
+                }`}
             />
 
           </li>

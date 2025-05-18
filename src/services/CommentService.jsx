@@ -10,12 +10,32 @@ export const getCommentsByPost = async (postId) => {
   }
 };
 
+export const getReplies = async (commentId) => {
+  try {
+    const response = await axiosClient.get(`/comments/${commentId}/replies`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy replies:', error);
+    throw error;
+  }
+};
+
 export const createComment = async (commentData) => {
   try {
     const response = await axiosClient.post(`/comments`, commentData);
     return response.data.data;
   } catch (error) {
     console.error('Lỗi khi tạo bình luận:', error);
+    throw error;
+  }
+};
+
+export const createReply = async (commentData) => {
+  try {
+    const response = await axiosClient.post(`/comments/reply`, commentData);
+    return response.data.data;
+  } catch (error) {
+    console.error('Lỗi khi tạo reply:', error);
     throw error;
   }
 };
@@ -37,5 +57,29 @@ export const deleteComment = async (id) => {
   } catch (error) {
     console.error('Lỗi khi xóa bình luận:', error);
     throw error;
+  }
+};
+
+export const controlActiveStatusComment = async (id) => {
+  try {
+    const response = await axiosClient.put(`/comments/controlActiveStatus/${id}`);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API controlActiveStatusComment:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
+export const controlReaction = async (userId, targetType, targetId, reactionType) => {
+  try {
+    const response = await axiosClient.post(
+      `/reactions/controlReaction?userId=${userId}&targetType=${targetType}&targetId=${targetId}&reactionType=${reactionType}`
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error('Lỗi khi thả cảm xúc:', error);
+    throw error;
+    // return response.data.data;
+
   }
 };

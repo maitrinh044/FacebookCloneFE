@@ -7,8 +7,11 @@ import { div, img } from "framer-motion/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { addComment } from "../../services/profileService";
+import PostByShare from "../Post/PostByShare";
+import PostItem from "../Post/PostItem";
+import { getAllPosts, shareToProfile } from "../../services/PostService";
 
-export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab, user, listPost, listFriends, commentByPost, reactionByPost, reactionTypes, users, reactionByCurrentUser, controlReactionUser,addCommentByUser,controlActiveStatusPost }) {
+export default function ProfileTabContent({ isOwnProfile, share, currentUser, activeTab, user, listPost, listFriends, commentByPost, reactionByPost, reactionTypes, users, reactionByCurrentUser, controlReactionUser,addCommentByUser,controlActiveStatusPost }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [activeAboutTab, setActiveAboutTab] = useState('tongquan');
@@ -68,6 +71,25 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
     const post = reactionByPost.find(e => e.postId === postId);
     return post.reactions || [];
   }
+  const [allpost, setAllPost] = useState([]);
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const data = await getAllPosts(); // Lấy dữ liệu từ API
+        setAllPost(data); // Lưu vào state posts
+      } catch (err) {
+        console.error("Error fetching posts:", err); // Log lỗi
+        setError("Failed to fetch posts"); // Thiết lập lỗi nếu có
+        setLoading(false); // Đổi trạng thái loading
+      }
+    };
+    fetchPosts(); // Gọi hàm fetchPosts khi component mount
+  }, [user.id]); // 
+
+  function getReactionByPost(postId) {
+    const reaction = reactionByPost.find(e => e.postId == postId);
+    return reaction || [];
+  }
   function getCommentByPostId(postId) {
     const post = commentByPost.find(e => e.postId === postId);
     return post.comments || [];
@@ -119,6 +141,10 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
 
     return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
   }
+  const handleSharePost = async (userId, postId, caption) => {
+      
+      share(userId, postId, caption);
+    };
   if (activeTab === "posts") {
     return (
       <div className="bg-gray rounded-xl max-w-[1000px] mx-auto mb-4 flex flex-row">
@@ -130,107 +156,23 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
           <div className="space-y-4">
           {listPost && listPost.length > 0 ? (
             listPost.map((posts, index) => (
-              <div key={index} className="bg-white shadow-md p-4 rounded-md text-gray-700 mb-3 flex flex-col">
-                {/* Header */}
-                <div className="w-full h-10 flex items-center gap-2">
-                  {user.profilePicture!=null?(
-                    <img src={user.profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />
-                  ):(
-                    <FaUserCircle className="rounded-full w-10 h-10 object-cover text-gray-300"/>
-                  )}
+              <div>
+                {/* {posts.originalPostId == null ? (
+                  <PostItem key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
+                ) : (
+                  <PostByShare posts={allpost} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
+                )} */}
+                {posts.activeStatus === 'ACTIVE' && (
                   <div>
-                    <div className="font-bold text-[15px]">{user.firstName + " " + user.lastName}</div>
-                    <div className="text-[13px] flex gap-1">{formatDateString(posts.createdAt)} <FaGlobe className="-top-[-3px] relative"/></div>
-                  </div>
-                  <button className="ml-auto hover:bg-gray-200 p-2 rounded-full transition-all text-gray-300">
-                    <FaEllipsisH className="w-4 h-4" onClick={() => handleClickActivePost(posts)}/>
-                  </button>
-                  
-                  {activePostDropDown && activePost === posts && (
-                      <div className="absolute bg-white border border-gray-300 rounded-lg shadow-md p-2 ml-[570px] mt-[100px] h-[115px] w-[240px]" 
-                          id="emojiDropdown">
-                          {isOwnProfile && (
-                            <div className="flex flex-col gap-2">
-                              <button className="hover:bg-gray-100 hover:text-blue-600 font-semibold p-1 rounded w-full">Chỉnh sửa bài viết</button>
-                              <button className="hover:bg-gray-100 hover:text-blue-600 font-semibold p-1 rounded w-full" onClick={() => controlActiveStatusPost(user.id, posts.id)}>Chuyển bài viết vào thùng rác</button>
-                            </div>
-                          )}
-                          
-                      </div>
-                  )}
-                </div>
-
-                {/* Nội dung bài viết */}
-                {posts.content && <p className="mt-2">{posts.content}</p>}
-
-                {/* Danh sách ảnh */}
-               
-                {posts.imageUrl!=null&&(
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    <img key={imgIndex} src={posts.imageUrl} alt={`Ảnh`} className="w-full h-40 object-cover rounded-md" />
-                  </div>
-                )}
-
-                {/* Lượt like, comment, share */}
-                <div className="flex justify-between items-center p-2">
-                  <div className="flex gap-1">
-                    <FaThumbsUp className="relative top-[3px]" />
-                      {getReactionByPostId(posts.id).length || 0}
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex gap-1">
-                      <FaFacebookMessenger className="relative top-[3px]" />
-                      {getCommentByPostId(posts.id).length || 0}
-                    </div>
-                    <div className="flex gap-1">
-                      <FaShare className="relative top-[3px]" />
-                      {/* {posts.amountOfShare} */}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Nút tương tác */}
-                <div className="flex justify-center items-center gap-5 w-full">
-                  <div className="flex-1 flex flex-col gap-4 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all">
-                    <div className="btn-reaction flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all"
-                                        onMouseEnter={() => handleMouseEnter(posts.id)} // Gửi ID bài viết
-                                        onMouseLeave={handleMouseLeave}>
-                        {/* <FaThumbsUp className="w-5 h-5" /> Thích */}
-                        {getReactionByUserAndPost(posts.id).type ? (
-                          <div>
-                            {getEmojiReactionById(getReactionByUserAndPost(posts.id).type).emoji}{" "}
-                            {getEmojiReactionById(getReactionByUserAndPost(posts.id).type).label}
-                          </div>
-                        ) : (
-                          <div className="flex flex-row gap-2">
-                            {/* {getEmojiReactionById('LIKE').emoji + " " + getEmojiReactionById('LIKE').label} */}
-                            <FaThumbsUp className="w-5 h-5" /> Thích
-                          </div>
-                        )}
-                    </div>
-                    {activeDropdown === posts.id && (
-                      <div className="absolute bg-white border border-gray-300 rounded-full shadow-md mt-2 p-2 mt-[-100px]" 
-                         id="emojiDropdown" onMouseEnter={() => handleMouseEnter(posts.id)} // Gửi ID bài viết
-                         onMouseLeave={handleMouseLeave}>
-                          <div className="flex space-x-2">
-                              {reactionTypes.map(e => (
-                                <span key={e.id} 
-                                      id={e.id} 
-                                      className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
-                                      onClick={() => controlReactionUser(currentUser.id, 'POST', posts.id, e.id)}>{e.emoji}</span>
-                              ))}
-                          </div>
-                      </div>
+                    {posts.originalPostId == null ? (
+                      <PostItem isOwnProfile={user.id == currentUser.id} reactionByUser={reactionByCurrentUser} reactionByPost={getReactionByPost(posts.id).reactions != [] ? getReactionByPost(posts.id).reactions : []} controlReactionUser={controlReactionUser} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
+                    ) : (
+                      <PostByShare isOwnProfile={user.id == currentUser.id} reactionByUser={reactionByCurrentUser} reactionByPost={getReactionByPost(posts.id).reactions != [] ? getReactionByPost(posts.id).reactions : []} controlReactionUser={controlReactionUser} posts={allpost} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
                     )}
                   </div>
-                  <button className="flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all" onClick={() => openModal(posts)}>
-                    <FaComment className="w-5 h-5" /> Bình luận
-                  </button>
-                  <button className="flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all">
-                    <FaShare className="w-5 h-5" /> Chia sẻ
-                  </button>
-                </div>
+                )}
               </div>
+              
             ))
           ) : (
             <p className="text-gray-500 italic">Chưa có bài viết nào.</p>
@@ -317,7 +259,7 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
                   </div>
                   {/* Bình luận */}
                               
-                  <div className="space-y-3">
+                  <div className="space-y-3 mb-[50px]">
                     {getCommentByPostId(selectedPost.id).length > 0 ? (
                       getCommentByPostId(selectedPost.id).map((cmt, cmtIndex) => (
                         <div key={cmtIndex} className="border-b p-2">
@@ -330,7 +272,9 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
                     ) : (
                       <p className="text-gray-500 italic text-center">Chưa có bình luận nào.</p>
                     )}
-                    <div className="flex justify-between gap-3 absolute bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-300">
+                    
+                  </div>
+                  <div className="flex justify-between gap-3 absolute bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-300">
                       <div className="w-[40px]">
                         {currentUser.profilePicture != null ? (
                           <img
@@ -360,7 +304,6 @@ export default function ProfileTabContent({ isOwnProfile, currentUser, activeTab
                             />
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
             </div>

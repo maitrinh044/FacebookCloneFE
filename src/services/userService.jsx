@@ -5,7 +5,7 @@ import axiosClient from "../utils/axiosClient";
 export const getUser = async () => {
     try {
         const response = await axiosClient.get('/users/getAllUsers');
-        return response.data.data;
+        return response.data?.data;
     } catch (error) {
         console.error("Lỗi khi gọi API getUser:", error);
         throw error; 
@@ -43,3 +43,23 @@ export const getJoinedGroup = async (userId) => {
         throw error;
     }
 };
+
+export const controlActiveStatusUser = async(id) => {
+    try {
+        const response = await axiosClient.put(`/users/controlActiveStatus/${id}`);
+        return response.data.data;
+    } catch (error) {
+        console.error("Lỗi khi gọi API controlActiveStatus:", error);
+        throw error;
+    }
+}
+
+export const findUsersByKeyword = async(keyword) => {
+    try {
+        const response = await axiosClient.get(`/users/findByKeyword/${keyword}`);
+        return response.data.data;
+    } catch (error) {
+        console.error("Lỗi khi gọi API findByKeyword:", error);
+        throw error;
+    }
+}

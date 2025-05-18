@@ -7,7 +7,6 @@ export default function ProfileTabs({ activeTab, setActiveTab }) {
         { key: "about", label: "Giới thiệu" },
         { key: "photos", label: "Ảnh" },
     ];
-    console.log('active: ' + activeTab);
     return (
         <div className="w-full max-w-[1000px] mx-auto overflow-x-auto">
             {/* Tabs + Icon */}

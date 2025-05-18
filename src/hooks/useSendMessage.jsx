@@ -12,7 +12,6 @@ const useSendMessage = () => {
 
     try {
       const savedMessage = await addNewMessage(message);  // Gọi hàm addNewMessage để gửi tin nhắn
-      console.log("Tin nhắn đã được gửi:", savedMessage);
       return savedMessage;
     } catch (err) {
       console.error("Lỗi khi gửi tin nhắn:", err);

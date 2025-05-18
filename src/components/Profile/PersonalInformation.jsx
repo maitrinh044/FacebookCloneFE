@@ -54,37 +54,6 @@ export default function PersonalInformation({ isOwnProfile, user, listFriends })
                                 Thêm tiểu sử
                             </button>
                         )}
-
-                        {/* Story Section */}
-                        {/* <div className="w-full px-4 relative">
-                            <Swiper
-                                slidesPerView={3}
-                                spaceBetween={10}
-                                navigation={{
-                                    nextEl: ".swiper-button-next",
-                                    prevEl: ".swiper-button-prev",
-                                }}
-                                modules={[Navigation]}
-                                className="mySwiper"
-                                onSlideChange={(swiper) => {
-                                    setHidePrev(swiper.isBeginning);
-                                    setHideNext(swiper.isEnd);
-                                }}
-                            >
-                                {images.map((src, index) => (
-                                    <SwiperSlide key={index} className="rounded-lg overflow-hidden shadow-md">
-                                        <img
-                                            src={src}
-                                            alt={`Story ${index + 1}`}
-                                            className="w-full h-40 object-cover rounded-md border border-gray-300"
-                                        />
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-
-                            <div className={`swiper-button-prev custom-nav-btn ${hidePrev ? "hidden" : ""}`}></div>
-                            <div className={`swiper-button-next custom-nav-btn ${hideNext ? "hidden" : ""}`}></div>
-                        </div> */}
                     </div>
                 )}
             </div>
@@ -104,62 +73,7 @@ export default function PersonalInformation({ isOwnProfile, user, listFriends })
 
                 {/* Grid danh sách bạn bè */}
                 <div className="grid grid-cols-3 gap-3">
-                    {/* <div className="p-1 flex flex-col gap-1">
-                        <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi5sTqyWXMuHWDzEI_BGr_0x3sFTA3TBG3SQ&s"
-                            alt="bạn bè 1"
-                            className="rounded-md object-cover"
-                        />
-                        <p className="text-xs font-bold">Nguyễn Văn A</p>
-                    </div>
-                    <div className="p-1 flex flex-col gap-1">
-                        <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi5sTqyWXMuHWDzEI_BGr_0x3sFTA3TBG3SQ&s"
-                            alt="bạn bè 1"
-                            className="rounded-md object-cover"
-                        />
-                        <p className="text-xs font-bold">Nguyễn Văn A</p>
-                    </div>
-                    <div className="p-1 flex flex-col gap-1">
-                        <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi5sTqyWXMuHWDzEI_BGr_0x3sFTA3TBG3SQ&s"
-                            alt="bạn bè 1"
-                            className="rounded-md object-cover"
-                        />
-                        <p className="text-xs font-bold">Nguyễn Văn A</p>
-                    </div>
-                    <div className="p-1 flex flex-col gap-1">
-                        <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi5sTqyWXMuHWDzEI_BGr_0x3sFTA3TBG3SQ&s"
-                            alt="bạn bè 1"
-                            className="rounded-md object-cover"
-                        />
-                        <p className="text-xs font-bold">Nguyễn Văn A</p>
-                    </div>
-                    <div className="p-1 flex flex-col gap-1">
-                        <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi5sTqyWXMuHWDzEI_BGr_0x3sFTA3TBG3SQ&s"
-                            alt="bạn bè 1"
-                            className="rounded-md object-cover"
-                        />
-                        <p className="text-xs font-bold">Nguyễn Văn A</p>
-                    </div>
-                    <div className="p-1 flex flex-col gap-1">
-                        <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi5sTqyWXMuHWDzEI_BGr_0x3sFTA3TBG3SQ&s"
-                            alt="bạn bè 1"
-                            className="rounded-md object-cover"
-                        />
-                        <p className="text-xs font-bold">Nguyễn Văn A</p>
-                    </div>
-                    <div className="p-1 flex flex-col gap-1">
-                        <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi5sTqyWXMuHWDzEI_BGr_0x3sFTA3TBG3SQ&s"
-                            alt="bạn bè 1"
-                            className="rounded-md object-cover"
-                        />
-                        <p className="text-xs font-bold">Nguyễn Văn A</p>
-                    </div> */}
+                    
                     {listFriends.slice(0, 7).map(e => (
                         <div className="p-1 flex flex-col gap-1 shadow rounded">
                             {e.imageUrl!=null ? (

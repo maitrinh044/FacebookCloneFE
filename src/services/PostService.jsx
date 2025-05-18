@@ -89,3 +89,56 @@ export const deletePost = async (id) => {
     throw error;
   }
 };
+
+export const shareToProfile = async (userId, postId, caption) => {
+  try {
+    const data = {
+      userId: userId,
+      originalPostId: postId,
+      caption: caption
+    }
+    console.log("data to share: ", data);
+    const response = await axiosClient.post(`/posts/shareToProfile`, data);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API shareToProfile:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+export const controlActiveStatus = async (postId) => {
+  try {
+    const response = await axiosClient.put(`/posts/controlActiveStatus/${postId}`);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API controlActiveStatus:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+export const getPostByKeyword = async (keyword) => {
+  try {
+    const response = await axiosClient.get(`/posts/getByKeyword/${keyword}`);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API getByKeyword:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+export const getPostByStartAndEnd = async (start, end) => {
+  try {
+    const response = await axiosClient.get(`/posts/getByStartAndEnd?start=${start}&end=${end}`);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API getByKeyword:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+
+export const getFriendPosts = async (userId) => {
+  try {
+    const response = await axiosClient.get(`/posts/getFriendPosts/${userId}`);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API getFriendPosts:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
