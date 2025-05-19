@@ -53,9 +53,11 @@ export const getPostsByGroup = async (groupId) => {
 export const createPost = async (postData) => {
   try {
     const response = await axiosClient.post(`/posts/createPost`, postData);
+    console.log('Đăng bài viết trong service!');
     return response.data.data;
   } catch (error) {
     console.error('Lỗi khi tạo bài viết:', error);
+    alert(`Lỗi khi tạo bài viết: ${response.data.message}`);
     throw error;
   }
 };

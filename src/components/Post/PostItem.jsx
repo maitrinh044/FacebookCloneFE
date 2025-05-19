@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
-import { FaThumbsUp, FaRegCommentDots, FaShare, FaUserCircle, FaEllipsisH, FaGlobe, FaFacebookMessenger, FaComment, FaTimes } from "react-icons/fa";
+import { FaThumbsUp, FaRegCommentDots, FaShare, FaUserCircle, FaEllipsisH, FaGlobe, FaFacebookMessenger, FaComment, FaTimes, FaFonticons } from "react-icons/fa";
 import SharePost from "./SharePost";
 import { getCommentsByPost, createComment, getReplies, createReply } from "../../services/CommentService";
 import { toggleReaction, countReactions, getReactionTypes, getReactions, getReactionCountsByType } from "../../services/ReactionService";
 import { addComment, controlReaction, getCommentByPost, getReactionByPostId, getReactionsByUserId } from "../../services/profileService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faIcons, faPaperPlane, faSmile } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import ReactionPopup from "./ReactionPopup";
-
+import { toast } from "react-toastify";
+import React from 'react';
+import Picker from '@emoji-mart/react';
+import data from '@emoji-mart/data'; 
 export default function PostItem({ post,reactionByPost, reactionByUser, controlReactionUser, isOwnProfile, onShare, user, controlActiveStatusPost, users }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -225,22 +228,6 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
     return user || [];
   }
 
-  // const controlReactionUser = async (userId, targetType, targetId, reactionType) => {
-  //   try {
-  //     const newReaction = await controlReaction(userId, targetType, targetId, reactionType);
-  //     const data = await getReactionsByUserId(userId);
-  //     setReactionByUser(data);
-  //     if (targetType === "POST") {
-  //       const tmp2 = await getReactionByPostId(post.id);
-  //       setReactionByPost(tmp2);
-  //     }
-  //   } catch (error) {
-  //     const data = await getReactionsByUserId(userId);
-  //     setReactionByUser(data);
-  //     console.error("Lỗi khi điều khiển phản ứng:", error);
-  //   }
-  // };
-
   const addCommentByUser = async (userId, postId, content, parentCommentId = null) => {
     try {
       const commentData = {
@@ -261,6 +248,8 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
       setComments(commentsWithReplies);
       setCommentByPost(commentsWithReplies);
       setReplyInputs(prev => ({ ...prev, [parentCommentId || postId]: "" }));
+      setShowPicker(false);
+      setShowPickerReply(false);
     } catch (error) {
       console.error("Lỗi khi thêm bình luận:", error);
     }
@@ -277,6 +266,15 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
   const [commentContent, setCommentContent] = useState("");
   const [activePost, setActivePost] = useState(null);
   const [activePostDropDown, setActivePostDropDown] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const [showPickerReply, setShowPickerReply] = useState(false);
+  
+  const handleEmojiSelect = (emoji) => {
+    setCommentContent((prev) => prev + emoji.native);
+  };
+  const handleEmojiSelectReply = (cmtId, emoji) => {
+    setReplyInputs(prev => ({ ...prev, [cmtId]: (prev[cmtId] || "") + emoji.native })); // Thêm emoji vào nội dung bình luận
+  };
 
   const handleClickActivePost = (post) => {
     if (activePost === post) {
@@ -356,6 +354,19 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
                 onChange={(e) => handleReplyInputChange(cmt.id, e.target.value)}
                 placeholder="Viết phản hồi..."
               />
+              <div className="relative">
+                  <button
+                    onClick={() => setShowPickerReply(!showPickerReply)}
+                    className="p-2 text-yellow-300 hover:bg-blue-50 rounded-full transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+                  </button>
+                  {showPickerReply && (
+                    <div className="absolute z-50" style={{ bottom: '100%', right: '0' }}>
+                      <Picker data={data} onEmojiSelect={(emoji) => handleEmojiSelectReply(cmt.id, emoji)}  locale="vi" />
+                    </div>
+                  )}
+                </div>
               <button
                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
                 onClick={() => {
@@ -416,8 +427,8 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
         </div>
         {post.content && <p className="mt-2">{post.content}</p>}
         {post.imageUrl != null && (
-          <div className="grid grid-cols-3 gap-2 mt-2">
-            <img src={post.imageUrl} alt="Ảnh" className="w-full h-40 object-cover rounded-md" />
+          <div className="flex justify-center gap-2 mt-2 h-full w-full">
+            <img src={post.imageUrl} alt="Ảnh" className="w-full h-full object-cover rounded-md" />
           </div>
         )}
         <div className="flex justify-between items-center p-2">
@@ -484,18 +495,26 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
       )}
       {isModalOpen && selectedPost && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="fixed relative bg-white p-5 rounded-lg shadow-lg w-[800px] max-w-full relative flex flex-col max-h-[110vh] overflow-hidden">
+          <div className="relative bg-white p-5 rounded-lg shadow-lg w-[800px] max-w-full flex flex-col max-h-[90vh] overflow-hidden">
+            
+            {/* Header */}
             <div className="flex justify-between items-center border-b-2 border-gray-500 p-4">
               <h1 className="font-bold text-[25px] text-center flex-1">Bài viết của {user.firstName + " " + user.lastName}</h1>
               <button className="text-gray-600 hover:text-red-500" onClick={closeModal}>
                 <FaTimes className="w-5 h-5" />
               </button>
             </div>
-            <div className="overflow-y-auto p-2 flex-1 max-h-[500px]">
+
+            {/* Nội dung có scroll */}
+            <div className="flex-1 overflow-y-auto p-2">
+              {/* Nội dung post: văn bản, ảnh, like, share... */}
               {selectedPost.content && <p className="mt-2">{selectedPost.content}</p>}
-              {selectedPost.imageUrl != null && (
-                <img src={selectedPost.imageUrl} alt="Ảnh" className="w-full h-40 object-cover rounded-md" />
+              {selectedPost.imageUrl && (
+                <img src={selectedPost.imageUrl} alt="Ảnh" className="w-full h-full object-cover rounded-md" />
               )}
+
+              {/* Reactions, Comments... */}
+              {/* ... */}
               <div className="flex justify-between items-center p-2">
                 <div className="flex gap-1">
                   <FaThumbsUp className="relative top-[3px]" />
@@ -550,46 +569,75 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
                   <FaShare className="w-5 h-5 rounded-md" /> Chia sẻ
                 </button>
               </div>
-              <div className="space-y-3 mt-4 pb-16">
+
+              {/* Comment list */}
+              <div className="space-y-3 mt-4 pb-10">
                 {commentByPost.length > 0 ? (
                   renderComments(commentByPost)
                 ) : (
                   <p className="text-gray-500 italic text-center py-4">Chưa có bình luận nào.</p>
                 )}
-                <div className="fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-300">
-                  <div className="flex items-center gap-3 max-w-4xl mx-auto">
-                    <div className="w-10 h-10 flex-shrink-0">
-                      {user.profilePicture ? (
-                        <img
-                          src={user.profilePicture}
-                          alt="avatar"
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <FaUserCircle className="w-10 h-10 text-gray-300" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <input
-                        className="w-full p-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={commentContent}
-                        onChange={(e) => setCommentContent(e.target.value)}
-                        placeholder={`Bình luận dưới tên ${user.firstName} ${user.lastName}`}
-                      />
-                    </div>
-                    <button
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                      onClick={() => {
-                        if (commentContent.trim()) {
-                          addCommentByUser(userid, selectedPost.id, commentContent);
-                          setCommentContent("");
-                        }
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faPaperPlane} className="w-5 h-5" />
-                    </button>
-                  </div>
+              </div>
+            </div>
+
+            {/* 🔽 Thanh nhập bình luận luôn dính đáy modal */}
+            <div className="border-t border-gray-300 p-3 bg-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 flex-shrink-0">
+                  {user.profilePicture ? (
+                    <img src={user.profilePicture} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
+                  ) : (
+                    <FaUserCircle className="w-10 h-10 text-gray-300" />
+                  )}
                 </div>
+                <div className="flex-1">
+                  <input
+                    className="w-full p-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={commentContent}
+                    onChange={(e) => setCommentContent(e.target.value)}
+                    placeholder={`Bình luận dưới tên ${user.firstName} ${user.lastName}`}
+                  />
+                </div>
+                
+                {/* <div className="relative ">
+                
+                  <button
+                    onClick={() => setShowPicker(!showPicker)}
+                    className="p-2 text-yellow-300 hover:bg-blue-50 rounded-full transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+                  </button>
+                  {showPicker && (
+                    <div className="absolute ">
+                      <Picker data={data} onEmojiSelect={handleEmojiSelect} locale="vi" />
+                    </div>
+                  )}
+                </div> */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowPicker(!showPicker)}
+                    className="p-2 text-yellow-300 hover:bg-blue-50 rounded-full transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+                  </button>
+                  {showPicker && (
+                    <div className="absolute z-50" style={{ bottom: '100%', right: '0' }}>
+                      <Picker data={data} onEmojiSelect={handleEmojiSelect} locale="vi" />
+                    </div>
+                  )}
+                </div>
+                <button
+                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                  onClick={() => {
+                    if (commentContent.trim()) {
+                      addCommentByUser(userid, selectedPost.id, commentContent);
+                      setCommentContent("");
+                    }
+                  }}
+                >
+                  <FontAwesomeIcon icon={faPaperPlane} className="w-5 h-5" />
+                </button>
+                
               </div>
             </div>
           </div>

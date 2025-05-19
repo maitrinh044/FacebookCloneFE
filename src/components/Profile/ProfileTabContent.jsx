@@ -10,8 +10,9 @@ import { addComment } from "../../services/profileService";
 import PostByShare from "../Post/PostByShare";
 import PostItem from "../Post/PostItem";
 import { getAllPosts, shareToProfile } from "../../services/PostService";
+import CreatePost from "../Post/CreatePost";
 
-export default function ProfileTabContent({ isOwnProfile, share, currentUser, activeTab, user, listPost, listFriends, commentByPost, reactionByPost, reactionTypes, users, reactionByCurrentUser, controlReactionUser,addCommentByUser,controlActiveStatusPost }) {
+export default function ProfileTabContent({ isOwnProfile, share, handlePostCreated, currentUser, activeTab, user, listPost, listFriends, commentByPost, reactionByPost, reactionTypes, users, reactionByCurrentUser, controlReactionUser,addCommentByUser,controlActiveStatusPost }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [activeAboutTab, setActiveAboutTab] = useState('tongquan');
@@ -153,15 +154,16 @@ export default function ProfileTabContent({ isOwnProfile, share, currentUser, ac
         </div>
         <div className="w-[600px] flex-shrink-0">
           {/* <ProfileTabContent activeTab={activeTab} user={user} /> */}
-          <div className="space-y-4">
+          <div className="space-y-4 mt-4">
+          <div>
+            {isOwnProfile && (
+              <CreatePost onPostCreated={handlePostCreated}  currentUser={currentUser}/> 
+            )}
+          </div>
           {listPost && listPost.length > 0 ? (
             listPost.map((posts, index) => (
               <div>
-                {/* {posts.originalPostId == null ? (
-                  <PostItem key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/> // Hiển thị các bài viết
-                ) : (
-                  <PostByShare posts={allpost} key={posts.id} post={posts} onShare={handleSharePost} user={currentUser} controlActiveStatusPost={controlActiveStatusPost} users={users}/>
-                )} */}
+                
                 {posts.activeStatus === 'ACTIVE' && (
                   <div>
                     {posts.originalPostId == null ? (

@@ -10,7 +10,7 @@ import useFetchProfile, { getReactionsByUser } from "../utils/userFetchProfile";
 import { useFetchUser, useFetchUserById } from "../utils/useFetchUser";
 import { getPostByUser, getReactionByPostId, getReactionsByUserId } from "../services/profileService";
 import { controlReaction } from "../services/CommentService";
-import { shareToProfile } from "../services/PostService";
+import { createPost, shareToProfile } from "../services/PostService";
 
 export default function ProfilePage() {
   const { id } = useParams();
@@ -112,6 +112,28 @@ export default function ProfilePage() {
       console.error("Lỗi khi share bài viết! ", error);
     }
   }
+  const handlePostCreated = async (newPost) => {
+    try {
+      const createdPost = await createPost(newPost); // Gửi dữ liệu tạo bài viết mới đến API
+      const response1 = await getPostByUser(id);
+      const data = await getReactionsByUserId(id); // Lấy người dùng bằng ID
+      setReactionByUser(data);
+      const reactionPromises = response1.map(post1 => {
+          return getReactionByPostId(post1.id).then(reactions => ({
+              postId: post1.id,
+              reactions
+          }));
+      });
+      // Chờ cho tất cả các yêu cầu reactions hoàn thành
+      const tmp1 = await Promise.all(reactionPromises);
+      setReactionByPost(tmp1);
+      setListPost(response1);
+      console.log('Đăng bài viết trong profilepage!');
+    } catch (err) {
+      console.error("Error creating post:", err); // Log lỗi nếu có
+      setError("Failed to create post"); // Thiết lập lỗi nếu có
+    }
+  };
   const [activeTab, setActiveTab] = useState("posts");
   const [showEdit, setShowEdit] = useState(false);
 
@@ -165,6 +187,7 @@ export default function ProfilePage() {
                                 addCommentByUser={addCommentByUser}
                                 controlActiveStatusPost={controlActiveStatusPost}
                                 share={share}
+                                handlePostCreated={handlePostCreated}
                                 />
             </div>
           </div>
