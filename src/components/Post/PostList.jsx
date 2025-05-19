@@ -157,6 +157,7 @@ export default function PostList() {
   }
   // console.log('posts: ', posts);
   // Kiểm tra trạng thái loading và lỗi
+  
   if (loading) return <div>Loading...</div>; // Hiển thị khi đang loading
   if (error) return <div>{error}</div>; // Hiển thị khi có lỗi
 

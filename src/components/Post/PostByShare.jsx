@@ -5,11 +5,14 @@ import { addComment, controlReaction, getCommentByPost, getReactionByPostId, get
 import { FaComment, FaEllipsisH, FaFacebookMessenger, FaGlobe, FaShare, FaThumbsUp, FaTimes, FaUserCircle } from "react-icons/fa";
 import SharePost from "./SharePost";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane, faSmile } from "@fortawesome/free-solid-svg-icons";
 import { getPostById } from "../../services/PostService";
 import { useNavigate } from "react-router-dom";
 import ReactionPopup from "./ReactionPopup";
-
+import { toast } from "react-toastify";
+import React from 'react';
+import Picker from '@emoji-mart/react';
+import data from '@emoji-mart/data'; 
 export default function PostByShare({ posts, reactionByPost, reactionByUser, controlReactionUser, post, isOwnProfile, onShare, user, controlActiveStatusPost, users }) {
   const [reactionTypes, setReactionTypes] = useState([]);
   // const [reactionByPost, setReactionByPost] = useState([]);
@@ -144,6 +147,8 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
       );
       setCommentByPost(commentsWithReplies);
       setReplyInputs(prev => ({ ...prev, [parentCommentId || postId]: "" }));
+      setShowPicker(false);
+      setShowPickerReply(false);
     } catch (error) {
       console.error("Lỗi khi thêm bình luận:", error);
     }
@@ -159,7 +164,20 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
 
   const [activePost, setActivePost] = useState(null);
   const [activePostDropDown, setActivePostDropDown] = useState(false);
-
+  const [showPicker, setShowPicker] = useState(false);
+  const [showPickerReply, setShowPickerReply] = useState(false);
+  
+  const handleEmojiSelect = (postId, emoji) => {
+    // setCommentContent((prev) => prev + emoji.native);
+    // setReplyInputs(((prev) => prev + emoji.native));
+    setReplyInputs(prev => ({
+    ...prev,
+    [postId]: (prev[postId] || "") + emoji.native // Thêm emoji vào bình luận tương ứng
+  }));
+  };
+  const handleEmojiSelectReply = (cmtId, emoji) => {
+    setReplyInputs(prev => ({ ...prev, [cmtId]: (prev[cmtId] || "") + emoji.native })); // Thêm emoji vào nội dung bình luận
+  };
   const handleClickActivePost = (post) => {
     if (activePost === post) {
       setActivePostDropDown(!activePostDropDown);
@@ -243,6 +261,19 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
                 onChange={(e) => handleReplyInputChange(cmt.id, e.target.value)}
                 placeholder="Viết phản hồi..."
               />
+              <div className="relative">
+                <button
+                  onClick={() => setShowPickerReply(!showPickerReply)}
+                  className="p-2 text-yellow-300 hover:bg-blue-50 rounded-full transition-colors"
+                >
+                  <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+                </button>
+                {showPickerReply && (
+                  <div className="absolute z-50" style={{ bottom: '100%', right: '0' }}>
+                    <Picker data={data} onEmojiSelect={(emoji) => handleEmojiSelectReply(cmt.id, emoji)}  locale="vi" />
+                  </div>
+                )}
+              </div>
               <button
                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
                 onClick={() => {
@@ -264,7 +295,6 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
       </div>
     ));
   };
-  console.log('reactionByPost in PostByShare: ', reactionByPost);
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -312,8 +342,8 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
           </div>
           {originalPost?.content && <p className="mt-2">{originalPost.content}</p>}
           {originalPost?.imageUrl && (
-            <div className="grid grid-cols-3 gap-2 mt-2">
-              <img src={originalPost.imageUrl} alt="Ảnh" className="w-full h-40 object-cover rounded-md" />
+            <div className="flex justify-center gap-2 mt-2 h-full w-full">
+              <img src={originalPost.imageUrl} alt="Ảnh" className="w-full h-full object-cover rounded-md" />
             </div>
           )}
         </div>
@@ -390,8 +420,8 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
                 </div>
                 {originalPost?.content && <p className="mt-2">{originalPost.content}</p>}
                 {originalPost?.imageUrl && (
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    <img src={originalPost.imageUrl} alt="Ảnh" className="w-full h-40 object-cover rounded-md" />
+                  <div className="">
+                    <img src={originalPost.imageUrl} alt="Ảnh" className="w-full h-full object-cover rounded-md" />
                   </div>
                 )}
               </div>
@@ -439,13 +469,15 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
                   <FaShare className="w-5 h-5 rounded-md" /> Chia sẻ
                 </button>
               </div>
-              <div className="space-y-3 mt-4 pb-16">
+              <div className="space-y-3 mt-4">
                 {commentByPost.length > 0 ? (
                   renderComments(commentByPost)
                 ) : (
                   <p className="text-gray-500 italic text-center py-4">Chưa có bình luận nào.</p>
                 )}
-                <div className="fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-300">
+              </div>
+            </div>
+            <div className="sticky bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-300">
                   <div className="flex items-center gap-3 max-w-4xl mx-auto">
                     <div className="w-10 h-10 flex-shrink-0">
                       {user.profilePicture ? (
@@ -462,6 +494,19 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
                         placeholder={`Bình luận dưới tên ${user.firstName} ${user.lastName}`}
                       />
                     </div>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowPicker(!showPicker)}
+                        className="p-2 text-yellow-300 hover:bg-blue-50 rounded-full transition-colors"
+                      >
+                        <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+                      </button>
+                      {showPicker && (
+                        <div className="absolute z-50" style={{ bottom: '100%', right: '0' }}>
+                          <Picker data={data} onEmojiSelect={(emoji) => handleEmojiSelect(post.id, emoji)}  locale="vi" />
+                        </div>
+                      )}
+                    </div>
                     <button
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
                       onClick={() => {
@@ -475,8 +520,6 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
                     </button>
                   </div>
                 </div>
-              </div>
-            </div>
           </div>
         </div>
       )}

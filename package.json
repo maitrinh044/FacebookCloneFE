@@ -9,6 +9,8 @@
     "dev:admin": "vite --open /admin"
   },
   "dependencies": {
+    "@emoji-mart/data": "^1.2.1",
+    "@emoji-mart/react": "^1.1.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
@@ -19,6 +21,7 @@
     "@stomp/stompjs": "^7.1.1",
     "antd": "^5.24.5",
     "axios": "^1.8.4",
+    "emoji-mart": "^5.6.0",
     "framer-motion": "^12.5.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
