@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { FaRegCommentDots, FaUserLock, FaUserSlash, FaSearch } from "react-icons/fa";
+import { FaRegCommentDots, FaUserLock, FaUserSlash, FaSearch, FaUserCircle } from "react-icons/fa";
 import { message } from "antd";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import * as FriendlistService from "../../services/FriendlistService";
 import { getUserById } from "../../services/userService";
@@ -17,6 +18,7 @@ export default function FriendListPage() {
 
   const currentUserId = localStorage.getItem("userId");
   const accessToken = localStorage.getItem("accessToken");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -46,11 +48,13 @@ export default function FriendListPage() {
             const user = await getUserById(friendId);
             const lastMessage = await getLastMessage(currentUserId, friendId);
 
+            console.log(`Friend ID: ${friendId}, ProfilePicture: ${user.profilePicture}, ImageUrl: ${user.imageUrl}`); // Debug log
+
             return {
               id: friendship.id,
               friendId,
               name: `${user.firstName} ${user.lastName}`,
-              avatar: user.avatar || "/default-avatar.png",
+              profilePicture: user.profilePicture, // Use profilePicture
               mutuals: user.mutualFriends || 0,
               online: user.online || false,
               firstName: user.firstName,
@@ -116,7 +120,7 @@ export default function FriendListPage() {
           firstName: friendData.firstName,
           lastName: friendData.lastName,
           name: friendData.name,
-          profilePicture: friendData.avatar,
+          profilePicture: friendData.profilePicture, // Use profilePicture
           online: friendData.online,
         };
 
@@ -204,6 +208,7 @@ export default function FriendListPage() {
                   menuOpenId={menuOpenId}
                   setMenuOpenId={setMenuOpenId}
                   handleAction={handleAction}
+                  navigate={navigate}
                 />
               ))}
             </ul>
@@ -211,30 +216,46 @@ export default function FriendListPage() {
         </div>
       </div>
 
-      {chatPanels.length > 0 && chatPanels.map((panel, index) => (
-        <MessagePanel
-          key={panel.id}
-          friend={panel.friend}
-          initialMessages={panel.messages}
-          onMessageSent={() => handleMessageSent(panel.id)}
-          onClose={() => handleCloseChat(panel.id)}
-          positionOffset={index}
-          currentUserId={currentUserId}
-        />
-      ))}
+      {chatPanels.length > 0 &&
+        chatPanels.map((panel, index) => (
+          <MessagePanel
+            key={panel.id}
+            friend={panel.friend}
+            initialMessages={panel.messages}
+            onMessageSent={() => handleMessageSent(panel.id)}
+            onClose={() => handleCloseChat(panel.id)}
+            positionOffset={index}
+            currentUserId={currentUserId}
+          />
+        ))}
     </div>
   );
 }
 
-function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction }) {
+function FriendItem({ friend, menuOpenId, setMenuOpenId, handleAction, navigate }) {
+  const [imgError, setImgError] = useState(false);
+
+  const handleProfileClick = () => {
+    console.log(`Navigating to profile with ID: ${friend.friendId}`); // Debug log
+    navigate(`/profile/${friend.friendId}`);
+  };
+
   return (
     <li className="flex justify-between items-center bg-gray-100 p-3 rounded-lg shadow relative">
-      <div className="flex items-center gap-4">
-        <img
-          src={friend.avatar}
-          alt={friend.name}
-          className="w-12 h-12 rounded-full object-cover"
-        />
+      <div
+        className="flex items-center gap-4 cursor-pointer"
+        onClick={handleProfileClick}
+      >
+        {friend.profilePicture && !imgError ? (
+          <img
+            src={friend.profilePicture}
+            alt={friend.name}
+            className="w-12 h-12 rounded-full object-cover"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <FaUserCircle className="w-12 h-12 text-gray-400" />
+        )}
         <div>
           <span className="font-medium">{friend.name}</span>
           <p className="text-gray-500 text-sm">{friend.mutuals} bạn chung</p>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { FaUserPlus, FaTimes, FaUserCheck } from "react-icons/fa";
+import { FaUserPlus, FaTimes, FaUserCheck, FaUserCircle } from "react-icons/fa";
 import { message } from "antd";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import * as FriendlistService from "../../services/FriendlistService";
 import { getUser, getUserById } from "../../services/userService";
@@ -9,6 +10,7 @@ export default function FriendSuggestionsPage() {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const currentUserId = localStorage.getItem("userId");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -57,12 +59,14 @@ export default function FriendSuggestionsPage() {
                 ((f.user1.id === user.id && friendIds.includes(f.user2.id)) ||
                  (f.user2.id === user.id && friendIds.includes(f.user1.id)))
             ).length;
+            console.log(`Suggestion ID: ${user.id}, ProfilePicture: ${userDetails.profilePicture}, ImageUrl: ${userDetails.imageUrl}`); // Debug log
             return {
               id: user.id,
               name: `${userDetails.firstName} ${userDetails.lastName}`,
-              avatar: userDetails.avatar || "/default-avatar.png",
+              profilePicture: userDetails.profilePicture, // Use profilePicture
               mutuals: mutualFriends,
               status: null,
+              imgError: false, // Initialize imgError
             };
           })
         );
@@ -108,7 +112,7 @@ export default function FriendSuggestionsPage() {
         activeStatus: "ACTIVE",
       };
 
-      const response = await FriendlistService.addFriendship(friendshipData);
+      await FriendlistService.addFriendship(friendshipData);
 
       setSuggestions(
         suggestions.map((s) => (s.id === id ? { ...s, status: "pending" } : s))
@@ -145,12 +149,31 @@ export default function FriendSuggestionsPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {suggestions.map((suggestion) => (
                 <div key={suggestion.id} className="bg-gray-50 p-4 rounded-lg shadow">
-                  <img
-                    src={suggestion.avatar}
-                    alt={suggestion.name}
-                    className="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-blue-500"
-                  />
-                  <h3 className="text-center font-medium">{suggestion.name}</h3>
+                  <div
+                    className="cursor-pointer flex flex-col items-center"
+                    onClick={() => {
+                      console.log(`Navigating to profile with ID: ${suggestion.id}`);
+                      navigate(`/profile/${suggestion.id}`);
+                    }}
+                  >
+                    {suggestion.profilePicture && !suggestion.imgError ? (
+                      <img
+                        src={suggestion.profilePicture}
+                        alt={suggestion.name}
+                        className="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-blue-500 object-cover"
+                        onError={() =>
+                          setSuggestions((prev) =>
+                            prev.map((s) =>
+                              s.id === suggestion.id ? { ...s, imgError: true } : s
+                            )
+                          )
+                        }
+                      />
+                    ) : (
+                      <FaUserCircle className="w-20 h-20 text-gray-400 mb-3" />
+                    )}
+                    <h3 className="text-center font-medium">{suggestion.name}</h3>
+                  </div>
                   <p className="text-center text-sm text-gray-500 mb-3">
                     {suggestion.mutuals} bạn chung
                   </p>
