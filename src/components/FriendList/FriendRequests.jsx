@@ -3,154 +3,145 @@ import { FaUserCheck, FaTimes } from "react-icons/fa";
 import { message } from "antd";
 import Sidebar from "./Sidebar";
 import * as FriendlistService from "../../services/FriendlistService";
-import { getUserById } from "../../services/UserService";
+import { getUserById } from "../../services/userService";
 
 export default function FriendRequestsPage() {
-    const [requests, setRequests] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const currentUserId = localStorage.getItem("userId");
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const currentUserId = localStorage.getItem("userId");
 
-    useEffect(() => {
-        const fetchRequests = async () => {
-            if (!currentUserId) {
-                message.error("Vui lòng đăng nhập để xem lời mời kết bạn");
-                setLoading(false);
-                return;
-            }
+  useEffect(() => {
+    const fetchRequests = async () => {
+      if (!currentUserId) {
+        message.error("Vui lòng đăng nhập để xem lời mời kết bạn");
+        setLoading(false);
+        return;
+      }
 
-            try {
-                setLoading(true);
-                const pendingRequests = await FriendlistService.getPendingRequests(currentUserId);
-                console.log("Pending Requests:", pendingRequests);
+      try {
+        setLoading(true);
+        const pendingRequests = await FriendlistService.getPendingRequests(currentUserId);
 
-                const requestsWithDetails = await Promise.all(
-                    pendingRequests.map(async (request) => {
-                        const senderId = request.user1.id === currentUserId ? request.user2.id : request.user1.id;
-                        const user = await getUserById(senderId);
-                        console.log(`User Details for ${senderId}:`, user);
-                        return {
-                            id: request.id,
-                            name: `${user.firstName} ${user.lastName}`,
-                            avatar: user.avatar || "/default-avatar.png",
-                            mutuals: user.mutualFriends || 0,
-                            // Lưu toàn bộ thông tin friendship để sử dụng khi cập nhật
-                            friendshipData: {
-                                id: request.id,
-                                user1: request.user1,
-                                user2: request.user2,
-                                createdAt: request.createdAt,
-                                activeStatus: request.activeStatus || "ACTIVE"
-                            }
-                        };
-                    })
-                );
-
-                console.log("Requests with Details:", requestsWithDetails);
-                setRequests(requestsWithDetails);
-            } catch (error) {
-                console.error("Không thể tải lời mời kết bạn:", error);
-                message.error("Không thể tải lời mời kết bạn. Vui lòng thử lại sau.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchRequests();
-    }, [currentUserId]);
-
-    const handleAccept = async (id) => {
-        try {
-            // Tìm request tương ứng để lấy thông tin friendship đã lưu
-            const request = requests.find(req => req.id === id);
-            if (!request) {
-                throw new Error("Không tìm thấy lời mời kết bạn");
-            }
-
-            // Cập nhật chỉ trường type, giữ nguyên các trường khác
-            const friendshipData = {
-                ...request.friendshipData,
-                type: "ACCEPTED"
+        const requestsWithDetails = await Promise.all(
+          pendingRequests.map(async (request) => {
+            const senderId = request.user1.id; // user1 là người gửi lời mời
+            const user = await getUserById(senderId);
+            return {
+              id: request.id,
+              name: `${user.firstName} ${user.lastName}`,
+              avatar: user.avatar || "/default-avatar.png",
+              mutuals: user.mutualFriends || 0,
+              friendshipData: {
+                id: request.id,
+                user1: request.user1,
+                user2: request.user2,
+                type: request.type,
+                createdAt: request.createdAt,
+                activeStatus: request.activeStatus || "ACTIVE",
+              },
             };
-            console.log("Accepting Friendship:", friendshipData);
+          })
+        );
 
-            await FriendlistService.updateFriendship(friendshipData);
-            
-            setRequests(prev => prev.filter(req => req.id !== id));
-            message.success("Đã chấp nhận lời mời kết bạn");
-        } catch (error) {
-            console.error("Lỗi khi chấp nhận lời mời:", error);
-            message.error("Không thể chấp nhận lời mời. Vui lòng thử lại.");
-        }
+        setRequests(requestsWithDetails);
+      } catch (error) {
+        console.error("Không thể tải lời mời kết bạn:", error);
+        message.error("Không thể tải lời mời kết bạn. Vui lòng thử lại sau.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleDecline = async (id) => {
-        try {
-            // Tìm request tương ứng để lấy thông tin friendship đã lưu
-            const request = requests.find(req => req.id === id);
-            if (!request) {
-                throw new Error("Không tìm thấy lời mời kết bạn");
-            }
+    fetchRequests();
+  }, [currentUserId]);
 
-            // Cập nhật chỉ trường type, giữ nguyên các trường khác
-            const friendshipData = {
-                ...request.friendshipData,
-                type: "REJECTED" // Giả định backend chấp nhận trạng thái "REJECTED"
-            };
-            console.log("Declining Friendship:", friendshipData);
+  const handleAccept = async (id) => {
+    try {
+      const request = requests.find((req) => req.id === id);
+      if (!request) {
+        throw new Error("Không tìm thấy lời mời kết bạn");
+      }
 
-            await FriendlistService.updateFriendship(friendshipData);
-            
-            setRequests(prev => prev.filter(req => req.id !== id));
-            message.success("Đã từ chối lời mời kết bạn");
-        } catch (error) {
-            console.error("Lỗi khi từ chối lời mời:", error);
-            message.error("Không thể từ chối lời mời. Vui lòng thử lại.");
-        }
-    };
+      const friendshipData = {
+        ...request.friendshipData,
+        type: "ACCEPTED",
+      };
 
-    return (
-        <div className="flex min-h-screen bg-gray-50">
-            <Sidebar />
-            <div className="flex-1 p-6">
-                <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-                    <h2 className="text-xl font-bold mb-4">Lời mời kết bạn ({requests.length})</h2>
-                    {loading ? (
-                        <p className="text-gray-500 text-center py-4">Đang tải...</p>
-                    ) : requests.length === 0 ? (
-                        <p className="text-gray-500 text-center py-4">Không có lời mời nào</p>
-                    ) : (
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {requests.map((request) => (
-                                <div key={request.id} className="bg-gray-50 p-4 rounded-lg shadow">
-                                    <img
-                                        src={request.avatar}
-                                        alt={request.name}
-                                        className="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-blue-500"
-                                    />
-                                    <h3 className="text-center font-medium">{request.name}</h3>
-                                    <p className="text-center text-sm text-gray-500 mb-3">
-                                        {request.mutuals} bạn chung
-                                    </p>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => handleAccept(request.id)}
-                                            className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition flex items-center justify-center gap-2"
-                                        >
-                                            <FaUserCheck /> Xác nhận
-                                        </button>
-                                        <button
-                                            onClick={() => handleDecline(request.id)}
-                                            className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300 transition flex items-center justify-center gap-2"
-                                        >
-                                            <FaTimes /> Xóa
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+      await FriendlistService.updateFriendship(friendshipData);
+
+      setRequests((prev) => prev.filter((req) => req.id !== id));
+      message.success("Đã chấp nhận lời mời kết bạn");
+    } catch (error) {
+      console.error("Lỗi khi chấp nhận lời mời:", error);
+      message.error(error.message || "Không thể chấp nhận lời mời. Vui lòng thử lại.");
+    }
+  };
+
+  const handleDecline = async (id) => {
+    try {
+      const request = requests.find((req) => req.id === id);
+      if (!request) {
+        throw new Error("Không tìm thấy lời mời kết bạn");
+      }
+
+      const friendshipData = {
+        ...request.friendshipData,
+        type: "REJECTED",
+      };
+
+      await FriendlistService.updateFriendship(friendshipData);
+
+      setRequests((prev) => prev.filter((req) => req.id !== id));
+      message.success("Đã từ chối lời mời kết bạn");
+    } catch (error) {
+      console.error("Lỗi khi từ chối lời mời:", error);
+      message.error(error.message || "Không thể từ chối lời mời. Vui lòng thử lại.");
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
+      <div className="flex-1 p-6">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+          <h2 className="text-xl font-bold mb-4">Lời mời kết bạn ({requests.length})</h2>
+          {loading ? (
+            <p className="text-gray-500 text-center py-4">Đang tải...</p>
+          ) : requests.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">Không có lời mời nào</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {requests.map((request) => (
+                <div key={request.id} className="bg-gray-50 p-4 rounded-lg shadow">
+                  <img
+                    src={request.avatar}
+                    alt={request.name}
+                    className="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-blue-500"
+                  />
+                  <h3 className="text-center font-medium">{request.name}</h3>
+                  <p className="text-center text-sm text-gray-500 mb-3">
+                    {request.mutuals} bạn chung
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleAccept(request.id)}
+                      className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition flex items-center justify-center gap-2"
+                    >
+                      <FaUserCheck /> Xác nhận
+                    </button>
+                    <button
+                      onClick={() => handleDecline(request.id)}
+                      className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300 transition flex items-center justify-center gap-2"
+                    >
+                      <FaTimes /> Xóa
+                    </button>
+                  </div>
                 </div>
+              ))}
             </div>
+          )}
         </div>
-    );
+      </div>
+    </div>
+  );
 }
