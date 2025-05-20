@@ -299,7 +299,7 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
 
   return (
     <div className="space-y-4">
-      <div className="bg-white shadow-md p-4 rounded-md text-gray-700 mb-3 flex flex-col cursor-pointer">
+      <div className="bg-white shadow-md p-4 rounded-md text-gray-700 mb-3 flex flex-col gap-3 cursor-pointer">
         <div className="w-full h-10 flex items-center gap-2" onClick={() => navigate(`/profile/${post.userId.id}`)}>
           {post.userId?.profilePicture ? (
             <img src={post.userId.profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover" />

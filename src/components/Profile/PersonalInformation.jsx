@@ -6,6 +6,7 @@ import "swiper/css/navigation";
 import "../Css/customSwiper.css"; // Import file CSS tùy chỉnh
 import { div } from "framer-motion/client";
 import { FaUserCircle } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const user = {
     workAt: "HoChiMinh City",
@@ -27,6 +28,7 @@ const images = [
 export default function PersonalInformation({ isOwnProfile, user, listFriends }) {
     const [hidePrev, setHidePrev] = useState(true);
     const [hideNext, setHideNext] = useState(false);
+      const navigate = useNavigate();
     
     // useEffect(() => {
     //     // Khi Swiper mount xong, kiểm tra trạng thái next/prev
@@ -75,7 +77,7 @@ export default function PersonalInformation({ isOwnProfile, user, listFriends })
                 <div className="grid grid-cols-3 gap-3">
                     
                     {listFriends.slice(0, 7).map(e => (
-                        <div className="p-1 flex flex-col gap-1 shadow rounded">
+                        <div className="p-1 flex flex-col gap-1 shadow rounded" onClick={() => navigate(`/profile/${e.id}`)}>
                             {e.imageUrl!=null ? (
                                 <img
                                     src={e.imageUrl}

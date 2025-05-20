@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import ReactionPopup from "./ReactionPopup";
 import { toast } from "react-toastify";
 import React from 'react';
+
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data'; 
 export default function PostItem({ post,reactionByPost, reactionByUser, controlReactionUser, isOwnProfile, onShare, user, controlActiveStatusPost, users }) {
@@ -33,7 +34,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
   const [replyInputs, setReplyInputs] = useState({}); // State để quản lý input reply
   const [reactionPopups, setReactionPopups] = useState({}); // State để quản lý popup reaction
   const userid = localStorage.getItem('userId');
-
+  const navigate = useNavigate();
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isModalOpen) {
@@ -402,6 +403,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
             navigate(`/profile/${post.userId.id}`);
           }}
         >
+        <div  className="w-full h-10 flex items-center gap-2 cursor-pointer" onClick={() => navigate(`/profile/${originalPost?.userId.id}`)}>
           {post.userId.profilePicture != null ? (
             <img src={post.userId.profilePicture} alt="avatar" className="rounded-full w-10 h-10 object-cover cursor-pointer" />
           ) : (
@@ -411,6 +413,8 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
             <div className="font-bold text-[15px] cursor-pointer">{post.userId.firstName + " " + post.userId.lastName}</div>
             <div className="text-[13px] flex gap-1">{formatDateString(post.createdAt)} <FaGlobe className="-top-[-3px] relative" /></div>
           </div>
+        </div>
+          
           <button className="ml-auto hover:bg-gray-200 p-2 rounded-full transition-all text-gray-300">
             <FaEllipsisH className="w-4 h-4" onClick={() => handleClickActivePost(post)} />
           </button>
