@@ -7,34 +7,29 @@ import {
   FaUserCircle,
   FaSignOutAlt,
   FaCog,
-
   FaHome,
   FaUsers,
   FaTv,
   FaStore,
   FaMagento,
-
 } from "react-icons/fa";
-
 import { handleLogout } from "../utils/auth";
-
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import MessagePopup from "./Message/MessagePopup";
-
 import useFetchUserFriends from "../utils/useFetchUserFriends";
 import MessagePanel from "./Message/MessagePanel";
 import { getLastMessage } from "../services/MessageService";
 import { useStomp } from "../contexts/StompContext";
 import { useFetchUserById } from "../utils/useFetchUser";
+import NotificationPopup from "./Notification/NotificationPopup";
 
 export default function Header() {
   const navigate = useNavigate();
   const { disconnect } = useStomp();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showMessagePopup, setShowMessagePopup] = useState(false);
-
+  const [notifications, setNotifications] = useState([]); // Lưu trữ thông báo
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
 
@@ -44,15 +39,8 @@ export default function Header() {
 
   const userId = localStorage.getItem("userId");
   const { user, loading, error } = useFetchUserById(userId);
-
-  // console.log(user);
-  const notifications = [
-    
-  ];
-
-
   const friendList = useFetchUserFriends().friends || [];
-  const unreadCount = notifications.length;
+  const unreadCount = notifications.filter((noti) => !noti.isRead).length;
 
   const [chatList, setChatList] = useState([]);
 
@@ -72,7 +60,6 @@ export default function Header() {
     }
   }, [friendList]);
 
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -86,10 +73,8 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
   const handleNotificationClick = () => {
     setShowNotifications(!showNotifications);
-    setIsRead(true);
   };
 
   const onLogout = () => {
@@ -107,7 +92,6 @@ export default function Header() {
 
   const handleCloseChat = (id) => {
     setOpenChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
-
   };
 
   return (
@@ -126,7 +110,6 @@ export default function Header() {
           />
         </div>
       </div>
-
 
       {/* Middle: Navigation icons */}
       <div className="flex gap-8 items-center">
@@ -162,13 +145,10 @@ export default function Header() {
         </Link>
       </div>
 
-
-
       <div className="flex gap-4 items-center relative">
         <button onClick={() => navigate("/friends")} className="p-2 rounded-full hover:bg-gray-100">
           <FaUserFriends className="text-xl text-gray-700" />
         </button>
-
 
         {location.pathname !== "/messages" && (
           <div className="relative">
@@ -187,13 +167,10 @@ export default function Header() {
               <MessagePanel friend={friend} onClose={() => handleCloseChat(friend.id)} />
             </div>
           ))}
-
         </div>
 
         <div className="relative" ref={notificationRef}>
-
           <button onClick={handleNotificationClick} className="p-2 rounded-full hover:bg-gray-100 relative">
-
             <FaBell className="text-xl text-gray-700" />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center animate-shake">
@@ -203,19 +180,11 @@ export default function Header() {
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 top-12 w-64 bg-white shadow-lg rounded-xl border border-gray-200 z-50">
-              <h4 className="p-3 font-semibold text-gray-700 border-b">Thông báo</h4>
-              <ul className="max-h-64 overflow-y-auto">
-                {notifications.length > 0 ? notifications.map((noti, index) => (
-                  <li key={index} className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
-                    <div>{noti.message}</div>
-                    <div className="text-xs text-gray-400">{noti.time}</div>
-                  </li>
-                )) : <li><div className="text-s text-gray-400">Không có thông báo</div> </li>}
-              </ul>
-            </div>
+            <NotificationPopup
+              onClose={() => setShowNotifications(false)}
+              setNotifications={setNotifications} // Truyền hàm setNotifications
+            />
           )}
-
         </div>
 
         <div className="relative" ref={profileRef}>
@@ -229,7 +198,6 @@ export default function Header() {
           {showProfileMenu && (
             <div className="absolute right-0 top-12 w-48 bg-white shadow-lg rounded-xl border border-gray-200 z-50">
               <ul className="text-sm text-gray-700">
-
                 <li className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer" onClick={() => navigate("/profile/1")}>
                   <FaUserCircle /> Hồ sơ cá nhân
                 </li>
@@ -237,7 +205,6 @@ export default function Header() {
                   <FaCog /> Cài đặt
                 </li>
                 <li className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-500" onClick={onLogout}>
-
                   <FaSignOutAlt /> Đăng xuất
                 </li>
               </ul>
