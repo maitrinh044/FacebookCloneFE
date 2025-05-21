@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { getUserFriends } from "../services/UserService";
+import { getUserFriends } from "../services/userService";
+// import { getUserFriends } from "../services/UserService";
 
 export const useFetchUserFriends = () => {
     const [friends, setFriends] = useState([]);
