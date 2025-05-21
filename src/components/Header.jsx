@@ -137,12 +137,15 @@ export default function Header() {
         >
           <FaStore className="text-2xl" />
         </Link>
-        <Link
-          to="/admin"
-          className={`p-2 rounded-md ${location.pathname === "/admin" ? "text-blue-600 border-b-4 border-blue-600" : "text-gray-700 hover:bg-gray-100"}`}
-        >
-          <FaMagento className="text-2xl" />
-        </Link>
+        {user && user.role && user.role.id === 1 && (
+          <Link
+            to="/admin"
+            className={`p-2 rounded-md ${location.pathname === "/admin" ? "text-blue-600 border-b-4 border-blue-600" : "text-gray-700 hover:bg-gray-100"}`}
+          >
+            <FaMagento className="text-2xl" />
+          </Link>
+        )}
+        
       </div>
 
       <div className="flex gap-4 items-center relative">
