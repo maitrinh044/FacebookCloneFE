@@ -68,7 +68,12 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
         setReactionTypes(types);
 
         const data = await getTop3Reaction('POST', post.id);
-        setTop3Reaction(data);
+        if (Array.isArray(data)) {
+            setTop3Reaction(data);
+        } else {
+            setTop3Reaction([]); // Hoặc thiết lập giá trị mặc định khác
+        }
+        // setTop3Reaction(data);
         const data2 = await getCountSharePost(post.id);
         setCountShare(data2);
         setLoading(false);

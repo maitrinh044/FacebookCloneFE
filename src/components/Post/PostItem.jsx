@@ -81,7 +81,12 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
         setCommentByPost(commentsWithReplies);
 
         const data = await getTop3Reaction('POST', post.id);
-        setTop3Reaction(data);
+        // setTop3Reaction(data);
+        if (Array.isArray(data)) {
+            setTop3Reaction(data);
+        } else {
+            setTop3Reaction([]); // Hoặc thiết lập giá trị mặc định khác
+        }
         // Lấy số lượng phản ứng
         // const count = await countReactions("POST", post.id);
         // setLikeCount(count);
