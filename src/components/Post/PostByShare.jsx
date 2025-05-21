@@ -6,7 +6,7 @@ import { FaComment, FaEllipsisH, FaFacebookMessenger, FaGlobe, FaShare, FaThumbs
 import SharePost from "./SharePost";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage, faPaperPlane, faSmile } from "@fortawesome/free-solid-svg-icons";
-import { getPostById } from "../../services/PostService";
+import { getCountSharePost, getPostById } from "../../services/PostService";
 import { useNavigate } from "react-router-dom";
 import ReactionPopup from "./ReactionPopup";
 import { toast } from "react-toastify";
@@ -30,6 +30,7 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
   const navigate = useNavigate();
   const userid = localStorage.getItem('userId');
   const [top3Reaction, setTop3Reaction] = useState([]);
+  const [countShare, setCountShare] = useState(0);
 
   useEffect(() => {
     if (!post?.originalPostId) return;
@@ -68,7 +69,8 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
 
         const data = await getTop3Reaction('POST', post.id);
         setTop3Reaction(data);
-
+        const data2 = await getCountSharePost(post.id);
+        setCountShare(data2);
         setLoading(false);
       } catch (err) {
         setError("Không thể tải dữ liệu");
@@ -392,7 +394,9 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
               {commentByPost.length || 0}
             </div>
             <div className="flex gap-1">
+    
               <FaShare className="relative top-[3px] text-gray-300" />
+              {countShare.count || 0}
             </div>
           </div>
         </div>

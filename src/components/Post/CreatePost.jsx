@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import React from 'react';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data'; 
+import { imageAnalysisForCreateCaptionOfPost } from "../../services/PostService";
 
 
 export default function CreatePost({ onPostCreated, currentUser }) {
@@ -18,19 +19,39 @@ export default function CreatePost({ onPostCreated, currentUser }) {
   const handleEmojiSelect = (emoji) => {
     setPostContent((prev) => prev + emoji.native);
   };
-  console.log('data: ', data);
 
+  // const handleImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setSelectedImage(file);
+  //     const reader = new FileReader();
+  //     reader.onloadend = async() => {
+  //       setImagePreview(reader.result);
+  //       if (imagePreview) {
+  //         const urlImage = await uploadMedia(avatarFile, user.id);
+  //         setProfilePicture(urlImage.url); // cập nhật URL thực
+  //         const caption = await imageAnalysisForCreateCaptionOfPost(urlImage.url);
+  //         setPostContent(caption);
+  //       }
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+        setSelectedImage(file);
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            setImagePreview(reader.result);
+            // Tải lên ảnh và phân tích
+            const urlImage = await uploadMedia(file, currentUser.id); // Sử dụng file thay vì selectedImage
+            const caption = await imageAnalysisForCreateCaptionOfPost(urlImage.url);
+            setPostContent(caption); // Cập nhật nội dung bài viết
+        };
+        reader.readAsDataURL(file);
     }
-  };
+};
   const handleRemoveImage = () => {
     setSelectedImage(null);
     setImagePreview("");

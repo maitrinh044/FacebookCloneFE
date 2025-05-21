@@ -13,6 +13,7 @@ import React from 'react';
 
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data'; 
+import { getCountSharePost } from "../../services/PostService";
 export default function PostItem({ post,reactionByPost, reactionByUser, controlReactionUser, isOwnProfile, onShare, user, controlActiveStatusPost, users }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -26,6 +27,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [countShare, setCountShare] = useState(0);
   // const [reactionByPost, setReactionByPost] = useState([]);
   const [commentByPost, setCommentByPost] = useState([]);
   // const [reactionByUser, setReactionByUser] = useState([]);
@@ -97,12 +99,8 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
         const types = await getReactionTypes();
         setReactionTypes(types);
 
-        // Lấy reactions của user và post
-        // const tmp1 = await getReactionsByUserId(userid);
-        // setReactionByUser(tmp1);
-
-        // const tmp2 = await getReactionByPostId(post.id);
-        // setReactionByPost(tmp2);
+        const data2 = await getCountSharePost(post.id);
+        setCountShare(data2);
 
         const tmp3 = await getCommentByPost(post.id);
         setCommentByPost(tmp3);
@@ -118,7 +116,8 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
     fetchData();
   }, [post.id, userId]);
 
-  console.log('top3Reaction in ' + post.id, top3Reaction);
+  // console.log('top3Reaction in ' + post.id, top3Reaction);
+  // console.log('countShare of postId = ' + post.id, countShare.count)
 
   function getReactionByUserIdAndPost(postid) {
     const reaction = reactionByUser.find(e => e.targetId === postid && e.targetType === "POST");
@@ -480,7 +479,9 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
               {commentByPost.length || 0}
             </div>
             <div className="flex gap-1">
+              
               <FaShare className="relative top-[3px] text-gray-300" />
+              {countShare.count || 0}
             </div>
           </div>
         </div>
@@ -508,7 +509,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
                   {reactionTypes.map(e => (
                     <span key={e.id}
                       id={e.id}
-                      className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
+                      className="cursor-pointer p-2 rounded-full hover:bg-gray-200 hover:scale-125 transition-transform duration-200"
                       onClick={() => controlReactionUser(userIdCurrent, 'POST', post.id, e.id)}>{e.emoji}</span>
                   ))}
                 </div>

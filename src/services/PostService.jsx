@@ -144,3 +144,21 @@ export const getFriendPosts = async (userId) => {
     throw error;
   }
 }
+export const getCountSharePost = async (postId) => {
+  try {
+    const response = await axiosClient.get(`/posts/getCountSharePost/${postId}`);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API getCountSharePost:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+export const imageAnalysisForCreateCaptionOfPost = async(imageUrl) => {
+  try {
+    const response = await axiosClient.get(`/posts/imageAnalysis?imageUrl=${imageUrl}`);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API getCountSharePost:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
