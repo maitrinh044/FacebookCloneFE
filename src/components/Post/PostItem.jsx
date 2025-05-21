@@ -3,7 +3,7 @@ import { FaThumbsUp, FaRegCommentDots, FaShare, FaUserCircle, FaEllipsisH, FaGlo
 import SharePost from "./SharePost";
 import { getCommentsByPost, createComment, getReplies, createReply } from "../../services/CommentService";
 import { toggleReaction, countReactions, getReactionTypes, getReactions, getReactionCountsByType } from "../../services/ReactionService";
-import { addComment, controlReaction, getCommentByPost, getReactionByPostId, getReactionsByUserId } from "../../services/profileService";
+import { addComment, controlReaction, getCommentByPost, getReactionByPostId, getReactionsByUserId, getTop3Reaction } from "../../services/profileService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faIcons, faPaperPlane, faSmile } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
@@ -35,6 +35,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
   const [reactionPopups, setReactionPopups] = useState({}); // State để quản lý popup reaction
   const userid = localStorage.getItem('userId');
   const navigate = useNavigate();
+  const [top3Reaction, setTop3Reaction] = useState([]);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isModalOpen) {
@@ -77,6 +78,8 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
         setComments(commentsWithReplies);
         setCommentByPost(commentsWithReplies);
 
+        const data = await getTop3Reaction('POST', post.id);
+        setTop3Reaction(data);
         // Lấy số lượng phản ứng
         const count = await countReactions("POST", post.id);
         setLikeCount(count);
@@ -114,6 +117,8 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
 
     fetchData();
   }, [post.id, userId]);
+
+  console.log('top3Reaction in ' + post.id, top3Reaction);
 
   function getReactionByUserIdAndPost(postid) {
     const reaction = reactionByUser.find(e => e.targetId === postid && e.targetType === "POST");
@@ -296,7 +301,14 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
     const seconds = String(date.getSeconds()).padStart(2, '0');
     return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
   }
-
+  const reactionMap = {
+      LIKE: { emoji: "👍", label: "Thích" },
+      LOVE: { emoji: "❤️", label: "Yêu thích" },
+      HAHA: { emoji: "😆", label: "Haha" },
+      WOW: { emoji: "😮", label: "Wow" },
+      SAD: { emoji: "😢", label: "Buồn" },
+      ANGRY: { emoji: "😡", label: "Phẫn nộ" },
+  };
   const renderComments = (comments, level = 0) => {
     return comments.map((cmt, cmtIndex) => (
       <div key={cmtIndex} className={`flex gap-3 p-2 hover:bg-gray-50 rounded-lg ${level > 0 ? 'ml-8' : ''}`}>
@@ -437,16 +449,38 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
         )}
         <div className="flex justify-between items-center p-2">
           <div className="flex gap-1">
-            <FaThumbsUp className="relative top-[3px]" />
+            {/* <FaThumbsUp className="relative top-[3px]" /> */}
+            <div className="flex items-center bg-white rounded-xl">
+              {top3Reaction.length === 0 ? (  // Sửa điều kiện kiểm tra
+                  <div className="flex items-center">
+                      {reactionMap['LIKE'].emoji}
+                  </div>
+              ) : (
+                  <div className="flex items-center bg-white rounded-xl">
+                      {top3Reaction.map(e => (
+                          <div className="rounded-full border-3 border-white object-cover -ml-2 text-gray-400" key={e.reactionType}>
+                              {reactionMap[e.reactionType] ? (
+                                  <span>
+                                      {reactionMap[e.reactionType].emoji}
+                                  </span>
+                              ) : (
+                                  <span>Không xác định</span>
+                              )}
+                          </div>
+                      ))}
+                  </div>
+              )}
+              
+            </div>
             {reactionByPost.length || 0}
           </div>
           <div className="flex gap-2">
             <div className="flex gap-1">
-              <FaFacebookMessenger className="relative top-[3px]" />
+              <FaFacebookMessenger className="relative top-[3px] text-gray-300" />
               {commentByPost.length || 0}
             </div>
             <div className="flex gap-1">
-              <FaShare className="relative top-[3px]" />
+              <FaShare className="relative top-[3px] text-gray-300" />
             </div>
           </div>
         </div>
@@ -462,7 +496,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
                 </div>
               ) : (
                 <div className="flex flex-row gap-2">
-                  <FaThumbsUp className="w-5 h-5" /> Thích
+                  <FaThumbsUp className="w-5 h-5 text-gray-300" /> Thích
                 </div>
               )}
             </div>
@@ -482,10 +516,10 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
             )}
           </div>
           <button className="flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all" onClick={() => openModal(post)}>
-            <FaComment className="w-5 h-5" /> Bình luận
+            <FaComment className="w-5 h-5 text-gray-300" /> Bình luận
           </button>
           <button onClick={() => setShowShareModal(true)} className="flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all">
-            <FaShare className="w-5 h-5" /> Chia sẻ
+            <FaShare className="w-5 h-5 text-gray-300" /> Chia sẻ
           </button>
         </div>
       </div>
@@ -521,16 +555,16 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
               {/* ... */}
               <div className="flex justify-between items-center p-2">
                 <div className="flex gap-1">
-                  <FaThumbsUp className="relative top-[3px]" />
+                  <FaThumbsUp className="relative top-[3px] text-gray-300" />
                   {reactionByPost.length || 0}
                 </div>
                 <div className="flex gap-2">
                   <div className="flex gap-1">
-                    <FaFacebookMessenger className="relative top-[3px]" />
+                    <FaFacebookMessenger className="relative top-[3px] text-gray-300" />
                     {commentByPost.length || 0}
                   </div>
                   <div className="flex gap-1">
-                    <FaShare className="relative top-[3px]" />
+                    <FaShare className="relative top-[3px] text-gray-300" />
                   </div>
                 </div>
               </div>
@@ -546,7 +580,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
                       </div>
                     ) : (
                       <div className="flex flex-row gap-2">
-                        <FaThumbsUp className="w-5 h-5" /> Thích
+                        <FaThumbsUp className="w-5 h-5 text-gray-300" /> Thích
                       </div>
                     )}
                   </div>
@@ -567,10 +601,10 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
                   )}
                 </div>
                 <button className="flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all">
-                  <FaComment className="w-5 h-5" /> Bình luận
+                  <FaComment className="w-5 h-5 text-gray-300" /> Bình luận
                 </button>
                 <button className="flex-1 rounded-md flex justify-center items-center gap-2 text-gray-600 hover:text-blue-500 py-2 hover:bg-gray-200 transition-all">
-                  <FaShare className="w-5 h-5 rounded-md" /> Chia sẻ
+                  <FaShare className="w-5 h-5 rounded-md text-gray-300" /> Chia sẻ
                 </button>
               </div>
 

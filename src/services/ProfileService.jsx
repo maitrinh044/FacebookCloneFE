@@ -119,3 +119,15 @@ export const update = async (user) => {
     throw error;
   }
 };
+export const getTop3Reaction = async (targetType, targetId) => {
+  try {
+    const response = await axiosClient.get(
+      `/reactions/top3Reaction?targetType=${targetType}&targetId=${targetId}`
+    );
+  //   console.log("response getCommentByPost: ", response.data?.data);
+    return response.data?.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API top3Reaction:", error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
