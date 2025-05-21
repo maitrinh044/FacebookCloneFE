@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "../utils/axiosClient";
@@ -10,9 +11,9 @@ export default function RegisterPage() {
   const [gender, setGender] = useState("");
   const [customGender, setCustomGender] = useState("");
   const [dob, setDob] = useState({ day: "", month: "", year: "" });
+  const [errorMessage, setErrorMessage] = useState(""); // Trạng thái để lưu thông báo lỗi
   const navigate = useNavigate();
 
-  // const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
   const months = [
     "01", "02", "03", "04", "05", "06",
@@ -20,47 +21,9 @@ export default function RegisterPage() {
   ];
   const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
 
-  // const handleRegister = (e) => {
-  //   e.preventDefault();
-  
-  //   // Kiểm tra xem các trường có hợp lệ không
-  //   // if (!firstName || !lastName || !email || !password || !gender || !dob.day || !dob.month || !dob.year) {
-  //   //   alert("Vui lòng điền đầy đủ thông tin.");
-  //   //   return;
-  //   // }
-  
-  //   // Tạo đối tượng user từ dữ liệu người dùng
-  //   const gd = null;
-  //   switch(gender) {
-  //     case 'Nam': gd = 'MALE'; break;
-  //     case 'Nữ' : gd = 'FEMALE'; break;
-  //     case 'Tuỳ chỉnh': gd = 'UNDEFINED'; break;
-  //     default:  break;
-  //   }
-  //   const userData = {
-  //     firstName,
-  //     lastName,
-  //     email,
-  //     password,
-  //     gd,
-  //     birthday: `${dob.year}-${dob.month}-${dob.day}`, // Chuẩn hóa ngày sinh
-  //   };
-  
-  //   // Gửi dữ liệu đến API sử dụng axiosClient
-  //   axiosClient
-  //     .post('/auth/register', userData)  // URL đã được cấu hình baseURL
-  //     .then((response) => {
-  //       alert("Đăng ký thành công!"); 
-  //       navigate("/login"); // Điều hướng tới trang đăng nhập
-  //     })
-  //     .catch((error) => {
-  //       alert("Đăng ký thất bại, vui lòng thử lại sau.");
-  //       console.error("Đăng ký thất bại: ", error);
-  //     });
-  // };
   const handleRegister = (e) => {
     e.preventDefault();
-  
+
     let gd = null;
     switch(gender) {
       case 'Nam': gd = 'MALE'; break;
@@ -74,11 +37,10 @@ export default function RegisterPage() {
       lastName,
       emailOrPhone: email,
       password,
-      gender: gd, // Đảm bảo rằng giá trị giới tính là hợp lệ
-      birthday: `${dob.year}-${dob.month}-${dob.day}`, // Chuẩn hóa ngày sinh
+      gender: gd,
+      birthday: `${dob.year}-${dob.month}-${dob.day}`,
     };
-    console.log("userData: ", userData);
-    // Gửi dữ liệu đến API sử dụng axiosClient
+
     axiosClient
       .post('/auth/register', userData)
       .then((response) => {
@@ -86,11 +48,15 @@ export default function RegisterPage() {
         navigate("/login");
       })
       .catch((error) => {
-        alert("Đăng ký thất bại, vui lòng thử lại sau.");
+        if (error.response && error.response.data) {
+          setErrorMessage(error.response.data.data || "Đăng ký thất bại, vui lòng thử lại sau.");
+        } else {
+          setErrorMessage("Đăng ký thất bại, vui lòng thử lại sau.");
+        }
         console.error("Đăng ký thất bại: ", error);
       });
-};
-  // console.log('gender: ', gender);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4">
       <h1 className="text-blue-600 text-5xl font-bold mb-6">facebook</h1>
@@ -98,6 +64,12 @@ export default function RegisterPage() {
       <div className="bg-white w-full max-w-md rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold text-center mb-1">Tạo tài khoản mới</h2>
         <p className="text-sm text-center text-gray-600 mb-4">Nhanh chóng và dễ dàng.</p>
+
+        {errorMessage && (
+          <div className="bg-red-100 text-red-700 p-2 rounded mb-4">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleRegister} className="space-y-3">
           <div className="flex gap-2">
@@ -107,7 +79,6 @@ export default function RegisterPage() {
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               className="w-1/2 border px-3 py-2 rounded-md text-sm"
-              
             />
             <input
               type="text"
@@ -115,7 +86,6 @@ export default function RegisterPage() {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               className="w-1/2 border px-3 py-2 rounded-md text-sm"
-              
             />
           </div>
 
@@ -124,7 +94,6 @@ export default function RegisterPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full border px-3 py-2 rounded-md text-sm"
-            
           />
 
           <input
@@ -133,7 +102,6 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full border px-3 py-2 rounded-md text-sm"
-            
           />
 
           <div>
@@ -143,7 +111,6 @@ export default function RegisterPage() {
                 value={dob.day}
                 onChange={(e) => setDob({ ...dob, day: e.target.value })}
                 className="w-1/3 border px-3 py-2 rounded-md text-sm"
-                
               >
                 <option value="">Ngày</option>
                 {days.map((d) => <option key={d}>{d}</option>)}
@@ -152,7 +119,6 @@ export default function RegisterPage() {
                 value={dob.month}
                 onChange={(e) => setDob({ ...dob, month: e.target.value })}
                 className="w-1/3 border px-3 py-2 rounded-md text-sm"
-                
               >
                 <option value="">Tháng</option>
                 {months.map((m, i) => <option key={i + 1}>{m}</option>)}
@@ -161,7 +127,6 @@ export default function RegisterPage() {
                 value={dob.year}
                 onChange={(e) => setDob({ ...dob, year: e.target.value })}
                 className="w-1/3 border px-3 py-2 rounded-md text-sm"
-                
               >
                 <option value="">Năm</option>
                 {years.map((y) => <option key={y}>{y}</option>)}
