@@ -13,9 +13,10 @@ import {
 import { useEffect, useState } from "react";
 import ProfileEditModal from "../Profile/EditProfileModal";
 import * as FriendlistService from "../../services/FriendlistService";
-import { getUserById } from "../../services/userService";
+import { getUserById } from "../../services/profileService";
+// import { getUserById } from "../../services/userService";
 
-export default function ProfileHeader({ user, isOwnProfile, onEdit, listFriends }) {
+export default function ProfileHeader({ user, isOwnProfile, onEdit, listFriends, onOpenChat }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [friendshipStatus, setFriendshipStatus] = useState(null); // null, 'PENDING', 'ACCEPTED', 'REJECTED'
   const [friendshipId, setFriendshipId] = useState(null);
@@ -225,11 +226,11 @@ export default function ProfileHeader({ user, isOwnProfile, onEdit, listFriends 
           )}
 
           {/* Nút chỉnh sửa hồ sơ */}
-          {isOwnProfile && (
+          {/* {isOwnProfile && (
             <div className="absolute bottom-4 right-4">
               <button className="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700 shadow-md">Chỉnh sửa ảnh bìa</button>
             </div>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -286,7 +287,7 @@ export default function ProfileHeader({ user, isOwnProfile, onEdit, listFriends 
               <div className="friend-button">
                 {renderFriendButton()}
               </div>
-              <button className="bg-gray-200 px-4 py-2 rounded-xl hover:bg-gray-300 text-sm shadow">
+              <button className="bg-gray-200 px-4 py-2 rounded-xl hover:bg-gray-300 text-sm shadow" onClick={() => onOpenChat(user)}>
                 Nhắn tin
               </button>
             </div>
@@ -295,9 +296,9 @@ export default function ProfileHeader({ user, isOwnProfile, onEdit, listFriends 
             <div className="w-32 flex-1 flex flex-col gap-5">
               <div className="flex flex-row-reverse">
                 <div className="flex gap-3 items-center">
-                  <button className="w-40 bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 text-sm shadow flex items-center justify-center gap-2">
+                  {/* <button className="w-40 bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 text-sm shadow flex items-center justify-center gap-2">
                     <FaPlus /> Thêm thông tin
-                  </button>
+                  </button> */}
                   <button className="text-bold bg-gray-200 px-4 py-2 rounded-xl hover:bg-gray-300 text-sm shadow flex items-center gap-2"
                     onClick={onEdit}
                   >

@@ -12,7 +12,7 @@ import { getPostByUser, getReactionByPostId, getReactionsByUserId } from "../ser
 import { controlReaction } from "../services/CommentService";
 import { createPost, shareToProfile } from "../services/PostService";
 
-export default function ProfilePage() {
+export default function ProfilePage({onOpenChat}) {
   const { id } = useParams();
   const currentUserId = localStorage.getItem("userId");
   const currentUserId2 = localStorage.getItem("userId");
@@ -156,6 +156,7 @@ export default function ProfilePage() {
       <Header />
       <div className="w-full min-h-screen mx-auto flex flex-col">
         <ProfileHeader
+          onOpenChat={onOpenChat}
           user={userData}
           isOwnProfile={id === currentUserId}
           onEdit={() => setIsModalOpen(true)}
