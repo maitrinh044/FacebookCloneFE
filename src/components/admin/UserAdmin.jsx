@@ -399,7 +399,7 @@ export default function ({}) {
                                     className="bg-blue-100 text-blue-700 font-semibold text-[17px] px-4 py-2 rounded-md hover:bg-blue-200"
                                     onClick={handleSave}
                                     >
-                                    Chỉnh sửa thông tin giới thiệu
+                                    Cập nhật
                                     </button>
                             </div>
                         </div>

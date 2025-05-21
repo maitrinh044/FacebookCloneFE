@@ -8,7 +8,7 @@ import EditProfileModal from "../components/Profile/EditProfileModal";
 import PersonalInformation from "../components/Profile/PersonalInformation";
 import useFetchProfile, { getReactionsByUser } from "../utils/userFetchProfile";
 import { useFetchUser, useFetchUserById } from "../utils/useFetchUser";
-import { getPostByUser, getReactionByPostId, getReactionsByUserId } from "../services/profileService";
+import { controlActiveStatus, getPostByUser, getReactionByPostId, getReactionsByUserId } from "../services/profileService";
 import { controlReaction } from "../services/CommentService";
 import { createPost, shareToProfile } from "../services/PostService";
 
@@ -45,8 +45,31 @@ export default function ProfilePage({onOpenChat}) {
     fetchData();
   },[]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const {userData,commentByPost,reactionTypes,listFriends,addCommentByUser,controlActiveStatusPost,updateUser,loading} = useFetchProfile(id, currentUserId2);
+  const {userData,commentByPost,reactionTypes,listFriends,addCommentByUser,updateUser,loading} = useFetchProfile(id, currentUserId2);
 
+  const controlActiveStatusPost = async (userId, postId) => {
+      try {
+        const response = await controlActiveStatus(postId);
+  
+        const data = await getReactionsByUserId(userId);
+        setReactionByUser(data);
+        const updatedComments = await getPostByUser(userId);
+        const tmp2 = await getReactionsByUserId(userId); // Lấy người dùng bằng ID
+        setReactionByUser(tmp2);
+        const reactionPromises = updatedComments.map(post1 => {
+            return getReactionByPostId(post1.id).then(reactions => ({
+                postId: post1.id,
+                reactions
+            }));
+        });
+        // Chờ cho tất cả các yêu cầu reactions hoàn thành
+        const tmp1 = await Promise.all(reactionPromises);
+        setReactionByPost(tmp1);
+        setListPost(updatedComments);
+      } catch (error) {
+        console.error("Lỗi khi điều chỉnh bài viết:", error);
+      }
+    }
   const controlReactionUser = async (userId, targetType, targetId, reactionType) => {
     try {
       const newReaction = await controlReaction(userId, targetType, targetId, reactionType);
@@ -143,6 +166,7 @@ export default function ProfilePage({onOpenChat}) {
       [id]: updatedUser,
     }));
   };
+  
   useEffect(() => {
     if (showEdit) {
       document.body.classList.add("overflow-hidden");
