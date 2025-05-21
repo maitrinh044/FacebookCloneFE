@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getUserById } from "../services/profileService";
+import { getUser } from "../services/UserService";
 export const useFetchUser = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);

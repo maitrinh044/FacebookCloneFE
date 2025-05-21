@@ -83,13 +83,13 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
         const data = await getTop3Reaction('POST', post.id);
         setTop3Reaction(data);
         // Lấy số lượng phản ứng
-        const count = await countReactions("POST", post.id);
-        setLikeCount(count);
+        // const count = await countReactions("POST", post.id);
+        // setLikeCount(count);
 
         // Lấy phản ứng của người dùng hiện tại
-        const userReaction = await getReactions("POST", post.id, userId);
-        setSelectedReaction(userReaction || null);
-        setIsLiked(!!userReaction);
+        // const userReaction = await getReactions("POST", post.id, userId);
+        // setSelectedReaction(userReaction || null);
+        // setIsLiked(!!userReaction);
 
         // Lấy số lượng phản ứng theo loại
         const counts = await getReactionCountsByType("POST", post.id);
@@ -593,7 +593,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
                         {reactionTypes.map(e => (
                           <span key={e.id}
                             id={e.id}
-                            className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
+                            className="cursor-pointer p-2 rounded-full hover:bg-gray-200 hover:scale-125 transition-transform duration-200"
                             onClick={() => controlReactionUser(userIdCurrent, 'POST', selectedPost.id, e.id)}
                           >{e.emoji}</span>
                         ))}
@@ -637,21 +637,7 @@ export default function PostItem({ post,reactionByPost, reactionByUser, controlR
                     placeholder={`Bình luận dưới tên ${user.firstName} ${user.lastName}`}
                   />
                 </div>
-                
-                {/* <div className="relative ">
-                
-                  <button
-                    onClick={() => setShowPicker(!showPicker)}
-                    className="p-2 text-yellow-300 hover:bg-blue-50 rounded-full transition-colors"
-                  >
-                    <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
-                  </button>
-                  {showPicker && (
-                    <div className="absolute ">
-                      <Picker data={data} onEmojiSelect={handleEmojiSelect} locale="vi" />
-                    </div>
-                  )}
-                </div> */}
+
                 <div className="relative">
                   <button
                     onClick={() => setShowPicker(!showPicker)}

@@ -88,10 +88,10 @@ export default function ProfilePage() {
   // console.log('reactionByUser: ', reactionByUser);
   const {users, error} = useFetchUser();
   // console.log("users: ", users);
-  function getUserById(userId) {
-    const user = users.find(e => e.id === userId);
-    return user || [];
-  }
+  // function getUserById(userId) {
+  //   const user = users.find(e => e.id === userId);
+  //   return user || [];
+  // }
   const share = async(userId, postId, caption)=> {
     try {
       const response = await shareToProfile(userId, postId, caption);

@@ -415,7 +415,7 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
                 onMouseEnter={() => handleMouseEnter(post.id)} onMouseLeave={handleMouseLeave}>
                 <div className="flex space-x-2">
                   {reactionTypes.map(e => (
-                    <span key={e.id} id={e.id} className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
+                    <span key={e.id} id={e.id} className="cursor-pointer p-2 rounded-full hover:bg-gray-200 hover:scale-125 transition-transform duration-200"
                       onClick={() => controlReactionUser(userid, 'POST', post.id, e.id)}>{e.emoji}</span>
                   ))}
                 </div>
@@ -493,7 +493,7 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
                       onMouseEnter={() => handleMouseEnter(selectedPost.id)} onMouseLeave={handleMouseLeave}>
                       <div className="flex space-x-2">
                         {reactionTypes.map(e => (
-                          <span key={e.id} id={e.id} className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
+                          <span key={e.id} id={e.id} className="cursor-pointer p-2 rounded-full hover:bg-gray-200 hover:scale-125 transition-transform duration-200"
                             onClick={() => controlReactionUser(userid, 'POST', selectedPost.id, e.id)}>{e.emoji}</span>
                         ))}
                       </div>
