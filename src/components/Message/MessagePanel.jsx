@@ -13,6 +13,7 @@ import {
   FaExpand,
   FaPhone,
   FaVideo,
+  FaUserCircle,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import CallModal from "../Message/CallModal";
@@ -84,11 +85,15 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
           <div className="bg-blue-600 text-white px-4 py-3 flex justify-between items-center">
             <div className="flex items-center gap-2">
               <div className="relative">
-                <img
-                  src={friend.profilePicture}
-                  alt="avatar"
-                  className="w-8 h-8 rounded-full border-2 border-white"
-                />
+                {friend.profilePicture != null ? (
+                  <img
+                    src={friend.profilePicture}
+                    alt="avatar"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaUserCircle className="w-10 h-10 rounded-full object-cover text-gray-300"/>
+                )}
                 <span
                   className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${friend.online ? "bg-green-500" : "bg-gray-400"
                     }`}></span>

@@ -28,11 +28,20 @@ export default function SidebarRight({ onOpenChat }) {
             className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer"
             onClick={() => onOpenChat(friend)}
           >
-            <img
+            {/* <img
               src={friend.profilePicture || "/default-avatar.png"}
               alt="Avatar"
               className="w-10 h-10 rounded-full object-cover"
-            />
+            /> */}
+            {friend.profilePicture != null ? (
+              <img
+                src={friend.profilePicture}
+                alt="avatar"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <FaUserCircle className="w-10 h-10 rounded-full object-cover text-gray-300"/>
+            )}
             <span className="text-sm">{`${friend.firstName} ${friend.lastName}`}</span>
             <span
               className={`w-2 h-2 rounded-full ml-auto ${friend.online ? "bg-green-500" : ""

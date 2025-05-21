@@ -12,45 +12,85 @@ export default function RegisterPage() {
   const [dob, setDob] = useState({ day: "", month: "", year: "" });
   const navigate = useNavigate();
 
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  // const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
   const months = [
     "01", "02", "03", "04", "05", "06",
     "07", "08", "09", "10", "11", "12"
   ];
   const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
 
+  // const handleRegister = (e) => {
+  //   e.preventDefault();
+  
+  //   // Kiểm tra xem các trường có hợp lệ không
+  //   // if (!firstName || !lastName || !email || !password || !gender || !dob.day || !dob.month || !dob.year) {
+  //   //   alert("Vui lòng điền đầy đủ thông tin.");
+  //   //   return;
+  //   // }
+  
+  //   // Tạo đối tượng user từ dữ liệu người dùng
+  //   const gd = null;
+  //   switch(gender) {
+  //     case 'Nam': gd = 'MALE'; break;
+  //     case 'Nữ' : gd = 'FEMALE'; break;
+  //     case 'Tuỳ chỉnh': gd = 'UNDEFINED'; break;
+  //     default:  break;
+  //   }
+  //   const userData = {
+  //     firstName,
+  //     lastName,
+  //     email,
+  //     password,
+  //     gd,
+  //     birthday: `${dob.year}-${dob.month}-${dob.day}`, // Chuẩn hóa ngày sinh
+  //   };
+  
+  //   // Gửi dữ liệu đến API sử dụng axiosClient
+  //   axiosClient
+  //     .post('/auth/register', userData)  // URL đã được cấu hình baseURL
+  //     .then((response) => {
+  //       alert("Đăng ký thành công!"); 
+  //       navigate("/login"); // Điều hướng tới trang đăng nhập
+  //     })
+  //     .catch((error) => {
+  //       alert("Đăng ký thất bại, vui lòng thử lại sau.");
+  //       console.error("Đăng ký thất bại: ", error);
+  //     });
+  // };
   const handleRegister = (e) => {
     e.preventDefault();
   
-    // Kiểm tra xem các trường có hợp lệ không
-    // if (!firstName || !lastName || !email || !password || !gender || !dob.day || !dob.month || !dob.year) {
-    //   alert("Vui lòng điền đầy đủ thông tin.");
-    //   return;
-    // }
-  
-    // Tạo đối tượng user từ dữ liệu người dùng
+    let gd = null;
+    switch(gender) {
+      case 'Nam': gd = 'MALE'; break;
+      case 'Nữ': gd = 'FEMALE'; break;
+      case 'Tùy chỉnh': gd = 'UNDEFINED'; break;
+      default: break;
+    }
+
     const userData = {
       firstName,
       lastName,
-      email,
+      emailOrPhone: email,
       password,
-      gender,
+      gender: gd, // Đảm bảo rằng giá trị giới tính là hợp lệ
       birthday: `${dob.year}-${dob.month}-${dob.day}`, // Chuẩn hóa ngày sinh
     };
-  
+    console.log("userData: ", userData);
     // Gửi dữ liệu đến API sử dụng axiosClient
     axiosClient
-      .post('/auth/register', userData)  // URL đã được cấu hình baseURL
+      .post('/auth/register', userData)
       .then((response) => {
         alert("Đăng ký thành công!"); 
-        navigate("/login"); // Điều hướng tới trang đăng nhập
+        navigate("/login");
       })
       .catch((error) => {
         alert("Đăng ký thất bại, vui lòng thử lại sau.");
         console.error("Đăng ký thất bại: ", error);
       });
-  };
-
+};
+  // console.log('gender: ', gender);
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4">
       <h1 className="text-blue-600 text-5xl font-bold mb-6">facebook</h1>
@@ -170,7 +210,6 @@ export default function RegisterPage() {
                 value={customGender}
                 onChange={(e) => setCustomGender(e.target.value)}
                 className="w-full border px-3 py-2 rounded-md text-sm mt-2"
-                
               />
             )}
           </div>

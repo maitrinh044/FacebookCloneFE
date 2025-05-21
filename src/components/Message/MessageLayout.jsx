@@ -4,6 +4,7 @@ import SendMessageForm from "./SendMessageForm";
 import { useChatSocket } from "../../utils/useChatSocket";
 import { addNewMessage } from "../../services/MessageService";
 import { useStomp } from "../../contexts/StompContext";
+import { FaUserCircle } from "react-icons/fa";
 
 export default function MessageLayout({
   chatList,
@@ -85,11 +86,20 @@ export default function MessageLayout({
               onClick={() => onSelectChat(chat)}
             >
               <div className="relative">
-                <img
+                {/* <img
                   src={chat.avatar || "https://placehold.co/40x40"}
                   alt={chat.name}
                   className="w-10 h-10 rounded-full object-cover"
-                />
+                /> */}
+                {chat.profilePicture != null ? (
+                  <img
+                    src={chat.profilePicture}
+                    alt="avatar"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaUserCircle className="w-10 h-10 rounded-full object-cover text-gray-300"/>
+                )}
                 <span
                   className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border border-white ${chat.user.online ? "bg-green-500" : "bg-gray-400"
                     }`}></span>

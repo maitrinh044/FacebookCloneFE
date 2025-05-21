@@ -1,6 +1,6 @@
 // src/components/ChatHeader.jsx
 import React, { useState, useRef, useEffect } from "react";
-import { FaPhoneAlt, FaVideo, FaEllipsisV, FaBellSlash, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPhoneAlt, FaVideo, FaEllipsisV, FaBellSlash, FaEdit, FaTrash, FaUserCircle } from "react-icons/fa";
 
 const ChatHeader = ({ chatUser }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -23,11 +23,16 @@ const ChatHeader = ({ chatUser }) => {
     <div className="flex items-center justify-between gap-4 p-4 border-b bg-white shadow-sm rounded-t-xl relative">
       {/* Avatar + Info */}
       <div className="flex items-center gap-4">
-        <img
-          src={chatUser.avatar || "https://placehold.co/40x40"}
-          alt="avatar"
-          className="w-10 h-10 rounded-full object-cover"
-        />
+        {chatUser.profilePicture != null ? (
+          <img
+            src={chatUser.profilePicture}
+            alt="avatar"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+        ) : (
+          <FaUserCircle className="w-10 h-10 rounded-full object-cover text-gray-300"/>
+        )}
+        
         <div>
           <div className="font-semibold text-lg">{chatUser.user.firstName} {chatUser.user.lastName}</div>
           <div className="text-sm text-gray-500 flex items-center gap-2">
