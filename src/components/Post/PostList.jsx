@@ -55,8 +55,8 @@ export default function PostList() {
     fetchPosts(); // Gọi hàm fetchPosts khi component mount
   }, [id]); // Chỉ gọi một lần khi component mount
 
-  console.log('reactionByPost: ', reactionByPost);
-  console.log('reactionByUser: ', reactionByUser);
+  // console.log('reactionByPost: ', reactionByPost);
+  // console.log('reactionByUser: ', reactionByUser);
   // function getReactionByPost(postId) {
   //   const reaction = reactionByPost.find(e => e.postId == postId);
   //   return reaction || [];
@@ -65,8 +65,8 @@ export default function PostList() {
     const reaction = reactionByPost.find(e => e.postId == postId);
     return reaction ? reaction.reactions : []; // Trả về mảng rỗng nếu không tìm thấy phản ứng
   }
-  console.log('reactionByPost in id = 2: ', getReactionByPost(2).reactions != [] ? getReactionByPost(2).reactions : []);
-  console.log('reactionByPost in id = 6: ', getReactionByPost(6).reactions != [] ? getReactionByPost(6).reactions : []);
+  // console.log('reactionByPost in id = 2: ', getReactionByPost(2).reactions != [] ? getReactionByPost(2).reactions : []);
+  // console.log('reactionByPost in id = 6: ', getReactionByPost(6).reactions != [] ? getReactionByPost(6).reactions : []);
   // Hàm xử lý khi tạo bài viết mới
   const handlePostCreated = async (newPost) => {
     try {

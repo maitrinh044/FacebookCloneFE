@@ -73,7 +73,7 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
   const panelWidth = 320;
   const spacing = 16;
   const rightOffset = positionOffset * (panelWidth + spacing);
-
+  console.log('friend: ', friend);
   return (
     <>
       {location.pathname !== "/messages" && (

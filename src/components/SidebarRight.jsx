@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 export default function SidebarRight({ onOpenChat }) {
   const { friends, loading, error } = useFetchUserFriends();
-  console.log('friends: ', friends);
+  console.log('friends in sidebarright: ', friends);
   let sortedFriends = [];
   const { onlineUsers } = ["1"];
 
@@ -21,8 +21,8 @@ export default function SidebarRight({ onOpenChat }) {
   return (
     <div className="w-64 pt-20 px-4 bg-white min-h-screen border-l border-gray-300 rounded-[10px]">
       <h3 className="text-sm font-semibold mb-4 text-gray-500">Người liên hệ</h3>
-      <ul className="space-y-3">
-        {(friends.length <= 0 || friends == undefined)? (
+      {/* <ul className="space-y-3"> */}
+        {(friends.length > 0 )? (
           <div className="space-y-3">
             {friends.map((friend, index) => (
           <li
@@ -57,7 +57,7 @@ export default function SidebarRight({ onOpenChat }) {
           <div></div>
         )}
         
-      </ul>
+      {/* </ul> */}
     </div>
   );
 }
