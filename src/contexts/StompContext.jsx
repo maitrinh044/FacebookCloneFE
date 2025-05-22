@@ -13,10 +13,14 @@ export const StompProvider = ({ children }) => {
     if (client && (client.active || client.connected)) return;
 
     userIdRef.current = userId;
+    const accessToken = localStorage.getItem("accessToken");
 
     const stompClient = new Client({
       brokerURL: "ws://localhost:8080/ws",
       reconnectDelay: 5000,
+      connectHeaders: {
+        Authorization: `Bearer ${accessToken}`,
+      },
       onConnect: () => {
         console.log("✅ STOMP connected");
         setConnected(true);
@@ -38,6 +42,7 @@ export const StompProvider = ({ children }) => {
         console.error("WebSocket error:", error);
       },
     });
+
 
     stompClient.activate();
     setClient(stompClient);

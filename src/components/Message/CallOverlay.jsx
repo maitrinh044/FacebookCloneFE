@@ -1,29 +1,59 @@
-// src/components/CallOverlay.jsx
-import { FaPhoneSlash } from "react-icons/fa";
+// CallOverlay.jsx
+import React, { useRef, useEffect } from "react";
+import { FaPhoneSlash, FaVideo, FaMicrophone } from "react-icons/fa";
 
-export default function CallOverlay({ friendName, avatarUrl, onEndCall, isVideo = false }) {
+export default function CallOverlay({ friend, isVideo, localStream, remoteStream, onEndCall }) {
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
+
+  // Gán stream vào video element khi có thay đổi
+  useEffect(() => {
+    if (isVideo) {
+      if (localVideoRef.current && localStream) {
+        localVideoRef.current.srcObject = localStream;
+      }
+      if (remoteVideoRef.current && remoteStream) {
+        remoteVideoRef.current.srcObject = remoteStream;
+      }
+    }
+  }, [localStream, remoteStream, isVideo]);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex flex-col items-center justify-center text-white">
-      {/* Avatar người nhận cuộc gọi */}
-      <img
-        src={avatarUrl || "https://scontent.fsgn5-6.fna.fbcdn.net/v/t39.30808-6/458161522_2243394162660512_7913931544320209269_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeFE4H0KfJHUauSeB90nsw9jIBJwHuSktOAgEnAe5KS04F5KUxSkb8DlPyoPUcf2mlb9fV6MzqCuAtSLoc7Ay6-A&_nc_ohc=CXoMMnzvULoQ7kNvgEh0ypF&_nc_oc=Adhd1HcZH8ihnu0nOpaHQL9P6zFJqIzADQy2tSGyfmQKeSJV_6Hkf7Xvt4OoxnzJG3Y&_nc_zt=23&_nc_ht=scontent.fsgn5-6.fna&_nc_gid=AQR7ZI_aDJOrecOKCXIigMN&oh=00_AYGQ7t7qCRDcZNQEIHRWgbCoYPYdNv04Mz2JyaDNxAK61w&oe=67D6AB59"}
-        alt="Avatar"
-        className="w-28 h-28 rounded-full border-4 border-white mb-4 animate-pulse"
-      />
+    <div className="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center z-50 p-4 text-white">
+      <h2 className="text-2xl mb-4">{friend?.firstName || "Bạn"}</h2>
 
-      {/* Tên và trạng thái */}
-      <h2 className="text-2xl font-bold">{friendName}</h2>
-      <p className="text-sm text-gray-300 mb-6">
-        {isVideo ? "Đang gọi video..." : "Đang gọi thoại..."}
-      </p>
+      {isVideo ? (
+        <div className="flex gap-4">
+          {/* Remote video */}
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className="w-96 h-72 rounded-lg bg-gray-900"
+          />
+          {/* Local video nhỏ */}
+          <video
+            ref={localVideoRef}
+            autoPlay
+            muted
+            playsInline
+            className="w-32 h-24 rounded-lg bg-gray-700 border-2 border-white"
+          />
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-4">
+          <FaMicrophone size={80} className="text-green-400" />
+          <p>Cuộc gọi thoại đang diễn ra...</p>
+        </div>
+      )}
 
-      {/* Nút kết thúc cuộc gọi */}
       <button
         onClick={onEndCall}
-        className="flex items-center gap-2 px-5 py-2 bg-red-600 hover:bg-red-700 rounded-full transition"
+        className="mt-6 bg-red-600 hover:bg-red-700 rounded-full p-4 flex items-center gap-2"
+        title="Kết thúc cuộc gọi"
       >
-        <FaPhoneSlash />
-        Kết thúc cuộc gọi
+        <FaPhoneSlash size={20} />
+        <span>Kết thúc</span>
       </button>
     </div>
   );

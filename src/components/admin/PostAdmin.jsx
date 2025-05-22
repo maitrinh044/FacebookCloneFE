@@ -42,7 +42,6 @@ export default function ({}) {
     };
     fetchPosts();
     }, [currentUserId]);
-    console.log('listPost: ', listPost);
     function formatDateString(dateString) {
         const date = new Date(dateString);
         
@@ -122,9 +121,6 @@ export default function ({}) {
         const post = commentByPost.find(e => e.postId == postid);
         return post || [];
     }
-
-    console.log('commentByPost: ', commentByPost);
-    console.log('commentByPost in 1: ', getListCmtByPost(1));
 
     /////////
     return (
