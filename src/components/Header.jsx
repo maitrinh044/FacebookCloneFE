@@ -125,7 +125,7 @@ export default function Header() {
         >
           <FaUsers className="text-2xl" />
         </Link>
-        <Link
+        {/* <Link
           to="/watch"
           className={`p-2 rounded-md ${location.pathname === "/watch" ? "text-blue-600 border-b-4 border-blue-600" : "text-gray-700 hover:bg-gray-100"}`}
         >
@@ -136,7 +136,7 @@ export default function Header() {
           className={`p-2 rounded-md ${location.pathname === "/marketplace" ? "text-blue-600 border-b-4 border-blue-600" : "text-gray-700 hover:bg-gray-100"}`}
         >
           <FaStore className="text-2xl" />
-        </Link>
+        </Link> */}
         {user && user.role && user.role.id === 1 && (
           <Link
             to="/admin"

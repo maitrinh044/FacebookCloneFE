@@ -65,7 +65,7 @@ export default function SidebarLeft() {
             <span>Bạn bè</span>
           </div>
         </li>
-        <li>
+        {/* <li>
           <div onClick={() => navigate("/watch")}
                className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md transition cursor-pointer">
             <FaVideo className="text-blue-600" />
@@ -78,7 +78,7 @@ export default function SidebarLeft() {
             <FaStore className="text-blue-600" />
             <span>Marketplace</span>
           </div>
-        </li>
+        </li> */}
         {currentUser.role.id == 1 && (
           <li>
             <div onClick={() => navigate("/admin")}
