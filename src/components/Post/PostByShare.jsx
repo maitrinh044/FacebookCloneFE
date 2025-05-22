@@ -221,15 +221,15 @@ export default function PostByShare({ posts, reactionByPost, reactionByUser, con
     return comments.map((cmt, cmtIndex) => (
       <div key={cmtIndex} className={`flex gap-3 p-2 hover:bg-gray-50 rounded-lg ${level > 0 ? 'ml-8' : ''}`}>
         <div className="w-10 h-10 flex-shrink-0">
-          {cmt.userId?.profilePicture ? (
-            <img src={cmt.userId.profilePicture} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
+          {getUserById(cmt.userId).profilePicture ? (
+            <img src={getUserById(cmt.userId).profilePicture} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
           ) : (
             <FaUserCircle className="w-10 h-10 text-gray-300" />
           )}
         </div>
         <div className="flex-1">
           <div className="bg-gray-100 rounded-2xl px-4 py-2">
-            <p className="font-semibold text-gray-800 text-sm">{cmt.userId?.firstName} {cmt.userId?.lastName}</p>
+            <p className="font-semibold text-gray-800 text-sm">{getUserById(cmt.userId).firstName} {getUserById(cmt.userId).lastName}</p>
             <p className="text-gray-700 text-sm">{cmt.content}</p>
           </div>
           <div className="flex items-center gap-4 mt-1 px-2">
