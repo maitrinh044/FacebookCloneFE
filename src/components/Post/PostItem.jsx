@@ -509,6 +509,8 @@ export default function PostItem({ post, reactionByPost, reactionByUser, control
                   </div>
                   <div className="flex gap-1">
                     <FaShare className="relative top-[3px] text-gray-300" />
+                    {countShare.count || 0}
+
                   </div>
                 </div>
               </div>
