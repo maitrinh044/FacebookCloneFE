@@ -9,7 +9,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useStomp } from "./contexts/StompContext";
 import { useChatSocket } from "./utils/useChatSocket";
-import { getUserById } from "./services/UserService";
+import { getUserById } from "./services/userService.jsx";
+import { CallProvider } from "./contexts/CallContext"; 
+import CallModalWrapper from "./components/Message/CallModalWrapper.jsx";
 
 function MainApp() {
 
@@ -72,7 +74,7 @@ function MainApp() {
       <ScrollToTop />
       <AppRouter onOpenChat={handleOpenChat} />
       <div className="fixed bottom-4 right-4 flex gap-4">
-        {openChats && openChats.map((chat, index) => 
+        {openChats && openChats.map((chat, index) =>
           <MessagePanel
             key={chat.id}
             friend={chat}
@@ -89,7 +91,10 @@ function MainApp() {
 export default function App() {
   return (
     <LoadingProvider>
-      <MainApp />
+      <CallProvider>
+        <MainApp />
+        <CallModalWrapper />
+      </CallProvider>
       <ToastContainer
         position="top-right"
         autoClose={1000}

@@ -5,6 +5,7 @@ import { addNewMessage } from "../../services/MessageService";
 import { useLocation } from "react-router-dom";
 import { getMessageList } from '../../services/MessageService';
 import { useChatSocket } from "../../utils/useChatSocket";
+import { useCall } from "../../contexts/CallContext";
 
 import {
   FaChevronDown,
@@ -14,16 +15,13 @@ import {
   FaPhone,
   FaVideo,
   FaUserCircle,
+  FaSignal,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import CallModal from "../Message/CallModal";
-import CallOverlay from "../Message/CallOverlay";
 
 export default function MessagePanel({ friend, onClose, positionOffset, currentUserId }) {
   const navigate = useNavigate();
   const [isMinimized, setIsMinimized] = useState(false);
-  const [callType, setCallType] = useState(null);
-  const [callInfo, setCallInfo] = useState(null);
   const scrollRef = useRef(null);
 
   const inputRef = useRef(null);
@@ -36,9 +34,9 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
   const { sendMessage } = useChatSocket({
     userId: currentUserId,
     onMessageReceived: (msg) => {
-      setMessageList((prevMessages) => [...prevMessages, msg]); // Cập nhật UI
+      setMessageList((prevMessages) => [...prevMessages, msg]);
     },
-  });  
+  });
 
   const fetchMessages = async () => {
     try {
@@ -48,13 +46,6 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
       console.error("Lỗi khi fetch messages:", e);
     }
   };
-
-  useEffect(() => {
-    if (currentUserId && receiverId) {
-      fetchMessages();
-    }
-  }, [currentUserId, receiverId]);
-
 
   const handleSendMessage = async (msgObj) => {
     try {
@@ -68,7 +59,33 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
     }
   };
 
-  const handleEndCall = () => setCallInfo(null);
+  useEffect(() => {
+    if (currentUserId && receiverId) {
+      fetchMessages();
+    }
+  }, [currentUserId, receiverId]);
+
+
+  const {
+    incomingSignal,
+    callInfo,
+    startCall,
+    acceptCall,
+    rejectCall,
+    endCall,
+    localStream,
+    remoteStream,
+  } = useCall();
+
+  const isCaller = callInfo?.caller?.id === currentUserId;
+
+  const handleCall = (type) => {
+    startCall(friend, type); // hoặc "voice"
+  };
+
+  console.log("incomingSignal:", incomingSignal);
+  console.log("callInfo:", callInfo);
+  console.log("incomingSignal typeof", typeof incomingSignal, incomingSignal);
 
   const panelWidth = 320;
   const spacing = 16;
@@ -92,7 +109,7 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
-                  <FaUserCircle className="w-10 h-10 rounded-full object-cover text-gray-300"/>
+                  <FaUserCircle className="w-10 h-10 rounded-full object-cover text-gray-300" />
                 )}
                 <span
                   className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${friend.online ? "bg-green-500" : "bg-gray-400"
@@ -118,9 +135,6 @@ export default function MessagePanel({ friend, onClose, positionOffset, currentU
               </button>
             </div>
           </div>
-
-          {callType && <CallModal type={callType} friendName={friend.firstName} onClose={() => setCallType(null)} />}
-          {callInfo && <CallOverlay friendName={callInfo.friendName} avatarUrl={callInfo.avatarUrl} isVideo={callInfo.type === "video"} onEndCall={handleEndCall} />}
 
           {!isMinimized && (
             <>
